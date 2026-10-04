@@ -1,0 +1,44 @@
+﻿@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.LinhVuc
+
+@{
+    ViewData["Title"] = "Chi tiết lĩnh vực";
+}
+
+<h2>Chi tiết lĩnh vực</h2>
+
+<div class="card">
+    <div class="card-body">
+
+        <div class="mb-3">
+            <strong>Mã lĩnh vực:</strong>
+            @Model.MaLinhVuc
+        </div>
+
+        <div class="mb-3">
+            <strong>Tên lĩnh vực:</strong>
+            @Model.TenLinhVuc
+        </div>
+
+        <div class="mb-3">
+            <strong>Mô tả:</strong>
+            @Model.MoTa
+        </div>
+
+        <div class="mb-3">
+            <strong>Trạng thái:</strong>
+            @(Model.TrangThai ? "Hoạt động" : "Ngừng hoạt động")
+        </div>
+
+        <a asp-action="Edit"
+           asp-route-id="@Model.MaLinhVuc"
+           class="btn btn-warning">
+            Sửa
+        </a>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Quay lại
+        </a>
+
+    </div>
+</div>

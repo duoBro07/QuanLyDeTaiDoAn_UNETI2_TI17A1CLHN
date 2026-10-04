@@ -1,0 +1,65 @@
+﻿@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.LinhVuc
+
+@{
+    ViewData["Title"] = "Sửa lĩnh vực";
+}
+
+<h2>Sửa lĩnh vực</h2>
+
+<form asp-action="Edit" method="post">
+
+    <input type="hidden" asp-for="MaLinhVuc" />
+
+    <div asp-validation-summary="ModelOnly"
+         class="text-danger mb-3">
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="TenLinhVuc"
+               class="form-label"></label>
+
+        <input asp-for="TenLinhVuc"
+               class="form-control" />
+
+        <span asp-validation-for="TenLinhVuc"
+              class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="MoTa"
+               class="form-label"></label>
+
+        <textarea asp-for="MoTa"
+                  class="form-control"
+                  rows="4">
+        </textarea>
+
+        <span asp-validation-for="MoTa"
+              class="text-danger"></span>
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="TrangThai"
+               class="form-check-input" />
+
+        <label asp-for="TrangThai"
+               class="form-check-label">
+            Hoạt động
+        </label>
+    </div>
+
+    <button type="submit"
+            class="btn btn-primary">
+        Lưu thay đổi
+    </button>
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        Quay lại
+    </a>
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

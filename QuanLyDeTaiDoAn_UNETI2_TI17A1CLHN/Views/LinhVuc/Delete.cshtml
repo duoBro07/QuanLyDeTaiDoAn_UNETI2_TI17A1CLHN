@@ -1,0 +1,40 @@
+﻿@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.LinhVuc
+
+@{
+    ViewData["Title"] = "Xóa lĩnh vực";
+}
+
+<h2>Xóa lĩnh vực</h2>
+
+<div class="alert alert-warning">
+    Bạn có chắc muốn xóa lĩnh vực này không?
+</div>
+
+<div class="mb-3">
+    <strong>Mã lĩnh vực:</strong>
+    @Model.MaLinhVuc
+</div>
+
+<div class="mb-3">
+    <strong>Tên lĩnh vực:</strong>
+    @Model.TenLinhVuc
+</div>
+
+<div class="mb-3">
+    <strong>Mô tả:</strong>
+    @Model.MoTa
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="MaLinhVuc" />
+
+    <button type="submit"
+            class="btn btn-danger">
+        Xác nhận xóa
+    </button>
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        Hủy
+    </a>
+</form>

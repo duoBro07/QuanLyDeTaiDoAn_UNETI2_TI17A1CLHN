@@ -1,0 +1,60 @@
+﻿@model IEnumerable<QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.LinhVuc>
+
+@{
+    ViewData["Title"] = "Quản lý lĩnh vực";
+}
+
+<h2>Quản lý lĩnh vực</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">
+        Thêm lĩnh vực
+    </a>
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Mã</th>
+            <th>Tên lĩnh vực</th>
+            <th>Mô tả</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.MaLinhVuc</td>
+                <td>@item.TenLinhVuc</td>
+                <td>@item.MoTa</td>
+                <td>
+                    @(item.TrangThai ? "Hoạt động" : "Ngừng hoạt động")
+                </td>
+
+                <td>
+                    <a asp-action="Details"
+                       asp-route-id="@item.MaLinhVuc">
+                        Chi tiết
+                    </a>
+
+                    |
+
+                    <a asp-action="Edit"
+                       asp-route-id="@item.MaLinhVuc">
+                        Sửa
+                    </a>
+
+                    |
+
+                    <a asp-action="Delete"
+                       asp-route-id="@item.MaLinhVuc">
+                        Xóa
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
