@@ -29,4 +29,4 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
 
         public bool TrangThai { get; set; } = true;
     }
-}
+}  
