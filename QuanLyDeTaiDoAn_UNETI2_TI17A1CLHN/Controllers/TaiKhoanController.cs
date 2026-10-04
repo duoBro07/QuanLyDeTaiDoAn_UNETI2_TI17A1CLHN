@@ -83,5 +83,9 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
 
             return RedirectToAction("Login");
         }
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
     }
 }

@@ -35,7 +35,13 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Filters
             // Đã đăng nhập nhưng không đúng quyền
             if (_vaiTro != null && vaiTro != _vaiTro)
             {
-                context.Result = new ForbidResult();
+                context.Result = new RedirectToActionResult(
+                    "AccessDenied",
+                    "TaiKhoan",
+                    null
+                );
+
+                return;
             }
         }
     }
