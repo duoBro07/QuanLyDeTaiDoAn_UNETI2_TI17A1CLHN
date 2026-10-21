@@ -1,0 +1,196 @@
+@model QuanLyDeTaiDoAn.Models.DeTai
+
+@{
+    ViewData["Title"] = "Sửa đề tài";
+}
+
+<div class="content-card">
+    <div class="p-4">
+
+        <h2 class="page-title mb-4">
+            Cập nhật đề tài
+        </h2>
+
+        <form asp-action="Edit" method="post">
+
+            <input type="hidden"
+                   asp-for="MaDeTai" />
+
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-danger">
+            </div>
+
+            <div class="row g-3">
+
+                <div class="col-md-8">
+                    <label asp-for="TenDeTai"
+                           class="form-label fw-semibold">
+                        Tên đề tài *
+                    </label>
+
+                    <input asp-for="TenDeTai"
+                           class="form-control" />
+
+                    <span asp-validation-for="TenDeTai"
+                          class="text-danger small">
+                    </span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="MaLinhVuc"
+                           class="form-label fw-semibold">
+                        Lĩnh vực *
+                    </label>
+
+                    <select asp-for="MaLinhVuc"
+                            asp-items="ViewBag.MaLinhVuc"
+                            class="form-select">
+                    </select>
+
+                    <span asp-validation-for="MaLinhVuc"
+                          class="text-danger small">
+                    </span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="MoTa"
+                           class="form-label fw-semibold">
+                        Mô tả
+                    </label>
+
+                    <textarea asp-for="MoTa"
+                              class="form-control"
+                              rows="4">
+                    </textarea>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="YeuCau"
+                           class="form-label fw-semibold">
+                        Yêu cầu
+                    </label>
+
+                    <textarea asp-for="YeuCau"
+                              class="form-control"
+                              rows="4">
+                    </textarea>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="SoSinhVienToiDa"
+                           class="form-label fw-semibold">
+                        Số SV tối đa *
+                    </label>
+
+                    <input asp-for="SoSinhVienToiDa"
+                           type="number"
+                           min="1"
+                           class="form-control" />
+
+                    <span asp-validation-for="SoSinhVienToiDa"
+                          class="text-danger small">
+                    </span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="NamHoc"
+                           class="form-label fw-semibold">
+                        Năm học *
+                    </label>
+
+                    <input asp-for="NamHoc"
+                           class="form-control" />
+
+                    <span asp-validation-for="NamHoc"
+                          class="text-danger small">
+                    </span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="HocKy"
+                           class="form-label fw-semibold">
+                        Học kỳ *
+                    </label>
+
+                    <select asp-for="HocKy"
+                            class="form-select">
+
+                        <option value="1">
+                            Học kỳ 1
+                        </option>
+
+                        <option value="2">
+                            Học kỳ 2
+                        </option>
+
+                        <option value="3">
+                            Học kỳ 3
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="HocKy"
+                          class="text-danger small">
+                    </span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="TrangThai"
+                           class="form-label fw-semibold">
+                        Trạng thái *
+                    </label>
+
+                    <select asp-for="TrangThai"
+                            class="form-select">
+
+                        <option value="Mở đăng ký">
+                            Mở đăng ký
+                        </option>
+
+                        <option value="Đủ số lượng">
+                            Đủ số lượng
+                        </option>
+
+                        <option value="Tạm khóa">
+                            Tạm khóa
+                        </option>
+
+                        <option value="Kết thúc">
+                            Kết thúc
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="TrangThai"
+                          class="text-danger small">
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="d-flex justify-content-end
+                gap-2 mt-4 pt-3 border-top">
+
+                <a asp-action="Index"
+                   class="btn btn-light border px-4">
+                    Hủy
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary px-4">
+                    Lưu thay đổi
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync(
+            "_ValidationScriptsPartial");
+    }
+}

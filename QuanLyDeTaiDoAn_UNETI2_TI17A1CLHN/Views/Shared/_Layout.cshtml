@@ -1,0 +1,577 @@
+﻿@{
+    var currentController =
+        ViewContext.RouteData.Values["controller"]?.ToString();
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @ViewData["Title"] - Quản lý đề tài đồ án
+    </title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <style>
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                background: #f4f7fb;
+                font-family: Arial, Helvetica, sans-serif;
+                color: #263238;
+            }
+
+            /* =========================
+                       HEADER
+                    ========================= */
+
+            .top-header {
+                height: 92px;
+                background: linear-gradient( 90deg, #0755a5, #0876d1 );
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 22px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+            }
+
+            .header-left {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+            }
+
+            .logo-box {
+                width: 62px;
+                height: 62px;
+                background: white;
+                border-radius: 50%;
+                color: #0866bd;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 30px;
+            }
+
+            .header-title h3 {
+                margin: 0;
+                font-size: 28px;
+                font-weight: 700;
+            }
+
+            .header-title small {
+                font-size: 15px;
+                opacity: .95;
+            }
+
+            .admin-box {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            }
+
+            .admin-label {
+                border: 1px solid rgba(255,255,255,.8);
+                padding: 9px 18px;
+                border-radius: 9px;
+                font-size: 14px;
+            }
+
+            .admin-user {
+                display: flex;
+                align-items: center;
+                gap: 9px;
+                font-size: 16px;
+            }
+
+            /* =========================
+                       SIDEBAR
+                    ========================= */
+
+            .sidebar {
+                position: fixed;
+                top: 92px;
+                left: 0;
+                bottom: 0;
+                width: 254px;
+                background: #0c467c;
+                padding-top: 13px;
+                overflow-y: auto;
+                z-index: 900;
+            }
+
+            .sidebar-brand {
+                color: white;
+                font-size: 14px;
+                padding: 17px 18px 23px;
+                opacity: .95;
+            }
+
+                .sidebar-brand i {
+                    margin-right: 8px;
+                }
+
+            .sidebar a {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                color: #ffffff;
+                text-decoration: none;
+                padding: 17px 20px;
+                font-size: 16px;
+                border-left: 4px solid transparent;
+                transition: .2s;
+            }
+
+                .sidebar a:hover {
+                    background: #155b98;
+                    color: white;
+                }
+
+                /*
+                       MENU ĐANG ĐƯỢC CHỌN
+                    */
+                .sidebar a.active {
+                    background: #087ddd;
+                    border-left-color: #ffffff;
+                    color: #ffffff;
+                    font-weight: 600;
+                }
+
+            .sidebar i {
+                width: 20px;
+                text-align: center;
+            }
+
+            /* =========================
+                       MAIN CONTENT
+                    ========================= */
+
+            .main-content {
+                margin-left: 254px;
+                padding: 123px 28px 35px;
+                min-height: 100vh;
+            }
+
+            /* =========================
+                       CARD
+                    ========================= */
+
+            .content-card {
+                background: white;
+                border: 1px solid #dfe7ef;
+                border-radius: 9px;
+                box-shadow: 0 2px 8px rgba(0,0,0,.06);
+                overflow: hidden;
+            }
+
+            /* =========================
+                       TITLE
+                    ========================= */
+
+            .page-title {
+                font-size: 27px;
+                font-weight: 700;
+                color: #172b4d;
+                margin: 0;
+            }
+
+            /* =========================
+                       BUTTON
+                    ========================= */
+
+            .btn-main {
+                background: #0878e5;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                padding: 10px 17px;
+                font-size: 14px;
+            }
+
+                .btn-main:hover {
+                    background: #0565c3;
+                    color: white;
+                }
+
+            /* =========================
+                       INPUT
+                    ========================= */
+
+            .form-control,
+            .form-select {
+                font-size: 14px;
+                min-height: 43px;
+            }
+
+            /* =========================
+                       TABLE
+                    ========================= */
+
+            .table {
+                font-size: 14px;
+            }
+
+                .table thead th {
+                    background: #f7f9fc;
+                    color: #42526e;
+                    font-size: 13px;
+                    border-bottom: 1px solid #dfe3e8;
+                    white-space: nowrap;
+                    padding-top: 14px;
+                    padding-bottom: 14px;
+                }
+
+                .table td {
+                    vertical-align: middle;
+                    padding-top: 13px;
+                    padding-bottom: 13px;
+                }
+
+            /* =========================
+                       STATUS
+                    ========================= */
+
+            .status-active {
+                display: inline-block;
+                background: #d9f8e5;
+                color: #168344;
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            .status-stop {
+                display: inline-block;
+                background: #fff0dc;
+                color: #e27416;
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            /* =========================
+                       ACTION BUTTON
+                    ========================= */
+
+            .action-btn {
+                border: 0;
+                background: transparent;
+                padding: 5px;
+                text-decoration: none;
+                font-size: 16px;
+            }
+
+            .action-edit {
+                color: #0878e5;
+            }
+
+            .action-info {
+                color: #12a0a0;
+            }
+
+            .action-delete {
+                color: #f44336;
+            }
+
+            .action-edit:hover {
+                color: #005bbb;
+            }
+
+            .action-info:hover {
+                color: #087b7b;
+            }
+
+            .action-delete:hover {
+                color: #c62828;
+            }
+
+            /* =========================
+                       PAGINATION
+                    ========================= */
+
+            .pagination .page-link {
+                font-size: 13px;
+            }
+
+            /* =========================
+                       RESPONSIVE
+                    ========================= */
+
+            @@media (max-width: 900px) {
+
+                .sidebar {
+                    width: 180px;
+                }
+
+                .main-content {
+                    margin-left: 180px;
+                }
+
+                .header-title h3 {
+                    font-size: 20px;
+                }
+
+                .header-title small {
+                    display: none;
+                }
+
+                .admin-label {
+                    display: none;
+                }
+            }
+
+    </style>
+
+    @await RenderSectionAsync(
+        "Styles",
+        required: false)
+
+</head>
+
+<body>
+
+    <!-- ======================================
+         HEADER
+    ======================================= -->
+
+    <header class="top-header">
+
+        <div class="header-left">
+
+            <div class="logo-box">
+                <i class="fa-solid fa-book-open"></i>
+            </div>
+
+            <div class="header-title">
+
+                <h3>
+                    Hệ thống Quản lý đề tài đồ án
+                </h3>
+
+                <small>
+                    Quản lý đề tài và phân công
+                    giảng viên hướng dẫn
+                </small>
+
+            </div>
+
+        </div>
+
+        <div class="admin-box">
+
+            <span class="admin-label">
+                Dành cho Admin
+            </span>
+
+            <div class="admin-user">
+
+                <i class="fa-solid
+                    fa-circle-user fs-3">
+                </i>
+
+                <span>
+                    Admin
+                </span>
+
+                <i class="fa-solid
+                    fa-chevron-down small">
+                </i>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- ======================================
+         SIDEBAR
+    ======================================= -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <i class="fa-solid fa-circle-dot"></i>
+
+            QuanLyDeTaiDoAn
+
+        </div>
+
+
+        <!-- TRANG CHỦ -->
+
+        <a asp-controller="Home"
+           asp-action="Index"
+           class="@(currentController == "Home"
+                               ? "active"
+                               : "")">
+
+            <i class="fa-solid fa-house"></i>
+
+            Trang chủ
+
+        </a>
+
+
+        <!-- TÀI KHOẢN -->
+
+        <a href="#">
+
+            <i class="fa-solid fa-user"></i>
+
+            Tài khoản
+
+        </a>
+
+
+        <!-- LĨNH VỰC -->
+
+        <a href="#">
+
+            <i class="fa-solid fa-layer-group"></i>
+
+            Lĩnh vực đề tài
+
+        </a>
+
+
+        <!-- GIẢNG VIÊN -->
+
+        <a asp-controller="GiangVien"
+           asp-action="Index"
+           class="@(currentController == "GiangVien"
+                               ? "active"
+                               : "")">
+
+            <i class="fa-solid fa-user-tie"></i>
+
+            Giảng viên
+
+        </a>
+
+
+        <!-- ĐỀ TÀI -->
+
+        <a asp-controller="DeTai"
+           asp-action="Index"
+           class="@(currentController == "DeTai"
+                               ? "active"
+                               : "")">
+
+            <i class="fa-solid fa-file-lines"></i>
+
+            Đề tài
+
+        </a>
+
+
+        <!-- ĐĂNG KÝ ĐỀ TÀI -->
+
+        <a href="#">
+
+            <i class="fa-solid fa-list-check"></i>
+
+            Đăng ký đề tài
+
+        </a>
+
+
+        <!-- DUYỆT ĐĂNG KÝ -->
+
+        <a href="#">
+
+            <i class="fa-solid fa-circle-check"></i>
+
+            Duyệt đăng ký
+
+        </a>
+
+
+        <!-- PHÂN CÔNG -->
+
+        <a href="#">
+
+            <i class="fa-solid fa-user-pen"></i>
+
+            Phân công giảng viên
+
+        </a>
+
+
+        <!-- THỐNG KÊ -->
+
+        <a href="#">
+
+            <i class="fa-solid fa-chart-column"></i>
+
+            Thống kê
+
+        </a>
+
+
+        <!-- CÀI ĐẶT -->
+
+        <a href="#">
+
+            <i class="fa-solid fa-gear"></i>
+
+            Cài đặt
+
+        </a>
+
+    </aside>
+
+
+    <!-- ======================================
+         NỘI DUNG
+    ======================================= -->
+
+    <main class="main-content">
+
+        @RenderBody()
+
+    </main>
+
+
+    <!-- ======================================
+         JAVASCRIPT
+    ======================================= -->
+
+    <script src="~/lib/jquery/dist/jquery.min.js">
+    </script>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    @await RenderSectionAsync(
+        "Scripts",
+        required: false)
+
+</body>
+
+</html>

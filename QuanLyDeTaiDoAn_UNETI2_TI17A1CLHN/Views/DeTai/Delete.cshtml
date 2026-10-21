@@ -1,0 +1,87 @@
+@model QuanLyDeTaiDoAn.Models.DeTai
+
+@{
+    ViewData["Title"] = "Xóa đề tài";
+}
+
+<div class="content-card">
+
+    <div class="p-4">
+
+        <h2 class="page-title text-danger mb-3">
+            Xóa đề tài
+        </h2>
+
+        <div class="alert alert-warning">
+            Bạn có chắc chắn muốn xóa đề tài này không?
+        </div>
+
+        <table class="table">
+
+            <tr>
+                <th style="width:220px">
+                    Mã đề tài
+                </th>
+
+                <td>
+                    @Model.MaDeTai
+                </td>
+            </tr>
+
+            <tr>
+                <th>Tên đề tài</th>
+                <td>@Model.TenDeTai</td>
+            </tr>
+
+            <tr>
+                <th>Lĩnh vực</th>
+
+                <td>
+                    @Model.LinhVuc?.TenLinhVuc
+                </td>
+            </tr>
+
+            <tr>
+                <th>Năm học</th>
+                <td>@Model.NamHoc</td>
+            </tr>
+
+            <tr>
+                <th>Học kỳ</th>
+                <td>@Model.HocKy</td>
+            </tr>
+
+            <tr>
+                <th>Trạng thái</th>
+                <td>@Model.TrangThai</td>
+            </tr>
+
+        </table>
+
+        <form asp-action="Delete"
+              method="post">
+
+            <input type="hidden"
+                   asp-for="MaDeTai" />
+
+            <div class="d-flex justify-content-end gap-2">
+
+                <a asp-action="Index"
+                   class="btn btn-light border">
+                    Hủy
+                </a>
+
+                <button type="submit"
+                        class="btn btn-danger">
+
+                    <i class="fa-solid fa-trash me-1"></i>
+                    Xóa đề tài
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>

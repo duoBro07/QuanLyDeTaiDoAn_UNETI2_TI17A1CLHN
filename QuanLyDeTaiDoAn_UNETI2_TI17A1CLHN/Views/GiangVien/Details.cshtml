@@ -1,0 +1,66 @@
+@model QuanLyDeTaiDoAn.Models.GiangVien
+
+@{
+    ViewData["Title"] = "Chi tiết giảng viên";
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">CHI TIẾT GIẢNG VIÊN</h2>
+
+    <table class="table table-bordered">
+
+        <tr>
+            <th style="width: 30%">Mã giảng viên</th>
+            <td>@Model.MaGiangVien</td>
+        </tr>
+
+        <tr>
+            <th>Họ tên</th>
+            <td>@Model.HoTen</td>
+        </tr>
+
+        <tr>
+            <th>Học vị</th>
+            <td>@Model.HocVi</td>
+        </tr>
+
+        <tr>
+            <th>Email</th>
+            <td>@Model.Email</td>
+        </tr>
+
+        <tr>
+            <th>Số điện thoại</th>
+            <td>@Model.SoDienThoai</td>
+        </tr>
+
+        <tr>
+            <th>Lĩnh vực</th>
+            <td>@Model.LinhVuc?.TenLinhVuc</td>
+        </tr>
+
+        <tr>
+            <th>Số sinh viên hướng dẫn tối đa</th>
+            <td>@Model.SoSinhVienHuongDanToiDa</td>
+        </tr>
+
+        <tr>
+            <th>Trạng thái</th>
+            <td>@Model.TrangThai</td>
+        </tr>
+
+    </table>
+
+    <a asp-action="Edit"
+       asp-route-id="@Model.MaGiangVien"
+       class="btn btn-warning">
+        Sửa
+    </a>
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        Quay lại
+    </a>
+
+</div>

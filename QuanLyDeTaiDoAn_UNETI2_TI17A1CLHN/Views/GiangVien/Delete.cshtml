@@ -1,0 +1,52 @@
+@model QuanLyDeTaiDoAn.Models.GiangVien
+
+@{
+    ViewData["Title"] = "Xóa giảng viên";
+}
+
+<div class="content-card p-4">
+
+    <h2 class="page-title text-danger">
+        Xóa giảng viên
+    </h2>
+
+    <p class="mt-3">
+        Bạn có chắc muốn xóa giảng viên
+        <strong>@Model.HoTen</strong>?
+    </p>
+
+    <table class="table">
+        <tr>
+            <th>Email</th>
+            <td>@Model.Email</td>
+        </tr>
+
+        <tr>
+            <th>Lĩnh vực</th>
+            <td>@Model.LinhVuc?.TenLinhVuc</td>
+        </tr>
+
+        <tr>
+            <th>Trạng thái</th>
+            <td>@Model.TrangThai</td>
+        </tr>
+    </table>
+
+    <form asp-action="Delete">
+
+        <input type="hidden"
+               asp-for="MaGiangVien" />
+
+        <a asp-action="Index"
+           class="btn btn-light border">
+            Hủy
+        </a>
+
+        <button type="submit"
+                class="btn btn-danger">
+            Xóa
+        </button>
+
+    </form>
+
+</div>
