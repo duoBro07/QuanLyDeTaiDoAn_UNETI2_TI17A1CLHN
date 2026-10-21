@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace QuanLyDeTaiDoAn.Data
@@ -12,7 +13,7 @@ namespace QuanLyDeTaiDoAn.Data
                 new DbContextOptionsBuilder<ApplicationDbContext>();
 
             optionsBuilder.UseSqlServer(
-                "Server=localhost;Database=QuanLyDoAnDB;Trusted_Connection=True;TrustServerCertificate=True;");
+                "Server=localhost;Database=QuanLyDoAn_Module2_Test;Trusted_Connection=True;TrustServerCertificate=True;");
 
             return new ApplicationDbContext(optionsBuilder.Options);
         }

@@ -1,3 +1,4 @@
+
 @model IEnumerable<QuanLyDeTaiDoAn.Models.DeTai>
 
 @{
@@ -15,96 +16,88 @@
     int ketThuc = Math.Min(
         trangHienTai * kichThuocTrang,
         tongBanGhi);
+
+    string[] trangThais =
+    {
+        "Mở đăng ký",
+        "Đủ số lượng",
+        "Tạm khóa",
+        "Kết thúc"
+    };
+
+    var sapXeps = new Dictionary<string, string>
+    {
+        { "", "Tên A → Z" },
+        { "ten_za", "Tên Z → A" },
+        { "sv_tang", "Số SV tối đa tăng dần" },
+        { "sv_giam", "Số SV tối đa giảm dần" },
+        { "cho_tang", "Số chỗ còn tăng dần" },
+        { "cho_giam", "Số chỗ còn giảm dần" }
+    };
+
+    var soDaDangKy =
+        ViewBag.SoDaDangKy as Dictionary<int, int>
+        ?? new Dictionary<int, int>();
 }
 
 <div class="content-card">
-
     <div class="p-3">
 
-        <div class="d-flex justify-content-between
-            align-items-center mb-3">
-
+        <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-                <h2 class="page-title">
-                    Quản lý đề tài
-                </h2>
-
+                <h2 class="page-title">Quản lý đề tài</h2>
                 <small class="text-muted">
                     Danh sách đề tài đồ án
                 </small>
             </div>
 
-            <a asp-action="Create"
-               class="btn btn-main">
-
+            <a asp-action="Create" class="btn btn-main">
                 <i class="fa-solid fa-plus me-1"></i>
                 Thêm đề tài
-
             </a>
         </div>
 
         @if (TempData["ThongBao"] != null)
         {
-            <div class="alert alert-success
-                alert-dismissible fade show">
-
+            <div class="alert alert-success">
                 @TempData["ThongBao"]
-
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="alert">
-                </button>
             </div>
         }
 
-        <form asp-action="Index"
-              method="get">
+        @if (TempData["Loi"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["Loi"]
+            </div>
+        }
 
+        <form asp-action="Index" method="get">
             <div class="row g-2">
 
-                <!-- TÌM KIẾM -->
-
                 <div class="col-lg-4">
-
                     <div class="input-group">
-
                         <span class="input-group-text bg-white">
-                            <i class="fa-solid
-                                fa-magnifying-glass
-                                text-secondary">
-                            </i>
+                            <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
 
                         <input type="text"
                                name="tuKhoa"
                                value="@ViewBag.TuKhoa"
                                class="form-control"
-                               placeholder="Tìm tên đề tài..." />
-
+                               placeholder="Tìm tên hoặc mô tả đề tài..." />
                     </div>
-
                 </div>
 
-                <!-- LĨNH VỰC -->
-
                 <div class="col-lg-2">
-
-                    <select name="maLinhVuc"
-                            class="form-select">
-
-                        <option value="">
-                            Tất cả lĩnh vực
-                        </option>
+                    <select name="maLinhVuc" class="form-select">
+                        <option value="">Tất cả lĩnh vực</option>
 
                         @foreach (var lv in ViewBag.LinhVucs)
                         {
-                            if (
-                                ViewBag.MaLinhVucLoc != null &&
-                                (int)ViewBag.MaLinhVucLoc ==
-                                lv.MaLinhVuc)
+                            if (ViewBag.MaLinhVucLoc != null &&
+                                (int)ViewBag.MaLinhVucLoc == lv.MaLinhVuc)
                             {
-                                <option value="@lv.MaLinhVuc"
-                                        selected>
+                                <option value="@lv.MaLinhVuc" selected>
                                     @lv.TenLinhVuc
                                 </option>
                             }
@@ -115,211 +108,128 @@
                                 </option>
                             }
                         }
-
                     </select>
-
                 </div>
 
-                <!-- NĂM HỌC -->
-
                 <div class="col-lg-2">
-
-                    <select name="namHoc"
-                            class="form-select">
-
-                        <option value="">
-                            Tất cả năm học
-                        </option>
+                    <select name="namHoc" class="form-select">
+                        <option value="">Tất cả năm học</option>
 
                         @foreach (var nam in ViewBag.NamHocs)
                         {
                             if (ViewBag.NamHocLoc == nam)
                             {
-                                <option value="@nam"
-                                        selected>
-                                    @nam
-                                </option>
+                                <option value="@nam" selected>@nam</option>
                             }
                             else
                             {
-                                <option value="@nam">
-                                    @nam
-                                </option>
+                                <option value="@nam">@nam</option>
                             }
                         }
-
                     </select>
-
                 </div>
 
-                <!-- HỌC KỲ -->
-
                 <div class="col-lg-2">
-
-                    <select name="hocKy"
-                            class="form-select">
-
-                        <option value="">
-                            Tất cả học kỳ
-                        </option>
+                    <select name="hocKy" class="form-select">
+                        <option value="">Tất cả học kỳ</option>
 
                         @for (int i = 1; i <= 3; i++)
                         {
-                            if (
-                                ViewBag.HocKyLoc != null &&
+                            if (ViewBag.HocKyLoc != null &&
                                 (int)ViewBag.HocKyLoc == i)
                             {
-                                <option value="@i" selected>
-                                    Học kỳ @i
-                                </option>
+                                <option value="@i" selected>Học kỳ @i</option>
                             }
                             else
                             {
-                                <option value="@i">
-                                    Học kỳ @i
-                                </option>
+                                <option value="@i">Học kỳ @i</option>
                             }
                         }
-
                     </select>
-
                 </div>
 
-                <!-- TRẠNG THÁI -->
-
                 <div class="col-lg-2">
+                    <select name="trangThai" class="form-select">
+                        <option value="">Tất cả trạng thái</option>
 
-                    <select name="trangThai"
-                            class="form-select">
-
-                        <option value="">
-                            Tất cả trạng thái
-                        </option>
-
-                        @foreach (var tt in new[]
-                        {
-                            "Mở đăng ký",
-                            "Đủ số lượng",
-                            "Tạm khóa",
-                            "Kết thúc"
-                        })
+                        @foreach (var tt in trangThais)
                         {
                             if (ViewBag.TrangThaiLoc == tt)
                             {
-                                <option value="@tt" selected>
-                                    @tt
-                                </option>
+                                <option value="@tt" selected>@tt</option>
                             }
                             else
                             {
-                                <option value="@tt">
-                                    @tt
-                                </option>
+                                <option value="@tt">@tt</option>
                             }
                         }
-
                     </select>
-
                 </div>
-
             </div>
 
             <div class="row g-2 mt-1">
 
                 <div class="col-lg-3">
+                    <select name="choCon" class="form-select">
+                        <option value="">Tất cả số chỗ</option>
 
-                    <select name="sapXep"
-                            class="form-select">
-
-                        @if (ViewBag.SapXep == null ||
-                             ViewBag.SapXep == "")
+                        @if (ViewBag.ChoCon == "con")
                         {
-                            <option value="" selected>
-                                Tên A → Z
-                            </option>
+                            <option value="con" selected>Còn chỗ</option>
                         }
                         else
                         {
-                            <option value="">
-                                Tên A → Z
-                            </option>
+                            <option value="con">Còn chỗ</option>
                         }
 
-                        @if (ViewBag.SapXep == "ten_za")
+                        @if (ViewBag.ChoCon == "het")
                         {
-                            <option value="ten_za" selected>
-                                Tên Z → A
-                            </option>
+                            <option value="het" selected>Hết chỗ</option>
                         }
                         else
                         {
-                            <option value="ten_za">
-                                Tên Z → A
-                            </option>
+                            <option value="het">Hết chỗ</option>
                         }
-
-                        @if (ViewBag.SapXep == "sv_tang")
-                        {
-                            <option value="sv_tang" selected>
-                                Số SV tối đa tăng dần
-                            </option>
-                        }
-                        else
-                        {
-                            <option value="sv_tang">
-                                Số SV tối đa tăng dần
-                            </option>
-                        }
-
-                        @if (ViewBag.SapXep == "sv_giam")
-                        {
-                            <option value="sv_giam" selected>
-                                Số SV tối đa giảm dần
-                            </option>
-                        }
-                        else
-                        {
-                            <option value="sv_giam">
-                                Số SV tối đa giảm dần
-                            </option>
-                        }
-
                     </select>
-
                 </div>
 
                 <div class="col-lg-3">
+                    <select name="sapXep" class="form-select">
+                        @foreach (var sx in sapXeps)
+                        {
+                            if ((ViewBag.SapXep ?? "") == sx.Key)
+                            {
+                                <option value="@sx.Key" selected>
+                                    @sx.Value
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="@sx.Key">
+                                    @sx.Value
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
 
-                    <button type="submit"
-                            class="btn btn-primary">
-
-                        <i class="fa-solid
-                            fa-filter me-1">
-                        </i>
-
+                <div class="col-lg-6">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-filter me-1"></i>
                         Tìm kiếm / Lọc
-
                     </button>
 
                     <a asp-action="Index"
                        class="btn btn-light border">
                         Đặt lại
                     </a>
-
                 </div>
-
             </div>
-
         </form>
-
     </div>
 
-    <!-- BẢNG -->
-
     <div class="table-responsive">
-
         <table class="table table-hover mb-0">
-
             <thead>
                 <tr>
                     <th class="ps-3">STT</th>
@@ -327,69 +237,82 @@
                     <th>Lĩnh vực</th>
                     <th>Năm học</th>
                     <th>HK</th>
-                    <th class="text-center">
-                        SV tối đa
-                    </th>
+                    <th class="text-center">SV tối đa</th>
+                    <th class="text-center">Đã đăng ký</th>
+                    <th class="text-center">Chỗ còn</th>
                     <th>Trạng thái</th>
-                    <th class="text-center">
-                        Thao tác
-                    </th>
+                    <th class="text-center">Thao tác</th>
                 </tr>
             </thead>
 
             <tbody>
-
                 @if (Model.Any())
                 {
                     int stt = batDau;
 
                     foreach (var item in Model)
                     {
-                        <tr>
+                        int daDangKy = soDaDangKy.TryGetValue(
+                            item.MaDeTai, out int soLuong)
+                            ? soLuong
+                            : 0;
 
-                            <td class="ps-3">
-                                @stt
-                            </td>
+                        int choCon = item.SoSinhVienToiDa - daDangKy;
+
+                        <tr>
+                            <td class="ps-3">@stt</td>
 
                             <td class="fw-semibold">
                                 @item.TenDeTai
                             </td>
 
-                            <td>
-                                @item.LinhVuc?.TenLinhVuc
-                            </td>
-
-                            <td>
-                                @item.NamHoc
-                            </td>
-
-                            <td>
-                                @item.HocKy
-                            </td>
+                            <td>@item.LinhVuc?.TenLinhVuc</td>
+                            <td>@item.NamHoc</td>
+                            <td>@item.HocKy</td>
 
                             <td class="text-center">
                                 @item.SoSinhVienToiDa
                             </td>
 
-                            <td>
+                            <td class="text-center">
+                                @daDangKy
+                            </td>
 
-                                @if (item.TrangThai ==
-                                     "Mở đăng ký")
+                            <td class="text-center">
+                                @if (choCon < 0)
+                                {
+                                    <span class="badge bg-danger">
+                                        Vượt @(-choCon) chỗ
+                                    </span>
+                                }
+                                else if (choCon == 0)
+                                {
+                                    <span class="badge bg-danger">
+                                        Hết chỗ (0)
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">
+                                        Còn @choCon chỗ
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (item.TrangThai == "Mở đăng ký")
                                 {
                                     <span class="status-active">
                                         Mở đăng ký
                                     </span>
                                 }
-                                else if (item.TrangThai ==
-                                         "Đủ số lượng")
+                                else if (item.TrangThai == "Đủ số lượng")
                                 {
-                                    <span class="badge bg-warning
-                                        text-dark">
+                                    <span class="badge bg-warning text-dark">
                                         Đủ số lượng
                                     </span>
                                 }
-                                else if (item.TrangThai ==
-                                         "Tạm khóa")
+                                else if (item.TrangThai == "Tạm khóa")
                                 {
                                     <span class="status-stop">
                                         Tạm khóa
@@ -397,51 +320,34 @@
                                 }
                                 else
                                 {
-                                    <span class="badge
-                                        bg-secondary">
+                                    <span class="badge bg-secondary">
                                         Kết thúc
                                     </span>
                                 }
-
                             </td>
 
                             <td class="text-center text-nowrap">
-
                                 <a asp-action="Edit"
                                    asp-route-id="@item.MaDeTai"
                                    class="action-btn action-edit"
                                    title="Sửa">
-
-                                    <i class="fa-solid
-                                        fa-pen-to-square">
-                                    </i>
-
+                                    <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
 
                                 <a asp-action="Details"
                                    asp-route-id="@item.MaDeTai"
                                    class="action-btn action-info"
                                    title="Chi tiết">
-
-                                    <i class="fa-solid
-                                        fa-circle-info">
-                                    </i>
-
+                                    <i class="fa-solid fa-circle-info"></i>
                                 </a>
 
                                 <a asp-action="Delete"
                                    asp-route-id="@item.MaDeTai"
                                    class="action-btn action-delete"
                                    title="Xóa">
-
-                                    <i class="fa-solid
-                                        fa-trash">
-                                    </i>
-
+                                    <i class="fa-solid fa-trash"></i>
                                 </a>
-
                             </td>
-
                         </tr>
 
                         stt++;
@@ -450,42 +356,24 @@
                 else
                 {
                     <tr>
-                        <td colspan="8"
-                            class="text-center
-                            text-muted py-5">
-
+                        <td colspan="10"
+                            class="text-center text-muted py-5">
                             Không tìm thấy đề tài.
-
                         </td>
                     </tr>
                 }
-
             </tbody>
-
         </table>
-
     </div>
 
-    <!-- PHÂN TRANG -->
-
-    <div class="d-flex justify-content-between
-        align-items-center
-        p-3 border-top">
+    <div class="d-flex justify-content-between align-items-center p-3 border-top flex-wrap gap-2">
 
         <nav>
-
             @if (tongTrang > 0)
             {
-                <ul class="pagination
-                    pagination-sm mb-0">
+                <ul class="pagination pagination-sm mb-0">
 
-                    <!-- TRƯỚC -->
-
-                    <li class="page-item
-                        @(trangHienTai <= 1
-                            ? "disabled"
-                            : "")">
-
+                    <li class="page-item @(trangHienTai <= 1 ? "disabled" : "")">
                         <a class="page-link"
                            asp-action="Index"
                            asp-route-trang="@(trangHienTai - 1)"
@@ -494,24 +382,15 @@
                            asp-route-namHoc="@ViewBag.NamHocLoc"
                            asp-route-hocKy="@ViewBag.HocKyLoc"
                            asp-route-trangThai="@ViewBag.TrangThaiLoc"
-                           asp-route-sapXep="@ViewBag.SapXep">
-
+                           asp-route-sapXep="@ViewBag.SapXep"
+                           asp-route-choCon="@ViewBag.ChoCon">
                             ‹
-
                         </a>
-
                     </li>
 
-                    <!-- SỐ TRANG -->
-                    @for (int i = 1;
-                                              i <= tongTrang;
-                                              i++)
+                    @for (int i = 1; i <= tongTrang; i++)
                     {
-                        <li class="page-item
-                            @(i == trangHienTai
-                                ? "active"
-                                : "")">
-
+                        <li class="page-item @(i == trangHienTai ? "active" : "")">
                             <a class="page-link"
                                asp-action="Index"
                                asp-route-trang="@i"
@@ -520,22 +399,14 @@
                                asp-route-namHoc="@ViewBag.NamHocLoc"
                                asp-route-hocKy="@ViewBag.HocKyLoc"
                                asp-route-trangThai="@ViewBag.TrangThaiLoc"
-                               asp-route-sapXep="@ViewBag.SapXep">
-
+                               asp-route-sapXep="@ViewBag.SapXep"
+                               asp-route-choCon="@ViewBag.ChoCon">
                                 @i
-
                             </a>
-
                         </li>
                     }
 
-                    <!-- SAU -->
-
-                    <li class="page-item
-                        @(trangHienTai >= tongTrang
-                            ? "disabled"
-                            : "")">
-
+                    <li class="page-item @(trangHienTai >= tongTrang ? "disabled" : "")">
                         <a class="page-link"
                            asp-action="Index"
                            asp-route-trang="@(trangHienTai + 1)"
@@ -544,27 +415,18 @@
                            asp-route-namHoc="@ViewBag.NamHocLoc"
                            asp-route-hocKy="@ViewBag.HocKyLoc"
                            asp-route-trangThai="@ViewBag.TrangThaiLoc"
-                           asp-route-sapXep="@ViewBag.SapXep">
-
+                           asp-route-sapXep="@ViewBag.SapXep"
+                           asp-route-choCon="@ViewBag.ChoCon">
                             ›
-
                         </a>
-
                     </li>
-
                 </ul>
             }
-
         </nav>
 
         <small class="text-muted">
-
-            Hiển thị
-            @batDau - @ketThuc
+            Hiển thị @batDau - @ketThuc
             trong @tongBanGhi kết quả
-
         </small>
-
     </div>
-
 </div>

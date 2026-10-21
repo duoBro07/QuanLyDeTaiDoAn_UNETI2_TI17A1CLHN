@@ -1,52 +1,59 @@
+
 @model QuanLyDeTaiDoAn.Models.GiangVien
 
 @{
-    ViewData["Title"] = "Xóa giảng viên";
+    ViewData["Title"] = "Tạm ngừng hướng dẫn";
 }
 
 <div class="content-card p-4">
 
-    <h2 class="page-title text-danger">
-        Xóa giảng viên
+    <h2 class="page-title">
+        Tạm ngừng hướng dẫn
     </h2>
 
     <p class="mt-3">
-        Bạn có chắc muốn xóa giảng viên
-        <strong>@Model.HoTen</strong>?
+        Bạn có chắc muốn chuyển giảng viên
+        <strong>@Model.HoTen</strong>
+        sang trạng thái tạm ngừng hướng dẫn?
     </p>
+
+    <div class="alert alert-warning">
+        Hồ sơ giảng viên sẽ được giữ lại,
+        không bị xóa khỏi cơ sở dữ liệu.
+    </div>
 
     <table class="table">
         <tr>
             <th>Email</th>
             <td>@Model.Email</td>
         </tr>
-
         <tr>
             <th>Lĩnh vực</th>
             <td>@Model.LinhVuc?.TenLinhVuc</td>
         </tr>
-
         <tr>
-            <th>Trạng thái</th>
+            <th>Trạng thái hiện tại</th>
             <td>@Model.TrangThai</td>
         </tr>
     </table>
 
-    <form asp-action="Delete">
+    <form asp-action="Delete"
+          asp-route-id="@Model.MaGiangVien"
+          method="post">
 
-        <input type="hidden"
-               asp-for="MaGiangVien" />
+        @Html.AntiForgeryToken()
 
         <a asp-action="Index"
            class="btn btn-light border">
             Hủy
         </a>
 
-        <button type="submit"
-                class="btn btn-danger">
-            Xóa
-        </button>
-
+        @if (Model.TrangThai != "Tạm ngừng hướng dẫn")
+        {
+            <button type="submit"
+                    class="btn btn-warning">
+                Xác nhận tạm ngừng
+            </button>
+        }
     </form>
-
 </div>

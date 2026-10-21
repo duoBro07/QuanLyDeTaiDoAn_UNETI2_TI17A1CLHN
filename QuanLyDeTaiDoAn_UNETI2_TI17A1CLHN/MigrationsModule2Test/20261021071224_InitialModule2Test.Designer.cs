@@ -2,17 +2,20 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuanLyDeTaiDoAn.Data;
 
 #nullable disable
 
-namespace QuanLyDeTaiDoAn.Migrations
+namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.MigrationsModule2Test
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261021071224_InitialModule2Test")]
+    partial class InitialModule2Test
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -20,6 +23,31 @@ namespace QuanLyDeTaiDoAn.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("QuanLyDeTaiDoAn.Models.DangKyDeTaiModule2", b =>
+                {
+                    b.Property<int>("MaDangKy")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaDangKy"));
+
+                    b.Property<int>("MaDeTai")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaSinhVien")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TrangThai")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("MaDangKy");
+
+                    b.HasIndex("MaDeTai");
+
+                    b.ToTable("DangKyDeTaiModule2s");
+                });
 
             modelBuilder.Entity("QuanLyDeTaiDoAn.Models.DeTai", b =>
                 {
@@ -30,9 +58,6 @@ namespace QuanLyDeTaiDoAn.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaDeTai"));
 
                     b.Property<int>("HocKy")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("LinhVucMaLinhVuc")
                         .HasColumnType("int");
 
                     b.Property<int>("MaLinhVuc")
@@ -63,7 +88,7 @@ namespace QuanLyDeTaiDoAn.Migrations
 
                     b.HasKey("MaDeTai");
 
-                    b.HasIndex("LinhVucMaLinhVuc");
+                    b.HasIndex("MaLinhVuc");
 
                     b.ToTable("DeTais");
                 });
@@ -91,9 +116,6 @@ namespace QuanLyDeTaiDoAn.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("LinhVucMaLinhVuc")
-                        .HasColumnType("int");
-
                     b.Property<int>("MaLinhVuc")
                         .HasColumnType("int");
 
@@ -110,7 +132,10 @@ namespace QuanLyDeTaiDoAn.Migrations
 
                     b.HasKey("MaGiangVien");
 
-                    b.HasIndex("LinhVucMaLinhVuc");
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("MaLinhVuc");
 
                     b.ToTable("GiangViens");
                 });
@@ -140,11 +165,24 @@ namespace QuanLyDeTaiDoAn.Migrations
                     b.ToTable("LinhVucs");
                 });
 
+            modelBuilder.Entity("QuanLyDeTaiDoAn.Models.DangKyDeTaiModule2", b =>
+                {
+                    b.HasOne("QuanLyDeTaiDoAn.Models.DeTai", "DeTai")
+                        .WithMany()
+                        .HasForeignKey("MaDeTai")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DeTai");
+                });
+
             modelBuilder.Entity("QuanLyDeTaiDoAn.Models.DeTai", b =>
                 {
                     b.HasOne("QuanLyDeTaiDoAn.Models.LinhVuc", "LinhVuc")
                         .WithMany("DeTais")
-                        .HasForeignKey("LinhVucMaLinhVuc");
+                        .HasForeignKey("MaLinhVuc")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("LinhVuc");
                 });
@@ -153,7 +191,9 @@ namespace QuanLyDeTaiDoAn.Migrations
                 {
                     b.HasOne("QuanLyDeTaiDoAn.Models.LinhVuc", "LinhVuc")
                         .WithMany("GiangViens")
-                        .HasForeignKey("LinhVucMaLinhVuc");
+                        .HasForeignKey("MaLinhVuc")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("LinhVuc");
                 });

@@ -14,7 +14,7 @@ namespace QuanLyDeTaiDoAn.Data
         public DbSet<LinhVuc> LinhVucs { get; set; }
         public DbSet<GiangVien> GiangViens { get; set; }
         public DbSet<DeTai> DeTais { get; set; }
-
+        public DbSet<DangKyDeTaiModule2> DangKyDeTaiModule2s { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -35,6 +35,11 @@ namespace QuanLyDeTaiDoAn.Data
             modelBuilder.Entity<GiangVien>()
                 .HasIndex(g => g.Email)
                 .IsUnique();
+            modelBuilder.Entity<DangKyDeTaiModule2>()
+                .HasOne(d => d.DeTai)
+                .WithMany()
+                .HasForeignKey(d => d.MaDeTai)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
