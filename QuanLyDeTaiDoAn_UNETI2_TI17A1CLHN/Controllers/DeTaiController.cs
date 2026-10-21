@@ -14,10 +14,6 @@ namespace QuanLyDeTaiDoAn.Controllers
         {
             _context = context;
         }
-
-        // =====================================================
-        // DANH SÁCH + TÌM KIẾM + LỌC + SẮP XẾP + PHÂN TRANG
-        // =====================================================
         public async Task<IActionResult> Index(
             string? tuKhoa,
             int? maLinhVuc,
@@ -33,9 +29,7 @@ namespace QuanLyDeTaiDoAn.Controllers
                 .Include(d => d.LinhVuc)
                 .AsQueryable();
 
-            // =========================
-            // TÌM KIẾM
-            // =========================
+
             if (!string.IsNullOrWhiteSpace(tuKhoa))
             {
                 tuKhoa = tuKhoa.Trim();
@@ -48,45 +42,31 @@ namespace QuanLyDeTaiDoAn.Controllers
                      d.YeuCau.Contains(tuKhoa)));
             }
 
-            // =========================
-            // LỌC LĨNH VỰC
-            // =========================
             if (maLinhVuc.HasValue)
             {
                 query = query.Where(d =>
                     d.MaLinhVuc == maLinhVuc.Value);
             }
 
-            // =========================
-            // LỌC NĂM HỌC
-            // =========================
+
             if (!string.IsNullOrWhiteSpace(namHoc))
             {
                 query = query.Where(d =>
                     d.NamHoc == namHoc);
             }
 
-            // =========================
-            // LỌC HỌC KỲ
-            // =========================
             if (hocKy.HasValue)
             {
                 query = query.Where(d =>
                     d.HocKy == hocKy.Value);
             }
 
-            // =========================
-            // LỌC TRẠNG THÁI
-            // =========================
             if (!string.IsNullOrWhiteSpace(trangThai))
             {
                 query = query.Where(d =>
                     d.TrangThai == trangThai);
             }
 
-            // =========================
-            // SẮP XẾP
-            // =========================
             query = sapXep switch
             {
                 "ten_za" =>
@@ -103,9 +83,6 @@ namespace QuanLyDeTaiDoAn.Controllers
                     query.OrderBy(d => d.TenDeTai)
             };
 
-            // =========================
-            // PHÂN TRANG
-            // =========================
             int tongBanGhi =
                 await query.CountAsync();
 
@@ -128,9 +105,6 @@ namespace QuanLyDeTaiDoAn.Controllers
                 .Take(kichThuocTrang)
                 .ToListAsync();
 
-            // =========================
-            // DỮ LIỆU CHO BỘ LỌC
-            // =========================
             ViewBag.LinhVucs =
                 await _context.LinhVucs
                     .OrderBy(l => l.TenLinhVuc)
@@ -143,7 +117,6 @@ namespace QuanLyDeTaiDoAn.Controllers
                     .OrderByDescending(n => n)
                     .ToListAsync();
 
-            // Giữ lại điều kiện
             ViewBag.TuKhoa = tuKhoa;
             ViewBag.MaLinhVucLoc = maLinhVuc;
             ViewBag.NamHocLoc = namHoc;
@@ -158,10 +131,6 @@ namespace QuanLyDeTaiDoAn.Controllers
 
             return View(danhSach);
         }
-
-        // =====================================================
-        // CHI TIẾT
-        // =====================================================
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -177,10 +146,6 @@ namespace QuanLyDeTaiDoAn.Controllers
 
             return View(deTai);
         }
-
-        // =====================================================
-        // THÊM - GET
-        // =====================================================
         public async Task<IActionResult> Create()
         {
             await NapDanhSachLinhVuc();
@@ -188,9 +153,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View();
         }
 
-        // =====================================================
-        // THÊM - POST
-        // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -199,8 +161,6 @@ namespace QuanLyDeTaiDoAn.Controllers
                 "SoSinhVienToiDa,NamHoc,HocKy,TrangThai")]
             DeTai deTai)
         {
-            // Kiểm tra tên đề tài trùng
-            // trong cùng năm học + học kỳ
             bool tenDaTonTai =
                 await _context.DeTais.AnyAsync(d =>
                     d.TenDeTai == deTai.TenDeTai &&
@@ -214,7 +174,6 @@ namespace QuanLyDeTaiDoAn.Controllers
                     "Tên đề tài đã tồn tại trong năm học và học kỳ này.");
             }
 
-            // Kiểm tra lĩnh vực thật sự tồn tại trong DB
             bool linhVucTonTai =
                 await _context.LinhVucs.AnyAsync(l =>
                     l.MaLinhVuc == deTai.MaLinhVuc);
@@ -225,8 +184,6 @@ namespace QuanLyDeTaiDoAn.Controllers
                     nameof(DeTai.MaLinhVuc),
                     "Lĩnh vực không tồn tại.");
             }
-
-            // Kiểm tra trạng thái
             string[] trangThaiHopLe =
             {
                 "Mở đăng ký",
@@ -261,9 +218,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(deTai);
         }
 
-        // =====================================================
-        // SỬA - GET
-        // =====================================================
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -281,9 +235,8 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(deTai);
         }
 
-        // =====================================================
-        // SỬA - POST
-        // =====================================================
+
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
@@ -370,9 +323,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(deTai);
         }
 
-        // =====================================================
-        // XÓA - GET
-        // =====================================================
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -389,9 +339,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(deTai);
         }
 
-        // =====================================================
-        // XÓA - POST
-        // =====================================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult>
@@ -413,9 +360,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // =====================================================
-        // NẠP LĨNH VỰC CHO DROPDOWN
-        // =====================================================
         private async Task NapDanhSachLinhVuc(
             int? maLinhVucDuocChon = null)
         {

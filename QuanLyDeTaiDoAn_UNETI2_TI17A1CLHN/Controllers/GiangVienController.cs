@@ -15,7 +15,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             _context = context;
         }
 
-        // ================= INDEX =================
 
         public async Task<IActionResult> Index(
             string? tuKhoa,
@@ -85,7 +84,7 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(ds);
         }
 
-        // ================= DETAILS =================
+      
 
         public async Task<IActionResult> Details(int? id)
         {
@@ -103,7 +102,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(gv);
         }
 
-        // ================= CREATE GET =================
 
         public async Task<IActionResult> Create()
         {
@@ -111,7 +109,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View();
         }
 
-        // ================= CREATE POST =================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -171,7 +168,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(gv);
         }
 
-        // ================= EDIT GET =================
 
         public async Task<IActionResult> Edit(int? id)
         {
@@ -189,7 +185,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(gv);
         }
 
-        // ================= EDIT POST =================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -260,7 +255,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(gv);
         }
 
-        // ================= DELETE GET =================
 
         public async Task<IActionResult> Delete(int? id)
         {
@@ -278,7 +272,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(gv);
         }
 
-        // ================= DELETE POST =================
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
