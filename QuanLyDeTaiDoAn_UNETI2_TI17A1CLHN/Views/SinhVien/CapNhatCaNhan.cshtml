@@ -1,0 +1,27 @@
+@* Chỉnh sửa thông tin cá nhân: sinh viên chỉ được sửa Email và Số điện thoại *@
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.SinhVien
+@{ ViewData["Title"] = "Cập nhật thông tin cá nhân"; }
+<h3 class="mb-3">Cập nhật thông tin cá nhân</h3>
+<div class="m3-card">
+    <p class="text-muted">Bạn chỉ có thể thay đổi email và số điện thoại. Các thông tin khác liên hệ Admin để được cập nhật.</p>
+    <form asp-action="CapNhatCaNhan" method="post">
+        <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">Mã sinh viên</label><input class="form-control" value="@Model.MaSinhVien" disabled /></div>
+            <div class="col-md-6"><label class="form-label">Họ tên</label><input class="form-control" value="@Model.HoTen" disabled /></div>
+            <div class="col-md-6">
+                <label class="form-label" for="email">Email</label>
+                <input id="email" name="email" value="@Model.Email" class="form-control" />
+                <span class="text-danger">@Html.ValidationMessage("email")</span>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="soDienThoai">Số điện thoại</label>
+                <input id="soDienThoai" name="soDienThoai" value="@Model.SoDienThoai" class="form-control" />
+                <span class="text-danger">@Html.ValidationMessage("soDienThoai")</span>
+            </div>
+        </div>
+        <div class="mt-4 d-flex gap-2 justify-content-end">
+            <a asp-action="CaNhan" class="btn btn-light border">Hủy</a>
+            <button class="btn btn-primary">Lưu</button>
+        </div>
+    </form>
+</div>

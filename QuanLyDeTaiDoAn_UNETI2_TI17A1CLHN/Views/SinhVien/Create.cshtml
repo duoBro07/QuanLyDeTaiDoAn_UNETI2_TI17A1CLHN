@@ -1,0 +1,10 @@
+@* Màn 2: Thêm sinh viên *@
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.SinhVien
+@{ ViewData["Title"] = "Thêm sinh viên"; }
+<h3 class="mb-3">Thêm sinh viên</h3>
+<div class="m3-card">
+    <form asp-action="Create" method="post">
+        <partial name="_Form" model="Model" />
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

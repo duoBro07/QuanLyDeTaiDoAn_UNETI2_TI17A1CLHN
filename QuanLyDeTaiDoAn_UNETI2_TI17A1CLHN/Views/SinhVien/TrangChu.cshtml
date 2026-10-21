@@ -1,0 +1,46 @@
+@* Màn 6: Trang chủ sinh viên *@
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.ViewModels.TrangChuSinhVienVM
+@using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
+@{ ViewData["Title"] = "Trang chủ"; }
+<h3>Xin chào, @Model.SinhVien.HoTen!</h3>
+<p class="text-muted">Sinh viên - Lớp: @Model.SinhVien.Lop</p>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3"><div class="m3-stat"><div class="so">@Model.TongDeTaiCoTheDangKy</div><div class="text-muted small mt-1">Đề tài có thể đăng ký</div></div></div>
+    <div class="col-6 col-lg-3"><div class="m3-stat"><div class="so">@Model.DaDangKy</div><div class="text-muted small mt-1">Đã đăng ký</div></div></div>
+    <div class="col-6 col-lg-3"><div class="m3-stat"><div class="so">@Model.ChoDuyet</div><div class="text-muted small mt-1">Đang chờ duyệt</div></div></div>
+    <div class="col-6 col-lg-3"><div class="m3-stat"><div class="so">@Model.DaDuyet</div><div class="text-muted small mt-1">Đã được duyệt</div></div></div>
+</div>
+
+<div class="m3-card">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="m-0">Đề tài nổi bật</h5>
+        <a asp-controller="TraCuuDeTai" asp-action="Index">Xem tất cả</a>
+    </div>
+    @if (!Model.DeTaiNoiBat.Any())
+    {
+        <div class="text-muted">Hiện chưa có đề tài nào đang mở đăng ký.</div>
+    }
+    else
+    {
+        <ul class="list-group list-group-flush">
+        @foreach (var d in Model.DeTaiNoiBat)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                <div>
+                    <div class="fw-semibold">@d.TenDeTai</div>
+                    <div class="small text-muted">Lĩnh vực: @d.TenLinhVuc · Còn @d.SoChoCon chỗ</div>
+                </div>
+                @if (d.SoChoCon > 0)
+                {
+                    <a asp-controller="DangKyDeTai" asp-action="Create" asp-route-id="@d.MaDeTai" class="btn btn-sm btn-primary">Đăng ký</a>
+                }
+                else
+                {
+                    <a asp-controller="TraCuuDeTai" asp-action="Details" asp-route-id="@d.MaDeTai" class="btn btn-sm btn-outline-secondary">Xem</a>
+                }
+            </li>
+        }
+        </ul>
+    }
+</div>
