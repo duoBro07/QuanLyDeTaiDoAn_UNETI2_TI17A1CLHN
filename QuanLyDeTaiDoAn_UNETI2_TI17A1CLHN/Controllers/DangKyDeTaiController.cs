@@ -58,7 +58,7 @@ public class DangKyDeTaiController : Module3BaseController
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(DangKyFormVM vm)
     {
-        var sv = await LaySinhVienHienTai();               // lấy từ Session, không từ form
+        var sv = await LaySinhVienHienTai();               
         if (sv == null) return NotFound();
         var dt = await _db.DeTais.Include(d => d.LinhVuc).FirstOrDefaultAsync(d => d.MaDeTai == vm.MaDeTai);
         if (dt == null) return NotFound();
@@ -66,16 +66,15 @@ public class DangKyDeTaiController : Module3BaseController
         vm.TenDeTai = dt.TenDeTai;
         vm.TenLinhVuc = dt.LinhVuc?.TenLinhVuc;
 
-        // Kiểm tra lại toàn bộ điều kiện ở server (không tin giao diện)
+
         vm.ThongBaoKhongDangKy = await DangKyRules.KiemTra(_db, sv, dt);
         if (vm.ThongBaoKhongDangKy != null || !ModelState.IsValid) return View(vm);   // không lưu gì
-
         var dk = new DangKyDeTai
         {
             MaSinhVien = sv.MaSinhVien,
             MaDeTai = dt.MaDeTai,
             LyDoDangKy = vm.LyDoDangKy!.Trim(),
-            NgayDangKy = DateTime.Now,                      // hệ thống tự gán
+            NgayDangKy = DateTime.Now,                      
             TrangThai = TrangThaiDangKy.ChoDuyet
         };
         _db.DangKyDeTais.Add(dk);
@@ -83,21 +82,21 @@ public class DangKyDeTaiController : Module3BaseController
         return RedirectToAction(nameof(XacNhan), new { id = dk.MaDangKy });
     }
 
-    // Màn 10: xác nhận đăng ký thành công (id = MaDangKy)
+ 
     public async Task<IActionResult> XacNhan(int id)
     {
         var dk = await LayDangKyCuaToi(id);
         return dk == null ? NotFound() : View(dk);
     }
 
-    // Màn 12: chi tiết kết quả đăng ký
+
     public async Task<IActionResult> Details(int id)
     {
         var dk = await LayDangKyCuaToi(id);
         return dk == null ? NotFound() : View(dk);
     }
 
-    // Màn 13: hủy đăng ký khi còn chờ duyệt
+  
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Huy(int id)
     {
@@ -113,13 +112,12 @@ public class DangKyDeTaiController : Module3BaseController
             return RedirectToAction(nameof(Index));
         }
 
-        dk.TrangThai = TrangThaiDangKy.DaHuy;               // không xóa vật lý, giữ lịch sử
+        dk.TrangThai = TrangThaiDangKy.DaHuy;              
         await _db.SaveChangesAsync();
         TempData["ThanhCong"] = "Đã hủy đăng ký.";
         return RedirectToAction(nameof(Index));
     }
 
-    // Màn 15: giảng viên hướng dẫn hiện tại
     public async Task<IActionResult> GiangVienHienTai()
     {
         var sv = await LaySinhVienHienTai();
@@ -131,10 +129,10 @@ public class DangKyDeTaiController : Module3BaseController
             .Where(p => p.DangKyDeTai!.MaSinhVien == sv.MaSinhVien && p.TrangThai == TrangThaiPhanCong.DangHuongDan)
             .OrderByDescending(p => p.NgayBatDau)
             .FirstOrDefaultAsync();
-        return View(pc);   // null => View hiển thị "chưa được phân công"
+        return View(pc);  
     }
 
-    // Màn 16: lịch sử phân công liên quan đến bản thân
+   
     public async Task<IActionResult> LichSuPhanCong()
     {
         var sv = await LaySinhVienHienTai();
@@ -149,7 +147,7 @@ public class DangKyDeTaiController : Module3BaseController
         return View(ds);
     }
 
-    // Chỉ lấy đăng ký thuộc về sinh viên đang đăng nhập; đổi id trên URL sang người khác thì ra null (NotFound)
+
     private async Task<DangKyDeTai?> LayDangKyCuaToi(int maDangKy)
     {
         var sv = await LaySinhVienHienTai();

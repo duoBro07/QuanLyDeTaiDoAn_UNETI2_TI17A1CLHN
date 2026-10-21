@@ -16,7 +16,7 @@ public abstract class Module3BaseController : Controller
 
     protected Module3BaseController(AppDbContext db) => _db = db;
 
-    // Sinh viên đang đăng nhập, lấy từ Session. KHÔNG nhận mã sinh viên từ URL hay form
+
     protected async Task<SinhVien?> LaySinhVienHienTai()
     {
         var maTK = HttpContext.Session.GetInt32("MaTaiKhoan");

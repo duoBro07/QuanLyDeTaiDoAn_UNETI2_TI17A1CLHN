@@ -14,7 +14,7 @@ public class PhanTrangVM
     public int SoHienThi { get; set; }
 }
 
-// Một dòng đề tài trong danh sách tra cứu. SoChoCon được TÍNH, không lưu trong database
+
 public class DeTaiTraCuuVM
 {
     public int MaDeTai { get; set; }

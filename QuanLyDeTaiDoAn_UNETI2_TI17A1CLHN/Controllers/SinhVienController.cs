@@ -15,13 +15,11 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers;
 
 public class SinhVienController : Module3BaseController
 {
-    private const string MatKhauMacDinh = "123456";   // nếu Module 1 mã hóa mật khẩu thì dùng hàm mã hóa của Module 1
+    private const string MatKhauMacDinh = "123456";  
 
     public SinhVienController(AppDbContext db) : base(db) { }
 
-    // =====================  PHẦN ADMIN  =====================
-
-    // Màn 1: danh sách + tìm kiếm + phân trang
+   
     [YeuCauVaiTro(VaiTroHeThong.Admin)]
     public async Task<IActionResult> Index(string? tuKhoa, int trang = 1)
     {
@@ -43,7 +41,7 @@ public class SinhVienController : Module3BaseController
         return View(ds);
     }
 
-    // Màn 2: thêm sinh viên
+   
     [YeuCauVaiTro(VaiTroHeThong.Admin)]
     public IActionResult Create() => View(new SinhVien());
 
@@ -67,7 +65,7 @@ public class SinhVienController : Module3BaseController
 
         if (!ModelState.IsValid) return View(sv);
 
-        // Tạo tài khoản đăng nhập (1-1) và sinh viên trong cùng một giao dịch
+       
         using var tx = await _db.Database.BeginTransactionAsync();
         var tk = new TaiKhoan
         {
@@ -90,7 +88,7 @@ public class SinhVienController : Module3BaseController
         return RedirectToAction(nameof(Index));
     }
 
-    // Màn 3: sửa sinh viên (không cho sửa mã sinh viên)
+   
     [YeuCauVaiTro(VaiTroHeThong.Admin)]
     public async Task<IActionResult> Edit(string? id)
     {
@@ -106,7 +104,7 @@ public class SinhVienController : Module3BaseController
         var sv = await _db.SinhViens.FirstOrDefaultAsync(s => s.MaSinhVien == id);
         if (sv == null) return NotFound();
 
-        form.MaSinhVien = id;   // luôn dùng mã từ URL, bỏ qua giá trị gửi lên
+        form.MaSinhVien = id;  
         ModelState.Remove(nameof(form.MaSinhVien));
 
         if (!string.IsNullOrWhiteSpace(form.Email) &&
@@ -117,7 +115,7 @@ public class SinhVienController : Module3BaseController
 
         if (!ModelState.IsValid) return View(form);
 
-        // Chỉ cập nhật các trường được phép (tránh overposting)
+       
         sv.HoTen = form.HoTen;
         sv.NgaySinh = form.NgaySinh;
         sv.GioiTinh = form.GioiTinh;
@@ -134,7 +132,6 @@ public class SinhVienController : Module3BaseController
         return RedirectToAction(nameof(Index));
     }
 
-    // Màn 4: chi tiết
     [YeuCauVaiTro(VaiTroHeThong.Admin)]
     public async Task<IActionResult> Details(string? id)
     {
@@ -143,7 +140,6 @@ public class SinhVienController : Module3BaseController
         return sv == null ? NotFound() : View(sv);
     }
 
-    // Màn 5: khóa / mở khóa (POST, có hộp thoại xác nhận ở View)
     [HttpPost, ValidateAntiForgeryToken]
     [YeuCauVaiTro(VaiTroHeThong.Admin)]
     public async Task<IActionResult> DoiTrangThai(string id)
@@ -160,17 +156,14 @@ public class SinhVienController : Module3BaseController
         return RedirectToAction(nameof(Index));
     }
 
-    // Đồng bộ trạng thái sang TaiKhoan để sinh viên bị khóa không đăng nhập được.
-    // [KHỚP VỚI MODULE 1] Nếu TaiKhoan.TrangThai của Module 1 không phải bool thì chỉ sửa dòng gán ở đây.
+   
     private async Task DongBoTaiKhoan(SinhVien sv)
     {
         var tk = await _db.TaiKhoans.FindAsync(sv.MaTaiKhoan);
         if (tk != null) tk.TrangThai = sv.TrangThai == TrangThaiSinhVien.HoatDong;
     }
 
-    // =====================  PHẦN SINH VIÊN  =====================
-
-    // Màn 6: trang chủ sinh viên
+    
     [YeuCauVaiTro(VaiTroHeThong.SinhVien)]
     public async Task<IActionResult> TrangChu()
     {
@@ -193,7 +186,7 @@ public class SinhVienController : Module3BaseController
         return View(vm);
     }
 
-    // Màn 14: thông tin cá nhân
+
     [YeuCauVaiTro(VaiTroHeThong.SinhVien)]
     public async Task<IActionResult> CaNhan()
     {
@@ -201,7 +194,7 @@ public class SinhVienController : Module3BaseController
         return sv == null ? NotFound() : View(sv);
     }
 
-    // Sinh viên chỉ được sửa Email và Số điện thoại
+ 
     [YeuCauVaiTro(VaiTroHeThong.SinhVien)]
     public async Task<IActionResult> CapNhatCaNhan()
     {

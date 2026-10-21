@@ -10,15 +10,15 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Services;
 
 public static class DangKyRules
 {
-    // Đợt đăng ký đang áp dụng: cả nhóm thống nhất và chỉ sửa ở đây
+    
     public const string NamHocHienTai = "2026-2027";
     public const int HocKyHienTai = 1;
 
-    // Số chỗ đã chiếm = đăng ký "Đã duyệt" (Chờ duyệt / Từ chối / Đã hủy không tính)
+    
     public static Task<int> DemDaDuyet(AppDbContext db, int maDeTai) =>
         db.DangKyDeTais.CountAsync(d => d.MaDeTai == maDeTai && d.TrangThai == TrangThaiDangKy.DaDuyet);
 
-    // Trả về null nếu hợp lệ, ngược lại trả về nguyên nhân để hiển thị cho sinh viên
+    
     public static async Task<string?> KiemTra(AppDbContext db, SinhVien sv, DeTai dt)
     {
         if (sv.TrangThai != TrangThaiSinhVien.HoatDong)
@@ -52,7 +52,7 @@ public static class DangKyRules
         return null;
     }
 
-    // Chiếu DeTai sang ViewModel kèm số đã đăng ký (tính từ dữ liệu thực tế)
+    
     public static IQueryable<DeTaiTraCuuVM> ToTraCuuVM(this IQueryable<DeTai> q) =>
         q.Select(d => new DeTaiTraCuuVM
         {

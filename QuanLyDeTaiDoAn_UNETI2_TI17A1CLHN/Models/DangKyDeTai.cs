@@ -20,7 +20,7 @@ public class DangKyDeTai
     [ValidateNever]
     public DeTai? DeTai { get; set; }
 
-    // Hệ thống tự gán khi tạo, người dùng không nhập
+   
     [Display(Name = "Ngày đăng ký")]
     public DateTime NgayDangKy { get; set; }
 

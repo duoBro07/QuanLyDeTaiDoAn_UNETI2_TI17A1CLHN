@@ -46,7 +46,7 @@ public static class TrangThaiPhanCong
 
 public static class UiHelper
 {
-    // Màu badge Bootstrap theo trạng thái
+   
     public static string Badge(string? trangThai) => trangThai switch
     {
         "Hoạt động" or "Đã duyệt" or "Mở đăng ký" or "Đang hướng dẫn" => "bg-success",

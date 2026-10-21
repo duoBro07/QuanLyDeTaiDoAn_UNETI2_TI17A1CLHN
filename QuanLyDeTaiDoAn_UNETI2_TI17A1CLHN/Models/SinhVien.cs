@@ -15,7 +15,7 @@ public class SinhVien
     [Display(Name = "Mã sinh viên")]
     public string MaSinhVien { get; set; } = "";
 
-    // FK -> TaiKhoan (quan hệ 1-1). Không cho form gửi giá trị này lên
+    
     [BindNever]
     public int MaTaiKhoan { get; set; }
 

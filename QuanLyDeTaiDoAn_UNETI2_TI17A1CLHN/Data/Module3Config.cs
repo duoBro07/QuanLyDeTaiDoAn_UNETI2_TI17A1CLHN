@@ -19,7 +19,7 @@ public static class Module3Config
              .OnDelete(DeleteBehavior.Restrict);
         });
 
-        // Restrict: không xóa dây chuyền, giữ lịch sử đăng ký
+      
         modelBuilder.Entity<DangKyDeTai>(e =>
         {
             e.HasOne(d => d.SinhVien)

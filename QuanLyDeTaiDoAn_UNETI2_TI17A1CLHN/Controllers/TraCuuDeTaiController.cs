@@ -16,7 +16,7 @@ public class TraCuuDeTaiController : Module3BaseController
 {
     public TraCuuDeTaiController(AppDbContext db) : base(db) { }
 
-    // Màn 7: danh sách đề tài
+    
     public async Task<IActionResult> Index(string? tuKhoa, int? linhVuc, string? namHoc, int? hocKy, string? trangThai, int trang = 1)
     {
         var q = _db.DeTais.AsQueryable();
@@ -40,7 +40,6 @@ public class TraCuuDeTaiController : Module3BaseController
         return View(ds);
     }
 
-    // Màn 8: chi tiết đề tài
     public async Task<IActionResult> Details(int id)
     {
         var sv = await LaySinhVienHienTai();
