@@ -1,8 +1,26 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.ViewModels.HomeDashboardViewModel
+@{
+    ViewData["Title"] = "Trang chủ";
+    var hoTen = Context.Session.GetString("HoTen") ?? "Người dùng";
+    var vaiTro = Context.Session.GetString("VaiTro");
+    bool laAdmin = vaiTro == "Admin";
 }
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (laAdmin)
+{
+    <div class="dashboard-welcome"><div><span class="eyebrow">ADMIN DASHBOARD</span><h2>Xin chào, @hoTen!</h2><p>Đây là tổng quan riêng của Module 1.</p></div></div>
+    <div class="stats-grid">
+        <div class="stat-card stat-blue"><div class="stat-title">Tổng tài khoản</div><div class="stat-number">@Model.TongTaiKhoan</div><div class="stat-description">Tất cả tài khoản hệ thống</div></div>
+        <div class="stat-card stat-green"><div class="stat-title">Đang hoạt động</div><div class="stat-number">@Model.TaiKhoanHoatDong</div><div class="stat-description">Có thể đăng nhập</div></div>
+        <div class="stat-card stat-red"><div class="stat-title">Tài khoản khóa</div><div class="stat-number">@Model.TaiKhoanBiKhoa</div><div class="stat-description">Không được đăng nhập</div></div>
+        <div class="stat-card stat-purple"><div class="stat-title">Lĩnh vực</div><div class="stat-number">@Model.TongLinhVuc</div><div class="stat-description">@Model.LinhVucHoatDong đang hoạt động</div></div>
+    </div>
+    <div class="dashboard-grid mt-4">
+        <div class="page-card"><div class="page-card-header"><h4>Chức năng Module 1</h4></div><div class="page-card-body"><div class="quick-actions"><a asp-controller="TaiKhoan" asp-action="Index" class="quick-action"><strong>Quản lý tài khoản</strong><span>Thêm, sửa, chi tiết, khóa/mở khóa</span></a><a asp-controller="LinhVuc" asp-action="Index" class="quick-action"><strong>Quản lý lĩnh vực</strong><span>CRUD, validation, trạng thái</span></a></div></div></div>
+        <div class="page-card"><div class="page-card-header"><h4>Trạng thái tích hợp</h4></div><div class="page-card-body"><div class="integration-item"><span class="integration-dot pending"></span><div><strong>Module 2</strong><p>Chờ GiangVien/DeTai để hoàn thiện ràng buộc xóa lĩnh vực.</p></div></div><div class="integration-item"><span class="integration-dot pending"></span><div><strong>Module 3/4</strong><p>Chờ SinhVien/DangKy/PhanCong để áp dụng kiểm soát dữ liệu cá nhân.</p></div></div></div></div>
+    </div>
+}
+else
+{
+    <div class="student-hero"><div><span class="eyebrow">SINH VIÊN</span><h2>Xin chào, @hoTen!</h2><p>Đăng nhập và phân quyền của Module 1 đang hoạt động. Chức năng tra cứu/đăng ký sẽ được nối từ Module 2 và 3.</p></div><div class="student-hero-icon">🎓</div></div>
+    <div class="page-card mt-4"><div class="page-card-header"><h4>Quyền hiện tại</h4></div><div class="page-card-body"><p>✓ Có thể đăng nhập/đăng xuất bằng Session.</p><p>✓ Không thể truy cập URL quản trị của Admin.</p><p class="mb-0">⏳ Dữ liệu đăng ký/phân công cá nhân sẽ được xác định từ tài khoản sau khi ghép Module 3/4.</p></div></div>
+}

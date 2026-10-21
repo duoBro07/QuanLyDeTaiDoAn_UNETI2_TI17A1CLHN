@@ -1,44 +1,15 @@
-﻿@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.LinhVuc
-
-@{
-    ViewData["Title"] = "Chi tiết lĩnh vực";
-}
-
-<h2>Chi tiết lĩnh vực</h2>
-
-<div class="card">
-    <div class="card-body">
-
-        <div class="mb-3">
-            <strong>Mã lĩnh vực:</strong>
-            @Model.MaLinhVuc
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.LinhVuc
+@{ ViewData["Title"] = "Chi tiết lĩnh vực"; }
+<div class="page-card">
+    <div class="page-card-header"><div><h4>Thông tin lĩnh vực</h4><small class="text-secondary">Thông tin này sẽ được dùng chung bởi Module 2</small></div><a asp-action="Edit" asp-route-id="@Model.MaLinhVuc" class="btn-main">Chỉnh sửa</a></div>
+    <div class="page-card-body">
+        <div class="detail-grid">
+            <div class="detail-label">Mã lĩnh vực</div><div class="detail-value">#@Model.MaLinhVuc</div>
+            <div class="detail-label">Tên lĩnh vực</div><div class="detail-value">@Model.TenLinhVuc</div>
+            <div class="detail-label">Mô tả</div><div class="detail-value">@(string.IsNullOrWhiteSpace(Model.MoTa) ? "Chưa có mô tả" : Model.MoTa)</div>
+            <div class="detail-label">Trạng thái</div><div class="detail-value">@if(Model.TrangThai){<span class="status-active">Hoạt động</span>}else{<span class="status-off">Ngừng hoạt động</span>}</div>
+            <div class="detail-label">Liên kết dự kiến</div><div class="detail-value"><span class="integration-badge">GiangVien.MaLinhVuc</span> <span class="integration-badge">DeTai.MaLinhVuc</span></div>
         </div>
-
-        <div class="mb-3">
-            <strong>Tên lĩnh vực:</strong>
-            @Model.TenLinhVuc
-        </div>
-
-        <div class="mb-3">
-            <strong>Mô tả:</strong>
-            @Model.MoTa
-        </div>
-
-        <div class="mb-3">
-            <strong>Trạng thái:</strong>
-            @(Model.TrangThai ? "Hoạt động" : "Ngừng hoạt động")
-        </div>
-
-        <a asp-action="Edit"
-           asp-route-id="@Model.MaLinhVuc"
-           class="btn btn-warning">
-            Sửa
-        </a>
-
-        <a asp-action="Index"
-           class="btn btn-secondary">
-            Quay lại
-        </a>
-
+        <div class="mt-4"><a asp-action="Index" class="btn-soft">Quay lại</a></div>
     </div>
 </div>

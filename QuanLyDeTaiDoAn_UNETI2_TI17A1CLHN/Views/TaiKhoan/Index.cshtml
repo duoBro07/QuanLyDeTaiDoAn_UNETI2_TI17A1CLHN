@@ -1,0 +1,65 @@
+@model IEnumerable<QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.TaiKhoan>
+@{
+    ViewData["Title"] = "Quản lý tài khoản";
+}
+<div class="page-card">
+    <div class="page-card-header">
+        <div>
+            <h4>Danh sách tài khoản</h4>
+            <small class="text-secondary">Quản lý tài khoản, vai trò và trạng thái đăng nhập</small>
+        </div>
+        <a asp-action="Create" class="btn-main">+ Thêm tài khoản</a>
+    </div>
+    <div class="page-card-body">
+        <form method="get" class="filter-bar">
+            <input type="text" name="q" value="@ViewBag.Q" class="form-control" placeholder="Tìm tên đăng nhập, họ tên, email..." />
+            <select name="vaiTro" class="form-select">
+                <option value="">Tất cả vai trò</option>
+                @if (ViewBag.VaiTro == "Admin") { <option value="Admin" selected>Admin</option> } else { <option value="Admin">Admin</option> }
+                @if (ViewBag.VaiTro == "SinhVien") { <option value="SinhVien" selected>Sinh viên</option> } else { <option value="SinhVien">Sinh viên</option> }
+            </select>
+            <select name="trangThai" class="form-select">
+                <option value="">Tất cả trạng thái</option>
+                @if (ViewBag.TrangThai == "active") { <option value="active" selected>Hoạt động</option> } else { <option value="active">Hoạt động</option> }
+                @if (ViewBag.TrangThai == "locked") { <option value="locked" selected>Đã khóa</option> } else { <option value="locked">Đã khóa</option> }
+            </select>
+            <button class="btn-main" type="submit">Lọc</button>
+            <a asp-action="Index" class="btn-soft">Đặt lại</a>
+        </form>
+
+        @if (!Model.Any())
+        {
+            <div class="empty-state">Không có tài khoản phù hợp.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead><tr><th>Mã</th><th>Tên đăng nhập</th><th>Họ tên</th><th>Vai trò</th><th>Email</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+                    <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>#@item.MaTaiKhoan</td>
+                            <td><strong>@item.TenDangNhap</strong></td>
+                            <td>@item.HoTen</td>
+                            <td><span class="role-badge @(item.VaiTro == "Admin" ? "role-admin" : "role-student")">@(item.VaiTro == "Admin" ? "Admin" : "Sinh viên")</span></td>
+                            <td>@(item.Email ?? "—")</td>
+                            <td>@if(item.TrangThai){<span class="status-active">Hoạt động</span>}else{<span class="status-off">Đã khóa</span>}</td>
+                            <td>
+                                <div class="action-group">
+                                    <a asp-action="Details" asp-route-id="@item.MaTaiKhoan" class="action-link">Xem</a>
+                                    <a asp-action="Edit" asp-route-id="@item.MaTaiKhoan" class="action-link">Sửa</a>
+                                    <form asp-action="ToggleStatus" asp-route-id="@item.MaTaiKhoan" method="post" class="d-inline" onsubmit="return confirm('@(item.TrangThai ? "Khóa" : "Mở khóa") tài khoản @item.TenDangNhap?');">
+                                        <button type="submit" class="action-link @(item.TrangThai ? "action-link-danger" : "action-link-success")">@(item.TrangThai ? "Khóa" : "Mở")</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

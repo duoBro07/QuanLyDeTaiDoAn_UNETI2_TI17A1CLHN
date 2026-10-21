@@ -1,17 +1,2 @@
-﻿@{
-    ViewData["Title"] = "Không có quyền truy cập";
-}
-
-<div class="text-center mt-5">
-    <h2>Không có quyền truy cập</h2>
-
-    <p>
-        Tài khoản của bạn không có quyền sử dụng chức năng này.
-    </p>
-
-    <a asp-controller="Home"
-       asp-action="Index"
-       class="btn btn-primary">
-        Về trang chủ
-    </a>
-</div>
+@{ ViewData["Title"] = "Không có quyền truy cập"; }
+<div class="center-message"><div class="message-card"><div class="message-icon">🔒</div><h2>Bạn không có quyền truy cập!</h2><p>Tài khoản hiện tại không được phép sử dụng chức năng này. Quyền đã được kiểm tra tại Controller.</p><a asp-controller="Home" asp-action="Index" class="btn-main">Quay về trang chủ</a></div></div>
