@@ -1,0 +1,73 @@
+@* Layout riêng cho Module 3 (sidebar xanh như ảnh minh họa). Không sửa _Layout chung của nhóm. *@
+@{
+    var vaiTro = Context.Session.GetString("VaiTro");
+    var hoTen = Context.Session.GetString("HoTen");
+    var ctrl = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var act = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    string Act(string c, params string[] a) => ctrl == c && (a.Length == 0 || a.Contains(act)) ? "active" : "";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Quản lý đề tài đồ án</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        :root { --m3-navy:#0b2a6b; --m3-blue:#1e5bd8; --m3-bg:#f1f5fb; }
+        body { background: var(--m3-bg); }
+        .m3-wrap { display:flex; min-height:100vh; }
+        .m3-side { width:230px; background:var(--m3-navy); color:#cfe0ff; flex-shrink:0; }
+        .m3-side .brand { color:#fff; font-weight:700; padding:18px 20px; font-size:1.05rem; border-bottom:1px solid rgba(255,255,255,.12); }
+        .m3-side a { display:block; color:#cfe0ff; text-decoration:none; padding:11px 20px; font-size:.95rem; }
+        .m3-side a:hover { background:rgba(255,255,255,.08); color:#fff; }
+        .m3-side a.active { background:var(--m3-blue); color:#fff; }
+        .m3-main { flex:1; min-width:0; }
+        .m3-top { background:#fff; border-bottom:1px solid #dbe4f3; padding:12px 24px; display:flex; justify-content:flex-end; align-items:center; gap:14px; }
+        .m3-content { padding:24px; }
+        .m3-card { background:#fff; border:1px solid #dbe4f3; border-radius:10px; padding:20px; }
+        .m3-stat { border-radius:10px; padding:16px 18px; background:#fff; border:1px solid #dbe4f3; }
+        .m3-stat .so { font-size:2rem; font-weight:700; color:var(--m3-blue); line-height:1; }
+        .m3-avatar { width:84px; height:84px; border-radius:50%; background:var(--m3-blue); color:#fff; display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:700; }
+        .table thead th { background:#eaf0fb; white-space:nowrap; }
+        @@media (max-width: 768px) { .m3-wrap { flex-direction:column; } .m3-side { width:100%; } }
+    </style>
+</head>
+<body>
+<div class="m3-wrap">
+    <aside class="m3-side">
+        <div class="brand">QuanLyDeTaiDoAn</div>
+        @if (vaiTro == "Admin")
+        {
+            <a class="@Act("SinhVien","Index","Create","Edit","Details")" asp-controller="SinhVien" asp-action="Index">Quản lý sinh viên</a>
+        }
+        else if (vaiTro == "SinhVien")
+        {
+            <a class="@Act("SinhVien","TrangChu")" asp-controller="SinhVien" asp-action="TrangChu">Trang chủ</a>
+            <a class="@Act("TraCuuDeTai")" asp-controller="TraCuuDeTai" asp-action="Index">Tra cứu đề tài</a>
+            <a class="@Act("DangKyDeTai","Index","Details","Create","XacNhan")" asp-controller="DangKyDeTai" asp-action="Index">Đăng ký của tôi</a>
+            <a class="@Act("DangKyDeTai","GiangVienHienTai")" asp-controller="DangKyDeTai" asp-action="GiangVienHienTai">Giảng viên hướng dẫn</a>
+            <a class="@Act("DangKyDeTai","LichSuPhanCong")" asp-controller="DangKyDeTai" asp-action="LichSuPhanCong">Lịch sử phân công</a>
+            <a class="@Act("SinhVien","CaNhan","CapNhatCaNhan")" asp-controller="SinhVien" asp-action="CaNhan">Thông tin cá nhân</a>
+        }
+    </aside>
+    <div class="m3-main">
+        <div class="m3-top">
+            <span class="text-muted">@hoTen (@(vaiTro == "Admin" ? "Admin" : "Sinh viên"))</span>
+            @* [KHỚP VỚI MODULE 1] đổi tên Controller/Action đăng xuất nếu Module 1 đặt khác *@
+            <form asp-controller="TaiKhoan" asp-action="DangXuat" method="post" class="m-0">
+                <button class="btn btn-sm btn-outline-secondary">Đăng xuất</button>
+            </form>
+        </div>
+        <div class="m3-content">
+            @if (TempData["ThanhCong"] != null) { <div class="alert alert-success alert-dismissible fade show">@TempData["ThanhCong"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div> }
+            @if (TempData["Loi"] != null) { <div class="alert alert-danger alert-dismissible fade show">@TempData["Loi"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div> }
+            @RenderBody()
+        </div>
+    </div>
+</div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

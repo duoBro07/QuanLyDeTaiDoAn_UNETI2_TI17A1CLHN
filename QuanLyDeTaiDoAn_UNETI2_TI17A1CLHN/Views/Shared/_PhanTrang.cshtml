@@ -1,0 +1,28 @@
+@* Phân trang dùng chung: giữ nguyên mọi tham số tìm kiếm/lọc trên URL, chỉ đổi "trang" *@
+@using Microsoft.AspNetCore.Http
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.ViewModels.PhanTrangVM
+@{
+    string Link(int t)
+    {
+        var d = Context.Request.Query.Where(k => k.Key != "trang")
+                       .ToDictionary(k => k.Key, k => (string?)k.Value.ToString());
+        d["trang"] = t.ToString();
+        return Context.Request.Path.Value + QueryString.Create(d).Value;
+    }
+}
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <span class="text-muted small">Hiển thị @Model.SoHienThi trong @Model.Tong kết quả</span>
+    @if (Model.TongTrang > 1)
+    {
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @(Model.Trang <= 1 ? "disabled" : "")"><a class="page-link" href="@Link(Model.Trang - 1)">«</a></li>
+                @for (int i = 1; i <= Model.TongTrang; i++)
+                {
+                    <li class="page-item @(i == Model.Trang ? "active" : "")"><a class="page-link" href="@Link(i)">@i</a></li>
+                }
+                <li class="page-item @(Model.Trang >= Model.TongTrang ? "disabled" : "")"><a class="page-link" href="@Link(Model.Trang + 1)">»</a></li>
+            </ul>
+        </nav>
+    }
+</div>
