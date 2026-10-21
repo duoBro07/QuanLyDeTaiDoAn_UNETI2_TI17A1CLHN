@@ -15,170 +15,180 @@ namespace QuanLyDeTaiDoAn.Controllers
         {
             _context = context;
         }
+
         public async Task<IActionResult> Index(
             string? tuKhoa,
             int? maLinhVuc,
             string? namHoc,
             int? hocKy,
             string? trangThai,
-            string? sapXep,
             string? choCon,
+            string? sapXep,
             int trang = 1)
         {
             const int kichThuocTrang = 10;
 
-            var query = _context.DeTais
+            trang = Math.Max(1, trang);
+
+            var duLieu = _context.DeTais
                 .AsNoTracking()
-                .AsQueryable();
+                .Select(d => new
+                {
+                    DeTai = d,
+                    SoDaDangKy = _context.DangKyDeTaiModule2s.Count(
+                        dk => dk.MaDeTai == d.MaDeTai &&
+                        (dk.TrangThai == "Đã duyệt" ||
+                         dk.TrangThai == "Đang thực hiện"))
+                });
+
+            var truyVan = duLieu.Select(x => new
+            {
+                x.DeTai,
+                x.SoDaDangKy,
+                SoChoCon = x.DeTai.SoSinhVienToiDa - x.SoDaDangKy
+            });
 
             if (!string.IsNullOrWhiteSpace(tuKhoa))
             {
                 tuKhoa = tuKhoa.Trim();
 
-                query = query.Where(d =>
-                    d.TenDeTai.Contains(tuKhoa) ||
-                    (d.MoTa != null &&
-                     d.MoTa.Contains(tuKhoa)) ||
-                    (d.YeuCau != null &&
-                     d.YeuCau.Contains(tuKhoa)));
+                truyVan = truyVan.Where(x =>
+                    x.DeTai.TenDeTai.Contains(tuKhoa) ||
+                    (x.DeTai.MoTa != null &&
+                     x.DeTai.MoTa.Contains(tuKhoa)) ||
+                    (x.DeTai.YeuCau != null &&
+                     x.DeTai.YeuCau.Contains(tuKhoa)));
             }
+
             if (maLinhVuc.HasValue)
             {
-                query = query.Where(d =>
-                    d.MaLinhVuc == maLinhVuc.Value);
+                truyVan = truyVan.Where(x =>
+                    x.DeTai.MaLinhVuc == maLinhVuc.Value);
             }
 
             if (!string.IsNullOrWhiteSpace(namHoc))
             {
-                query = query.Where(d =>
-                    d.NamHoc == namHoc);
+                truyVan = truyVan.Where(x =>
+                    x.DeTai.NamHoc == namHoc);
             }
+
             if (hocKy.HasValue)
             {
-                query = query.Where(d =>
-                    d.HocKy == hocKy.Value);
+                truyVan = truyVan.Where(x =>
+                    x.DeTai.HocKy == hocKy.Value);
             }
-            if (!string.IsNullOrWhiteSpace(trangThai))
-            {
-                query = query.Where(d =>
-                    d.TrangThai == trangThai);
-            }
-
-            var thongKe = query.Select(d => new
-            {
-                DeTai = d,
-
-                SoDaDangKy = _context
-                    .DangKyDeTaiModule2s
-                    .Count(k =>
-                        k.MaDeTai == d.MaDeTai &&
-                        (k.TrangThai == "Đã duyệt" ||
-                         k.TrangThai == "Đang thực hiện"))
-            });
 
             if (choCon == "con")
             {
-                thongKe = thongKe.Where(x =>
-                    x.DeTai.SoSinhVienToiDa >
-                    x.SoDaDangKy);
+                truyVan = truyVan.Where(x => x.SoChoCon > 0);
+            }
+            else if (choCon == "het")
+            {
+                truyVan = truyVan.Where(x => x.SoChoCon <= 0);
             }
 
-   
-            if (choCon == "het")
+            if (!string.IsNullOrWhiteSpace(trangThai))
             {
-                thongKe = thongKe.Where(x =>
-                    x.DeTai.SoSinhVienToiDa <=
-                    x.SoDaDangKy);
+                if (trangThai == "Mở đăng ký")
+                {
+                    truyVan = truyVan.Where(x =>
+                        x.DeTai.TrangThai != "Tạm khóa" &&
+                        x.DeTai.TrangThai != "Kết thúc" &&
+                        x.SoChoCon > 0);
+                }
+                else if (trangThai == "Đủ số lượng")
+                {
+                    truyVan = truyVan.Where(x =>
+                        x.DeTai.TrangThai != "Tạm khóa" &&
+                        x.DeTai.TrangThai != "Kết thúc" &&
+                        x.SoChoCon <= 0);
+                }
+                else
+                {
+                    truyVan = truyVan.Where(x =>
+                        x.DeTai.TrangThai == trangThai);
+                }
             }
 
-        
-            var querySapXep = sapXep switch
+            truyVan = sapXep switch
             {
-                "ten_za" => thongKe
-                    .OrderByDescending(x =>
-                        x.DeTai.TenDeTai),
+                "ten_za" => truyVan
+                    .OrderByDescending(x => x.DeTai.TenDeTai)
+                    .ThenBy(x => x.DeTai.MaDeTai),
 
-                "sv_tang" => thongKe
-                    .OrderBy(x =>
-                        x.DeTai.SoSinhVienToiDa),
+                "sv_tang" => truyVan
+                    .OrderBy(x => x.DeTai.SoSinhVienToiDa)
+                    .ThenBy(x => x.DeTai.MaDeTai),
 
-                "sv_giam" => thongKe
-                    .OrderByDescending(x =>
-                        x.DeTai.SoSinhVienToiDa),
+                "sv_giam" => truyVan
+                    .OrderByDescending(x => x.DeTai.SoSinhVienToiDa)
+                    .ThenBy(x => x.DeTai.MaDeTai),
 
-                "cho_tang" => thongKe
-                    .OrderBy(x =>
-                        x.DeTai.SoSinhVienToiDa -
-                        x.SoDaDangKy),
+                "cho_tang" => truyVan
+                    .OrderBy(x => x.SoChoCon)
+                    .ThenBy(x => x.DeTai.MaDeTai),
 
-                "cho_giam" => thongKe
-                    .OrderByDescending(x =>
-                        x.DeTai.SoSinhVienToiDa -
-                        x.SoDaDangKy),
+                "cho_giam" => truyVan
+                    .OrderByDescending(x => x.SoChoCon)
+                    .ThenBy(x => x.DeTai.MaDeTai),
 
-                _ => thongKe
-                    .OrderBy(x =>
-                        x.DeTai.TenDeTai)
+                _ => truyVan
+                    .OrderBy(x => x.DeTai.TenDeTai)
+                    .ThenBy(x => x.DeTai.MaDeTai)
             };
 
-    
-            int tongBanGhi =
-                await thongKe.CountAsync();
+            int tongBanGhi = await truyVan.CountAsync();
 
             int tongTrang = (int)Math.Ceiling(
                 tongBanGhi / (double)kichThuocTrang);
 
-            trang = Math.Max(1, trang);
-
-            if (tongTrang > 0)
+            if (tongTrang > 0 && trang > tongTrang)
             {
-                trang = Math.Min(trang, tongTrang);
+                trang = tongTrang;
             }
 
-     
-            var ketQua = await querySapXep
-                .ThenBy(x => x.DeTai.MaDeTai)
+            var ketQua = await truyVan
                 .Skip((trang - 1) * kichThuocTrang)
                 .Take(kichThuocTrang)
-                .Select(x => new
-                {
-                    x.DeTai,
-                    x.SoDaDangKy
-                })
                 .ToListAsync();
 
-            var danhSach = ketQua
+            var danhSachDeTai = ketQua
                 .Select(x => x.DeTai)
                 .ToList();
+
+            var maLinhVucs = danhSachDeTai
+                .Select(x => x.MaLinhVuc)
+                .Distinct()
+                .ToList();
+
             var linhVucs = await _context.LinhVucs
                 .AsNoTracking()
-                .OrderBy(l => l.TenLinhVuc)
-                .ToListAsync();
+                .Where(x => maLinhVucs.Contains(x.MaLinhVuc))
+                .ToDictionaryAsync(x => x.MaLinhVuc);
 
-            var linhVucTheoMa = linhVucs
-                .ToDictionary(l => l.MaLinhVuc);
-
-            foreach (var deTai in danhSach)
+            foreach (var deTai in danhSachDeTai)
             {
-                if (linhVucTheoMa.TryGetValue(
+                if (linhVucs.TryGetValue(
                     deTai.MaLinhVuc, out var linhVuc))
                 {
                     deTai.LinhVuc = linhVuc;
                 }
             }
 
-            ViewBag.SoDaDangKy = ketQua
-                .ToDictionary(
-                    x => x.DeTai.MaDeTai,
-                    x => x.SoDaDangKy);
+            ViewBag.SoDaDangKy = ketQua.ToDictionary(
+                x => x.DeTai.MaDeTai,
+                x => x.SoDaDangKy);
 
-            ViewBag.LinhVucs = linhVucs;
+            ViewBag.LinhVucs = await _context.LinhVucs
+                .AsNoTracking()
+                .OrderBy(x => x.TenLinhVuc)
+                .ToListAsync();
 
             ViewBag.NamHocs = await _context.DeTais
                 .AsNoTracking()
-                .Select(d => d.NamHoc)
+                .Select(x => x.NamHoc)
                 .Distinct()
-                .OrderByDescending(n => n)
+                .OrderByDescending(x => x)
                 .ToListAsync();
 
             ViewBag.TuKhoa = tuKhoa;
@@ -186,70 +196,59 @@ namespace QuanLyDeTaiDoAn.Controllers
             ViewBag.NamHocLoc = namHoc;
             ViewBag.HocKyLoc = hocKy;
             ViewBag.TrangThaiLoc = trangThai;
-            ViewBag.SapXep = sapXep;
             ViewBag.ChoCon = choCon;
+            ViewBag.SapXep = sapXep ?? "";
+
             ViewBag.TrangHienTai = trang;
             ViewBag.TongTrang = tongTrang;
             ViewBag.TongBanGhi = tongBanGhi;
             ViewBag.KichThuocTrang = kichThuocTrang;
 
-            return View(danhSach);
+            return View(danhSachDeTai);
         }
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
                 return NotFound();
 
             var deTai = await _context.DeTais
-                .Include(d => d.LinhVuc)
+                .Include(x => x.LinhVuc)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(d =>
-                    d.MaDeTai == id);
+                .FirstOrDefaultAsync(x => x.MaDeTai == id);
 
             if (deTai == null)
                 return NotFound();
 
             return View(deTai);
         }
+
         public async Task<IActionResult> Create()
         {
-            await NapLinhVuc();
-            return View();
+            await LoadLinhVuc();
+            return View(new DeTai());
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             [Bind("TenDeTai,MaLinhVuc,MoTa,YeuCau,SoSinhVienToiDa,NamHoc,HocKy,TrangThai")]
             DeTai deTai)
         {
-            ChuanHoa(deTai);
+            ModelState.Remove("LinhVuc");
 
-            await KiemTraDuLieu(deTai);
-            await KiemTraTrungTen(deTai);
+            await KiemTraDeTai(deTai);
 
             if (ModelState.IsValid)
             {
                 _context.DeTais.Add(deTai);
+                await _context.SaveChangesAsync();
 
-                try
-                {
-                    await _context.SaveChangesAsync();
-
-                    TempData["ThongBao"] =
-                        "Thêm đề tài thành công.";
-
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateException)
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "Không thể lưu đề tài. Vui lòng kiểm tra dữ liệu.");
-                }
+                TempData["ThongBao"] = "Thêm đề tài thành công.";
+                return RedirectToAction(nameof(Index));
             }
 
-            await NapLinhVuc(deTai.MaLinhVuc);
-
+            await LoadLinhVuc(deTai.MaLinhVuc);
             return View(deTai);
         }
 
@@ -258,14 +257,12 @@ namespace QuanLyDeTaiDoAn.Controllers
             if (id == null)
                 return NotFound();
 
-            var deTai = await _context.DeTais
-                .FindAsync(id);
+            var deTai = await _context.DeTais.FindAsync(id);
 
             if (deTai == null)
                 return NotFound();
 
-            await NapLinhVuc(deTai.MaLinhVuc);
-
+            await LoadLinhVuc(deTai.MaLinhVuc);
             return View(deTai);
         }
 
@@ -279,211 +276,181 @@ namespace QuanLyDeTaiDoAn.Controllers
             if (id != deTai.MaDeTai)
                 return NotFound();
 
-            ChuanHoa(deTai);
+            ModelState.Remove("LinhVuc");
 
-            await KiemTraDuLieu(deTai);
-            await KiemTraTrungTen(deTai, id);
+            await KiemTraDeTai(deTai, id);
 
-            int soDaDangKy = await _context
-                .DangKyDeTaiModule2s
-                .CountAsync(k =>
-                    k.MaDeTai == id &&
-                    (k.TrangThai == "Đã duyệt" ||
-                     k.TrangThai == "Đang thực hiện"));
+            var deTaiCu = await _context.DeTais
+                .FirstOrDefaultAsync(x => x.MaDeTai == id);
+
+            if (deTaiCu == null)
+                return NotFound();
+
+            int soDaDangKy = await DemDangKyHopLe(id);
 
             if (deTai.SoSinhVienToiDa < soDaDangKy)
             {
                 ModelState.AddModelError(
-                    nameof(deTai.SoSinhVienToiDa),
-                    $"Số sinh viên tối đa không được nhỏ hơn {soDaDangKy} sinh viên đã đăng ký hợp lệ.");
+                    "SoSinhVienToiDa",
+                    $"Số sinh viên tối đa không được nhỏ hơn {soDaDangKy}.");
             }
 
             if (ModelState.IsValid)
             {
-                var deTaiCu = await _context.DeTais
-                    .FindAsync(id);
-
-                if (deTaiCu == null)
-                    return NotFound();
-
                 deTaiCu.TenDeTai = deTai.TenDeTai;
                 deTaiCu.MaLinhVuc = deTai.MaLinhVuc;
                 deTaiCu.MoTa = deTai.MoTa;
                 deTaiCu.YeuCau = deTai.YeuCau;
-                deTaiCu.SoSinhVienToiDa =
-                    deTai.SoSinhVienToiDa;
+                deTaiCu.SoSinhVienToiDa = deTai.SoSinhVienToiDa;
                 deTaiCu.NamHoc = deTai.NamHoc;
                 deTaiCu.HocKy = deTai.HocKy;
                 deTaiCu.TrangThai = deTai.TrangThai;
 
-                try
-                {
-                    await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
-                    TempData["ThongBao"] =
-                        "Cập nhật đề tài thành công.";
-
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateException)
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "Không thể cập nhật đề tài.");
-                }
+                TempData["ThongBao"] = "Cập nhật đề tài thành công.";
+                return RedirectToAction(nameof(Index));
             }
 
-            await NapLinhVuc(deTai.MaLinhVuc);
-
+            await LoadLinhVuc(deTai.MaLinhVuc);
             return View(deTai);
         }
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
                 return NotFound();
 
             var deTai = await _context.DeTais
-                .Include(d => d.LinhVuc)
+                .Include(x => x.LinhVuc)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(d =>
-                    d.MaDeTai == id);
+                .FirstOrDefaultAsync(x => x.MaDeTai == id);
 
             if (deTai == null)
                 return NotFound();
 
             return View(deTai);
         }
-        [HttpPost]
-        [ActionName("Delete")]
+
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var deTai = await _context.DeTais
-                .FindAsync(id);
+            var deTai = await _context.DeTais.FindAsync(id);
 
             if (deTai == null)
                 return NotFound();
 
-            bool coDangKy = await _context
-                .DangKyDeTaiModule2s
-                .AnyAsync(k => k.MaDeTai == id);
+            bool coDangKy = await _context.DangKyDeTaiModule2s
+                .AnyAsync(x => x.MaDeTai == id);
 
             if (coDangKy)
             {
                 TempData["Loi"] =
-                    "Không thể xóa đề tài đã có đăng ký.";
+                    "Đề tài đã có đăng ký, không thể xóa. Hãy chuyển sang trạng thái Tạm khóa hoặc Kết thúc.";
 
                 return RedirectToAction(nameof(Index));
             }
 
             _context.DeTais.Remove(deTai);
+            await _context.SaveChangesAsync();
 
-            try
-            {
-                await _context.SaveChangesAsync();
-
-                TempData["ThongBao"] =
-                    "Xóa đề tài thành công.";
-            }
-            catch (DbUpdateException)
-            {
-                TempData["Loi"] =
-                    "Không thể xóa đề tài đang có dữ liệu liên quan.";
-            }
-
+            TempData["ThongBao"] = "Xóa đề tài thành công.";
             return RedirectToAction(nameof(Index));
         }
-        private void ChuanHoa(DeTai deTai)
+
+        private async Task<int> DemDangKyHopLe(int maDeTai)
         {
-            deTai.TenDeTai =
-                (deTai.TenDeTai ?? "").Trim();
-
-            deTai.NamHoc =
-                (deTai.NamHoc ?? "").Trim();
-
-            deTai.MoTa =
-                string.IsNullOrWhiteSpace(deTai.MoTa)
-                    ? null
-                    : deTai.MoTa.Trim();
-
-            deTai.YeuCau =
-                string.IsNullOrWhiteSpace(deTai.YeuCau)
-                    ? null
-                    : deTai.YeuCau.Trim();
-
-            if (deTai.TenDeTai.Length == 0)
-            {
-                ModelState.AddModelError(
-                    nameof(deTai.TenDeTai),
-                    "Vui lòng nhập tên đề tài.");
-            }
-
-            if (deTai.NamHoc.Length == 0)
-            {
-                ModelState.AddModelError(
-                    nameof(deTai.NamHoc),
-                    "Vui lòng nhập năm học.");
-            }
+            return await _context.DangKyDeTaiModule2s
+                .CountAsync(x =>
+                    x.MaDeTai == maDeTai &&
+                    (x.TrangThai == "Đã duyệt" ||
+                     x.TrangThai == "Đang thực hiện"));
         }
-        private async Task KiemTraTrungTen(
+
+        private async Task KiemTraDeTai(
             DeTai deTai,
-            int? idLoaiTru = null)
+            int? maDeTaiHienTai = null)
         {
-            bool trungTen = await _context.DeTais
-                .AnyAsync(d =>
-                    (!idLoaiTru.HasValue ||
-                     d.MaDeTai != idLoaiTru.Value) &&
-                    d.TenDeTai == deTai.TenDeTai &&
-                    d.NamHoc == deTai.NamHoc &&
-                    d.HocKy == deTai.HocKy);
-
-            if (trungTen)
+            if (string.IsNullOrWhiteSpace(deTai.TenDeTai))
             {
                 ModelState.AddModelError(
-                    nameof(deTai.TenDeTai),
-                    "Tên đề tài đã tồn tại trong năm học và học kỳ này.");
+                    "TenDeTai",
+                    "Tên đề tài không được để trống.");
             }
-        }
-        private async Task KiemTraDuLieu(DeTai deTai)
-        {
-            bool linhVucTonTai =
-                await _context.LinhVucs
-                    .AnyAsync(l =>
-                        l.MaLinhVuc == deTai.MaLinhVuc);
+            else
+            {
+                deTai.TenDeTai = deTai.TenDeTai.Trim();
+
+                bool trungTen = await _context.DeTais
+                    .AnyAsync(x =>
+                        x.TenDeTai == deTai.TenDeTai &&
+                        (!maDeTaiHienTai.HasValue ||
+                         x.MaDeTai != maDeTaiHienTai.Value) &&
+                        x.NamHoc == deTai.NamHoc &&
+                        x.HocKy == deTai.HocKy);
+
+                if (trungTen)
+                {
+                    ModelState.AddModelError(
+                        "TenDeTai",
+                        "Tên đề tài đã tồn tại trong năm học và học kỳ này.");
+                }
+            }
+
+            bool linhVucTonTai = await _context.LinhVucs
+                .AnyAsync(x => x.MaLinhVuc == deTai.MaLinhVuc);
 
             if (!linhVucTonTai)
             {
                 ModelState.AddModelError(
-                    nameof(deTai.MaLinhVuc),
-                    "Lĩnh vực không tồn tại.");
+                    "MaLinhVuc",
+                    "Vui lòng chọn lĩnh vực hợp lệ.");
             }
 
-            string[] trangThaiHopLe =
-            {
-                "Mở đăng ký",
-                "Đủ số lượng",
-                "Tạm khóa",
-                "Kết thúc"
-            };
-
-            if (!trangThaiHopLe.Contains(deTai.TrangThai))
+            if (deTai.SoSinhVienToiDa < 1)
             {
                 ModelState.AddModelError(
-                    nameof(deTai.TrangThai),
-                    "Trạng thái không hợp lệ.");
+                    "SoSinhVienToiDa",
+                    "Số sinh viên tối đa phải lớn hơn 0.");
+            }
+
+            if (deTai.HocKy < 1 || deTai.HocKy > 3)
+            {
+                ModelState.AddModelError(
+                    "HocKy",
+                    "Học kỳ phải từ 1 đến 3.");
+            }
+
+            if (deTai.TrangThai != "Mở đăng ký" &&
+                deTai.TrangThai != "Đủ số lượng" &&
+                deTai.TrangThai != "Tạm khóa" &&
+                deTai.TrangThai != "Kết thúc")
+            {
+                ModelState.AddModelError(
+                    "TrangThai",
+                    "Trạng thái đề tài không hợp lệ.");
             }
         }
-        private async Task NapLinhVuc(
-            int? selected = null)
+
+        private async Task LoadLinhVuc(int? maLinhVuc = null)
         {
+            var linhVucs = await _context.LinhVucs
+                .AsNoTracking()
+                .OrderBy(x => x.TenLinhVuc)
+                .ToListAsync();
+
             ViewBag.MaLinhVuc = new SelectList(
-                await _context.LinhVucs
-                    .AsNoTracking()
-                    .OrderBy(l => l.TenLinhVuc)
-                    .ToListAsync(),
+                linhVucs,
                 "MaLinhVuc",
                 "TenLinhVuc",
-                selected);
+                maLinhVuc);
+
+            ViewBag.LinhVucs = new SelectList(
+                linhVucs,
+                "MaLinhVuc",
+                "TenLinhVuc",
+                maLinhVuc);
         }
     }
 }
