@@ -1,0 +1,20 @@
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.TaiKhoan
+@{ ViewData["Title"] = "Chi tiết tài khoản"; }
+<div class="page-card">
+    <div class="page-card-header"><div><h4>Thông tin tài khoản</h4><small class="text-secondary">Mật khẩu không hiển thị trên màn hình chi tiết</small></div><a asp-action="Edit" asp-route-id="@Model.MaTaiKhoan" class="btn-main">Chỉnh sửa</a></div>
+    <div class="page-card-body">
+        <div class="profile-summary">
+            <div class="profile-avatar">@Model.HoTen.Trim()[0].ToString().ToUpper()</div>
+            <div><h3>@Model.HoTen</h3><p>@("@" + Model.TenDangNhap)</p></div>
+        </div>
+        <div class="detail-grid mt-4">
+            <div class="detail-label">Mã tài khoản</div><div class="detail-value">#@Model.MaTaiKhoan</div>
+            <div class="detail-label">Tên đăng nhập</div><div class="detail-value">@Model.TenDangNhap</div>
+            <div class="detail-label">Họ tên</div><div class="detail-value">@Model.HoTen</div>
+            <div class="detail-label">Email</div><div class="detail-value">@(Model.Email ?? "Chưa cập nhật")</div>
+            <div class="detail-label">Vai trò</div><div class="detail-value">@(Model.VaiTro == "Admin" ? "Admin" : "Sinh viên")</div>
+            <div class="detail-label">Trạng thái</div><div class="detail-value">@if(Model.TrangThai){<span class="status-active">Hoạt động</span>}else{<span class="status-off">Đã khóa</span>}</div>
+        </div>
+        <div class="mt-4"><a asp-action="Index" class="btn-soft">Quay lại</a></div>
+    </div>
+</div>

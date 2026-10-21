@@ -26,6 +26,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Phục vụ CSS/JS trong wwwroot
+app.UseStaticFiles();
+
 app.UseRouting();
 
 // Bật Session
