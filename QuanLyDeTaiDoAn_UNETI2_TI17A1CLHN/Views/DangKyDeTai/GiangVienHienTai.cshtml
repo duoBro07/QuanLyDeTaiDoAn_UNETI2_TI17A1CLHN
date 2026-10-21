@@ -1,0 +1,24 @@
+@* Màn 15: Giảng viên hướng dẫn hiện tại *@
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.PhanCongHuongDan?
+@{ ViewData["Title"] = "Giảng viên hướng dẫn"; }
+<h3 class="mb-3">Giảng viên hướng dẫn</h3>
+<div class="m3-card">
+    @if (Model == null || Model.GiangVien == null)
+    {
+        <div class="alert alert-info mb-0">Bạn chưa được phân công giảng viên hướng dẫn. Vui lòng theo dõi kết quả duyệt đăng ký.</div>
+    }
+    else
+    {
+        var g = Model.GiangVien;
+        <dl class="row">
+            <dt class="col-sm-3">Họ tên</dt><dd class="col-sm-9">@g.HoTen</dd>
+            <dt class="col-sm-3">Học vị</dt><dd class="col-sm-9">@(g.HocVi ?? "—")</dd>
+            <dt class="col-sm-3">Email</dt><dd class="col-sm-9">@(g.Email ?? "—")</dd>
+            <dt class="col-sm-3">Số điện thoại</dt><dd class="col-sm-9">@(g.SoDienThoai ?? "—")</dd>
+            <dt class="col-sm-3">Lĩnh vực</dt><dd class="col-sm-9">@g.LinhVuc?.TenLinhVuc</dd>
+            <dt class="col-sm-3">Đề tài</dt><dd class="col-sm-9">@Model.DangKyDeTai?.DeTai?.TenDeTai</dd>
+            <dt class="col-sm-3">Bắt đầu từ</dt><dd class="col-sm-9">@Model.NgayBatDau.ToString("dd/MM/yyyy")</dd>
+        </dl>
+    }
+    <a asp-action="LichSuPhanCong" class="btn btn-outline-primary">Xem lịch sử phân công</a>
+</div>

@@ -1,0 +1,35 @@
+@* Màn 8: Chi tiết đề tài (cho sinh viên) *@
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.ViewModels.DeTaiChiTietVM
+@using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
+@{ ViewData["Title"] = "Chi tiết đề tài"; var d = Model.DeTai; }
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Chi tiết đề tài</h3>
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="btn btn-light border">Quay lại</a>
+        @if (Model.CoTheDangKy)
+        {
+            <a asp-controller="DangKyDeTai" asp-action="Create" asp-route-id="@d.MaDeTai" class="btn btn-primary">Đăng ký</a>
+        }
+    </div>
+</div>
+
+@if (!Model.CoTheDangKy)
+{
+    <div class="alert alert-warning">Bạn chưa thể đăng ký đề tài này: @Model.LyDoKhongDangKy</div>
+}
+
+<div class="m3-card">
+    <h5 class="mb-3">@d.TenDeTai</h5>
+    <dl class="row mb-0">
+        <dt class="col-sm-3">Lĩnh vực</dt><dd class="col-sm-9">@Model.TenLinhVuc</dd>
+        <dt class="col-sm-3">Giảng viên cùng lĩnh vực</dt>
+        <dd class="col-sm-9">@(Model.GiangVienCungLinhVuc.Any() ? string.Join(", ", Model.GiangVienCungLinhVuc) : "Chưa có")</dd>
+        <dt class="col-sm-3">Số sinh viên tối đa</dt><dd class="col-sm-9">@d.SoSinhVienToiDa</dd>
+        <dt class="col-sm-3">Số chỗ còn</dt><dd class="col-sm-9">@Model.SoChoCon</dd>
+        <dt class="col-sm-3">Năm học</dt><dd class="col-sm-9">@d.NamHoc</dd>
+        <dt class="col-sm-3">Học kỳ</dt><dd class="col-sm-9">@d.HocKy</dd>
+        <dt class="col-sm-3">Mô tả</dt><dd class="col-sm-9" style="white-space:pre-line">@(d.MoTa ?? "—")</dd>
+        <dt class="col-sm-3">Yêu cầu</dt><dd class="col-sm-9" style="white-space:pre-line">@(d.YeuCau ?? "—")</dd>
+        <dt class="col-sm-3">Trạng thái</dt><dd class="col-sm-9"><span class="badge @UiHelper.Badge(d.TrangThai)">@d.TrangThai</span></dd>
+    </dl>
+</div>

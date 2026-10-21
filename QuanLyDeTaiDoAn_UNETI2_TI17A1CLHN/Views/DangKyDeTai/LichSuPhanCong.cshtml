@@ -1,0 +1,32 @@
+@* Màn 16: Lịch sử phân công liên quan đến bản thân *@
+@model List<QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.PhanCongHuongDan>
+@using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
+@{ ViewData["Title"] = "Lịch sử phân công"; int stt = 0; }
+<h3 class="mb-3">Lịch sử phân công giảng viên</h3>
+<div class="m3-card">
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info mb-0">Chưa có lịch sử phân công nào.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead><tr><th>STT</th><th>Tên đề tài</th><th>Giảng viên</th><th>Ngày bắt đầu</th><th>Ngày kết thúc</th><th>Trạng thái</th></tr></thead>
+                <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td>@(++stt)</td>
+                        <td>@p.DangKyDeTai?.DeTai?.TenDeTai</td>
+                        <td>@p.GiangVien?.HoTen</td>
+                        <td>@p.NgayBatDau.ToString("dd/MM/yyyy")</td>
+                        <td>@(p.NgayKetThuc?.ToString("dd/MM/yyyy") ?? "—")</td>
+                        <td><span class="badge @UiHelper.Badge(p.TrangThai)">@p.TrangThai</span></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -1,0 +1,60 @@
+@* Màn 11: Danh sách đăng ký của sinh viên + mở hộp thoại hủy (màn 13) *@
+@model List<QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.DangKyDeTai>
+@using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
+@using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.ViewModels
+@{
+    ViewData["Title"] = "Đăng ký của tôi";
+    var pt = (PhanTrangVM)ViewBag.PhanTrang;
+    string? fTrangThai = (string?)ViewBag.TrangThai;
+    int stt = (pt.Trang - 1) * 5;
+}
+<h3 class="mb-3">Danh sách đăng ký</h3>
+<div class="m3-card">
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-md-3">
+            <select name="trangThai" class="form-select">
+                <option value="">Tất cả trạng thái</option>
+                @foreach (var t in new[] { TrangThaiDangKy.ChoDuyet, TrangThaiDangKy.DaDuyet, TrangThaiDangKy.TuChoi, TrangThaiDangKy.DaHuy })
+                { <option value="@t" selected="@(fTrangThai == t)">@t</option> }
+            </select>
+        </div>
+        <div class="col-md-7"><input name="tuKhoa" value="@ViewBag.TuKhoa" class="form-control" placeholder="Tìm kiếm theo tên đề tài..." /></div>
+        <div class="col-md-2"><button class="btn btn-primary w-100">Tìm kiếm</button></div>
+    </form>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info mb-0">Bạn chưa có đăng ký nào. <a asp-controller="TraCuuDeTai" asp-action="Index">Tra cứu đề tài</a> để đăng ký.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead><tr><th>STT</th><th>Tên đề tài</th><th>GVHD</th><th>Ngày đăng ký</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+                <tbody>
+                @foreach (var dk in Model)
+                {
+                    var gv = dk.PhanCongs.FirstOrDefault(p => p.TrangThai == TrangThaiPhanCong.DangHuongDan)?.GiangVien?.HoTen;
+                    <tr>
+                        <td>@(++stt)</td>
+                        <td>@dk.DeTai?.TenDeTai</td>
+                        <td>@(gv ?? "Chưa phân công")</td>
+                        <td>@dk.NgayDangKy.ToString("dd/MM/yyyy")</td>
+                        <td><span class="badge @UiHelper.Badge(dk.TrangThai)">@dk.TrangThai</span></td>
+                        <td class="text-nowrap">
+                            <a asp-action="Details" asp-route-id="@dk.MaDangKy" class="btn btn-sm btn-outline-primary">Xem</a>
+                            @if (dk.TrangThai == TrangThaiDangKy.ChoDuyet)
+                            {
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalHuy"
+                                        data-url="@Url.Action("Huy", new { id = dk.MaDangKy })" data-ten="@dk.DeTai?.TenDeTai">Hủy</button>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        <partial name="_PhanTrang" model="pt" />
+    }
+</div>
+<partial name="_ModalHuy" />

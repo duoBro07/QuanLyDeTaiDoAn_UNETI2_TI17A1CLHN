@@ -1,0 +1,23 @@
+@* Hộp thoại xác nhận hủy đăng ký (màn 13). Nút mở modal cần: data-bs-toggle="modal" data-bs-target="#modalHuy" data-url data-ten *@
+<div class="modal fade" id="modalHuy" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="formHuy" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header"><h5 class="modal-title">Hủy đăng ký</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body" id="huyNoiDung"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-danger">Hủy đăng ký</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('modalHuy').addEventListener('show.bs.modal', function (e) {
+        var b = e.relatedTarget;
+        document.getElementById('formHuy').action = b.dataset.url;
+        document.getElementById('huyNoiDung').textContent = 'Bạn có chắc chắn muốn hủy đăng ký đề tài "' + b.dataset.ten + '"?';
+    });
+</script>

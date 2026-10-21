@@ -1,0 +1,31 @@
+@* Màn 12: Chi tiết kết quả đăng ký + hủy đăng ký khi còn chờ duyệt (màn 13) *@
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.DangKyDeTai
+@using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
+@{
+    ViewData["Title"] = "Chi tiết kết quả đăng ký";
+    var gv = Model.PhanCongs.FirstOrDefault(p => p.TrangThai == TrangThaiPhanCong.DangHuongDan)?.GiangVien?.HoTen;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Chi tiết kết quả đăng ký</h3>
+    <a asp-action="Index" class="btn btn-light border">Quay lại</a>
+</div>
+<div class="m3-card">
+    <dl class="row mb-0">
+        <dt class="col-sm-3">Tên đề tài</dt><dd class="col-sm-9">@Model.DeTai?.TenDeTai</dd>
+        <dt class="col-sm-3">Lĩnh vực</dt><dd class="col-sm-9">@Model.DeTai?.LinhVuc?.TenLinhVuc</dd>
+        <dt class="col-sm-3">Giảng viên hướng dẫn</dt><dd class="col-sm-9">@(gv ?? "Chưa phân công")</dd>
+        <dt class="col-sm-3">Ngày đăng ký</dt><dd class="col-sm-9">@Model.NgayDangKy.ToString("dd/MM/yyyy HH:mm")</dd>
+        <dt class="col-sm-3">Lý do đăng ký</dt><dd class="col-sm-9" style="white-space:pre-line">@Model.LyDoDangKy</dd>
+        <dt class="col-sm-3">Trạng thái</dt><dd class="col-sm-9"><span class="badge @UiHelper.Badge(Model.TrangThai)">@Model.TrangThai</span></dd>
+        <dt class="col-sm-3">Ghi chú</dt>
+        <dd class="col-sm-9">@(!string.IsNullOrEmpty(Model.GhiChuDuyet) ? Model.GhiChuDuyet : (Model.TrangThai == TrangThaiDangKy.ChoDuyet ? "Đang chờ xét duyệt." : "—"))</dd>
+    </dl>
+    @if (Model.TrangThai == TrangThaiDangKy.ChoDuyet)
+    {
+        <div class="mt-3 text-end">
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalHuy"
+                    data-url="@Url.Action("Huy", new { id = Model.MaDangKy })" data-ten="@Model.DeTai?.TenDeTai">Hủy đăng ký</button>
+        </div>
+    }
+</div>
+<partial name="_ModalHuy" />

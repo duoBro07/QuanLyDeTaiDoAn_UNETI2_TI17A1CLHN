@@ -1,0 +1,78 @@
+@* Màn 7: Danh sách đề tài cho sinh viên tra cứu *@
+@model List<QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.ViewModels.DeTaiTraCuuVM>
+@using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
+@using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.ViewModels
+@{
+    ViewData["Title"] = "Danh sách đề tài";
+    var pt = (PhanTrangVM)ViewBag.PhanTrang;
+    var linhVucs = (List<LinhVuc>)ViewBag.LinhVucs;
+    var namHocs = (List<string>)ViewBag.NamHocs;
+    int? fLinhVuc = (int?)ViewBag.LinhVuc;
+    int? fHocKy = (int?)ViewBag.HocKy;
+    string? fNamHoc = (string?)ViewBag.NamHoc;
+    string? fTrangThai = (string?)ViewBag.TrangThai;
+    int stt = (pt.Trang - 1) * 5;
+}
+<h3 class="mb-3">Danh sách đề tài</h3>
+<div class="m3-card">
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-lg-4"><input name="tuKhoa" value="@ViewBag.TuKhoa" class="form-control" placeholder="Tìm kiếm theo tên đề tài..." /></div>
+        <div class="col-lg-2 col-6">
+            <select name="linhVuc" class="form-select">
+                <option value="">Tất cả lĩnh vực</option>
+                @foreach (var l in linhVucs) { <option value="@l.MaLinhVuc" selected="@(fLinhVuc == l.MaLinhVuc)">@l.TenLinhVuc</option> }
+            </select>
+        </div>
+        <div class="col-lg-2 col-6">
+            <select name="namHoc" class="form-select">
+                <option value="">Tất cả năm học</option>
+                @foreach (var n in namHocs) { <option value="@n" selected="@(fNamHoc == n)">@n</option> }
+            </select>
+        </div>
+        <div class="col-lg-1 col-6">
+            <select name="hocKy" class="form-select">
+                <option value="">Học kỳ</option>
+                <option value="1" selected="@(fHocKy == 1)">1</option>
+                <option value="2" selected="@(fHocKy == 2)">2</option>
+            </select>
+        </div>
+        <div class="col-lg-2 col-6">
+            <select name="trangThai" class="form-select">
+                <option value="">Tất cả trạng thái</option>
+                @foreach (var t in new[] { TrangThaiDeTai.MoDangKy, TrangThaiDeTai.DuSoLuong, TrangThaiDeTai.TamKhoa, TrangThaiDeTai.KetThuc })
+                { <option value="@t" selected="@(fTrangThai == t)">@t</option> }
+            </select>
+        </div>
+        <div class="col-12"><button class="btn btn-primary">Tìm kiếm</button> <a asp-action="Index" class="btn btn-light border">Xóa lọc</a></div>
+    </form>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info mb-0">Không tìm thấy đề tài phù hợp.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead><tr><th>STT</th><th>Tên đề tài</th><th>Lĩnh vực</th><th>Năm học</th><th>HK</th><th>SV tối đa</th><th>Số chỗ còn</th><th>Trạng thái</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var d in Model)
+                {
+                    <tr>
+                        <td>@(++stt)</td>
+                        <td>@d.TenDeTai</td>
+                        <td>@d.TenLinhVuc</td>
+                        <td>@d.NamHoc</td>
+                        <td>@d.HocKy</td>
+                        <td>@d.SoSinhVienToiDa</td>
+                        <td>@d.SoChoCon</td>
+                        <td><span class="badge @UiHelper.Badge(d.TrangThai)">@d.TrangThai</span></td>
+                        <td><a asp-action="Details" asp-route-id="@d.MaDeTai" class="btn btn-sm btn-outline-primary">Xem</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        <partial name="_PhanTrang" model="pt" />
+    }
+</div>

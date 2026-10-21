@@ -1,0 +1,17 @@
+@* Màn 10: Xác nhận đăng ký thành công *@
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.DangKyDeTai
+@using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
+@{ ViewData["Title"] = "Xác nhận đăng ký"; }
+<div class="m3-card text-center mx-auto" style="max-width:560px">
+    <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle bg-success text-white" style="width:72px;height:72px;font-size:2.2rem">✓</div>
+    <h4>Đăng ký đề tài thành công!</h4>
+    <p class="text-muted mb-1">Bạn đã đăng ký đề tài</p>
+    <p class="fw-semibold">@Model.DeTai?.TenDeTai</p>
+    <p class="mb-1">Ngày đăng ký: @Model.NgayDangKy.ToString("dd/MM/yyyy HH:mm")</p>
+    <p>Trạng thái: <span class="badge @UiHelper.Badge(Model.TrangThai)">@Model.TrangThai</span></p>
+    <p class="text-muted small">Đăng ký của bạn đang chờ Admin duyệt. Kết quả sẽ hiển thị trong mục "Đăng ký của tôi".</p>
+    <div class="d-flex gap-2 justify-content-center">
+        <a asp-controller="TraCuuDeTai" asp-action="Index" class="btn btn-primary">Về danh sách đề tài</a>
+        <a asp-action="Index" class="btn btn-outline-primary">Đăng ký của tôi</a>
+    </div>
+</div>
