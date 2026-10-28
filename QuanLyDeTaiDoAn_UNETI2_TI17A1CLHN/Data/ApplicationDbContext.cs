@@ -1,8 +1,8 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
-using QuanLyDeTaiDoAn.Models;
+using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models;
 
-namespace QuanLyDeTaiDoAn.Data
+namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Data
 {
     public class ApplicationDbContext : DbContext
     {
@@ -12,41 +12,12 @@ namespace QuanLyDeTaiDoAn.Data
         {
         }
 
+        // MODULE 1 - Giữ nguyên
         public DbSet<TaiKhoan> TaiKhoans { get; set; }
         public DbSet<LinhVuc> LinhVucs { get; set; }
+
+        // MODULE 2 - Thêm mới
         public DbSet<GiangVien> GiangViens { get; set; }
         public DbSet<DeTai> DeTais { get; set; }
-        public DbSet<DangKyDeTaiModule2> DangKyDeTaiModule2s { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<TaiKhoan>()
-                .HasIndex(x => x.TenDangNhap)
-                .IsUnique();
-
-            modelBuilder.Entity<GiangVien>()
-                .HasOne(g => g.LinhVuc)
-                .WithMany(l => l.GiangViens)
-                .HasForeignKey(g => g.MaLinhVuc)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<DeTai>()
-                .HasOne(d => d.LinhVuc)
-                .WithMany(l => l.DeTais)
-                .HasForeignKey(d => d.MaLinhVuc)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<GiangVien>()
-                .HasIndex(g => g.Email)
-                .IsUnique();
-
-            modelBuilder.Entity<DangKyDeTaiModule2>()
-                .HasOne(d => d.DeTai)
-                .WithMany()
-                .HasForeignKey(d => d.MaDeTai)
-                .OnDelete(DeleteBehavior.Restrict);
-        }
     }
 }
