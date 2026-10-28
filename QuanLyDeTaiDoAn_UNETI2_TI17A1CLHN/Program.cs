@@ -1,6 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
-using QuanLyDeTaiDoAn.Data;
+using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +8,9 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    )
+);
 
 builder.Services.AddDistributedMemoryCache();
 
@@ -21,19 +23,6 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    using var scope = app.Services.CreateScope();
-
-    var context = scope.ServiceProvider
-        .GetRequiredService<ApplicationDbContext>();
-
-    await context.Database.MigrateAsync();
-
-    await Module1SeedData.SeedAsync(context);
-    await Module2SeedData.SeedAsync(context);
-}
-
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -42,13 +31,23 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=DangNhap}/{action=Index}/{id?}");
+    pattern: "{controller=GiangVien}/{action=Index}/{id?}");
+
+
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+
+    var db = scope.ServiceProvider
+        .GetRequiredService<ApplicationDbContext>();
+
+    await Module2SeedData.SeedAsync(db);
+}
 
 app.Run();

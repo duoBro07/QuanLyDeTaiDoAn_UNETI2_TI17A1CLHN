@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using QuanLyDeTaiDoAn.Data;
+using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Data;
 
 #nullable disable
 
-namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.MigrationsModule2Test
+namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN._UNETI2_TI17A1CLHN.MigrationsModule2Test
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20261021071647_InitialModule2Clean")]
@@ -24,7 +24,7 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.MigrationsModule2Test
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("QuanLyDeTaiDoAn.Models.DangKyDeTaiModule2", b =>
+            modelBuilder.Entity("QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN..Models.DangKyDeTaiModule2", b =>
                 {
                     b.Property<int>("MaDangKy")
                         .ValueGeneratedOnAdd()
@@ -49,7 +49,7 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.MigrationsModule2Test
                     b.ToTable("DangKyDeTaiModule2s");
                 });
 
-            modelBuilder.Entity("QuanLyDeTaiDoAn.Models.DeTai", b =>
+            modelBuilder.Entity("QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN..Models.DeTai", b =>
                 {
                     b.Property<int>("MaDeTai")
                         .ValueGeneratedOnAdd()
@@ -93,7 +93,7 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.MigrationsModule2Test
                     b.ToTable("DeTais");
                 });
 
-            modelBuilder.Entity("QuanLyDeTaiDoAn.Models.GiangVien", b =>
+            modelBuilder.Entity("QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN..Models.GiangVien", b =>
                 {
                     b.Property<int>("MaGiangVien")
                         .ValueGeneratedOnAdd()
@@ -140,7 +140,7 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.MigrationsModule2Test
                     b.ToTable("GiangViens");
                 });
 
-            modelBuilder.Entity("QuanLyDeTaiDoAn.Models.LinhVuc", b =>
+            modelBuilder.Entity("QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN..Models.LinhVuc", b =>
                 {
                     b.Property<int>("MaLinhVuc")
                         .ValueGeneratedOnAdd()
@@ -165,9 +165,9 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.MigrationsModule2Test
                     b.ToTable("LinhVucs");
                 });
 
-            modelBuilder.Entity("QuanLyDeTaiDoAn.Models.DangKyDeTaiModule2", b =>
+            modelBuilder.Entity("QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN..Models.DangKyDeTaiModule2", b =>
                 {
-                    b.HasOne("QuanLyDeTaiDoAn.Models.DeTai", "DeTai")
+                    b.HasOne("QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN..Models.DeTai", "DeTai")
                         .WithMany()
                         .HasForeignKey("MaDeTai")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -176,9 +176,9 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.MigrationsModule2Test
                     b.Navigation("DeTai");
                 });
 
-            modelBuilder.Entity("QuanLyDeTaiDoAn.Models.DeTai", b =>
+            modelBuilder.Entity("QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN..Models.DeTai", b =>
                 {
-                    b.HasOne("QuanLyDeTaiDoAn.Models.LinhVuc", "LinhVuc")
+                    b.HasOne("QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN..Models.LinhVuc", "LinhVuc")
                         .WithMany("DeTais")
                         .HasForeignKey("MaLinhVuc")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -187,9 +187,9 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.MigrationsModule2Test
                     b.Navigation("LinhVuc");
                 });
 
-            modelBuilder.Entity("QuanLyDeTaiDoAn.Models.GiangVien", b =>
+            modelBuilder.Entity("QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN..Models.GiangVien", b =>
                 {
-                    b.HasOne("QuanLyDeTaiDoAn.Models.LinhVuc", "LinhVuc")
+                    b.HasOne("QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN..Models.LinhVuc", "LinhVuc")
                         .WithMany("GiangViens")
                         .HasForeignKey("MaLinhVuc")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -198,7 +198,7 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.MigrationsModule2Test
                     b.Navigation("LinhVuc");
                 });
 
-            modelBuilder.Entity("QuanLyDeTaiDoAn.Models.LinhVuc", b =>
+            modelBuilder.Entity("QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN..Models.LinhVuc", b =>
                 {
                     b.Navigation("DeTais");
 

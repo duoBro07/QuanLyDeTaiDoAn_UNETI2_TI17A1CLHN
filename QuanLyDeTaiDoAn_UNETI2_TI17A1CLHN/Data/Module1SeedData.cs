@@ -1,9 +1,9 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using QuanLyDeTaiDoAn.Models;
+using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models;
 
-namespace QuanLyDeTaiDoAn.Data
+namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Data
 {
     public static class Module1SeedData
     {
@@ -18,7 +18,7 @@ namespace QuanLyDeTaiDoAn.Data
                 HoTen = "Quản trị viên",
                 Email = "admin@example.com",
                 VaiTro = "Admin",
-                TrangThai = "Hoạt động"
+                TrangThai = true
             };
 
             admin.MatKhau = new PasswordHasher<TaiKhoan>()

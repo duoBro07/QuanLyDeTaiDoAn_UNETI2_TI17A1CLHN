@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using QuanLyDeTaiDoAn.Models;
+using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models;
 using System.Diagnostics;
 
-namespace QuanLyDeTaiDoAn.Controllers
+namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
 {
     public class HomeController : Controller
     {

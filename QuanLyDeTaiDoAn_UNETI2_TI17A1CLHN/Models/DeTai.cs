@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace QuanLyDeTaiDoAn.Models
+﻿
+using System.ComponentModel.DataAnnotations;
+namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
 {
     public class DeTai
     {
@@ -25,8 +25,7 @@ namespace QuanLyDeTaiDoAn.Models
         public string? YeuCau { get; set; }
 
         [Range(1, int.MaxValue,
-            ErrorMessage =
-                "Số sinh viên tối đa phải lớn hơn 0")]
+            ErrorMessage = "Số sinh viên tối đa phải lớn hơn 0")]
         [Display(Name = "Số sinh viên tối đa")]
         public int SoSinhVienToiDa { get; set; }
 
@@ -35,14 +34,18 @@ namespace QuanLyDeTaiDoAn.Models
         [Display(Name = "Năm học")]
         public string NamHoc { get; set; } = "";
 
-        [Range(1, 3, ErrorMessage = "Vui lòng chọn học kỳ")]
+        [Range(1, 3, ErrorMessage = "Học kỳ không hợp lệ")]
         [Display(Name = "Học kỳ")]
         public int HocKy { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn trạng thái")]
+        [StringLength(50)]
         [Display(Name = "Trạng thái")]
         public string TrangThai { get; set; } = "Mở đăng ký";
 
         public LinhVuc? LinhVuc { get; set; }
+
+        public ICollection<DangKyDeTai> DangKyDeTais { get; set; }
+            = new List<DangKyDeTai>();
     }
 }

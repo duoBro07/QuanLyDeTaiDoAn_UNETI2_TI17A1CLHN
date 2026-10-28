@@ -2,11 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using QuanLyDeTaiDoAn.Data;
-using QuanLyDeTaiDoAn.Models;
+using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Data;
+using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models;
 
-namespace QuanLyDeTaiDoAn.Controllers
+namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
 {
+
     public class DeTaiController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -27,7 +28,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             int trang = 1)
         {
             const int kichThuocTrang = 10;
-
             trang = Math.Max(1, trang);
 
             var duLieu = _context.DeTais
@@ -35,7 +35,7 @@ namespace QuanLyDeTaiDoAn.Controllers
                 .Select(d => new
                 {
                     DeTai = d,
-                    SoDaDangKy = _context.DangKyDeTaiModule2s.Count(
+                    SoDaDangKy = _context.DangKyDeTais.Count(
                         dk => dk.MaDeTai == d.MaDeTai &&
                         (dk.TrangThai == "Đã duyệt" ||
                          dk.TrangThai == "Đang thực hiện"))
@@ -45,7 +45,8 @@ namespace QuanLyDeTaiDoAn.Controllers
             {
                 x.DeTai,
                 x.SoDaDangKy,
-                SoChoCon = x.DeTai.SoSinhVienToiDa - x.SoDaDangKy
+                SoChoCon = x.DeTai.SoSinhVienToiDa
+                    - x.SoDaDangKy
             });
 
             if (!string.IsNullOrWhiteSpace(tuKhoa))
@@ -68,6 +69,8 @@ namespace QuanLyDeTaiDoAn.Controllers
 
             if (!string.IsNullOrWhiteSpace(namHoc))
             {
+                namHoc = namHoc.Trim();
+
                 truyVan = truyVan.Where(x =>
                     x.DeTai.NamHoc == namHoc);
             }
@@ -80,11 +83,13 @@ namespace QuanLyDeTaiDoAn.Controllers
 
             if (choCon == "con")
             {
-                truyVan = truyVan.Where(x => x.SoChoCon > 0);
+                truyVan = truyVan.Where(x =>
+                    x.SoChoCon > 0);
             }
             else if (choCon == "het")
             {
-                truyVan = truyVan.Where(x => x.SoChoCon <= 0);
+                truyVan = truyVan.Where(x =>
+                    x.SoChoCon <= 0);
             }
 
             if (!string.IsNullOrWhiteSpace(trangThai))
@@ -142,10 +147,8 @@ namespace QuanLyDeTaiDoAn.Controllers
             int tongTrang = (int)Math.Ceiling(
                 tongBanGhi / (double)kichThuocTrang);
 
-            if (tongTrang > 0 && trang > tongTrang)
-            {
-                trang = tongTrang;
-            }
+            if (tongTrang > 0)
+                trang = Math.Min(trang, tongTrang);
 
             var ketQua = await truyVan
                 .Skip((trang - 1) * kichThuocTrang)
@@ -198,7 +201,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             ViewBag.TrangThaiLoc = trangThai;
             ViewBag.ChoCon = choCon;
             ViewBag.SapXep = sapXep ?? "";
-
             ViewBag.TrangHienTai = trang;
             ViewBag.TongTrang = tongTrang;
             ViewBag.TongBanGhi = tongBanGhi;
@@ -220,13 +222,24 @@ namespace QuanLyDeTaiDoAn.Controllers
             if (deTai == null)
                 return NotFound();
 
+            ViewBag.SoDaDangKy = await DemDangKyHopLe(id.Value);
+
+            ViewBag.SoChoCon = deTai.SoSinhVienToiDa
+                - (int)ViewBag.SoDaDangKy;
+
             return View(deTai);
         }
 
         public async Task<IActionResult> Create()
         {
             await LoadLinhVuc();
-            return View(new DeTai());
+
+            return View(new DeTai
+            {
+                SoSinhVienToiDa = 3,
+                HocKy = 1,
+                TrangThai = "Mở đăng ký"
+            });
         }
 
         [HttpPost]
@@ -235,17 +248,30 @@ namespace QuanLyDeTaiDoAn.Controllers
             [Bind("TenDeTai,MaLinhVuc,MoTa,YeuCau,SoSinhVienToiDa,NamHoc,HocKy,TrangThai")]
             DeTai deTai)
         {
-            ModelState.Remove("LinhVuc");
+            ModelState.Remove(nameof(DeTai.LinhVuc));
+            ModelState.Remove(nameof(DeTai.DangKyDeTais));
 
             await KiemTraDeTai(deTai);
 
             if (ModelState.IsValid)
             {
                 _context.DeTais.Add(deTai);
-                await _context.SaveChangesAsync();
 
-                TempData["ThongBao"] = "Thêm đề tài thành công.";
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _context.SaveChangesAsync();
+
+                    TempData["ThongBao"] =
+                        "Thêm đề tài thành công.";
+
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException)
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Không thể thêm đề tài. Tên đề tài có thể đã tồn tại trong năm học và học kỳ này.");
+                }
             }
 
             await LoadLinhVuc(deTai.MaLinhVuc);
@@ -263,6 +289,7 @@ namespace QuanLyDeTaiDoAn.Controllers
                 return NotFound();
 
             await LoadLinhVuc(deTai.MaLinhVuc);
+
             return View(deTai);
         }
 
@@ -276,22 +303,23 @@ namespace QuanLyDeTaiDoAn.Controllers
             if (id != deTai.MaDeTai)
                 return NotFound();
 
-            ModelState.Remove("LinhVuc");
-
-            await KiemTraDeTai(deTai, id);
-
             var deTaiCu = await _context.DeTais
                 .FirstOrDefaultAsync(x => x.MaDeTai == id);
 
             if (deTaiCu == null)
                 return NotFound();
 
+            ModelState.Remove(nameof(DeTai.LinhVuc));
+            ModelState.Remove(nameof(DeTai.DangKyDeTais));
+
+            await KiemTraDeTai(deTai, id);
+
             int soDaDangKy = await DemDangKyHopLe(id);
 
             if (deTai.SoSinhVienToiDa < soDaDangKy)
             {
                 ModelState.AddModelError(
-                    "SoSinhVienToiDa",
+                    nameof(deTai.SoSinhVienToiDa),
                     $"Số sinh viên tối đa không được nhỏ hơn {soDaDangKy}.");
             }
 
@@ -306,10 +334,21 @@ namespace QuanLyDeTaiDoAn.Controllers
                 deTaiCu.HocKy = deTai.HocKy;
                 deTaiCu.TrangThai = deTai.TrangThai;
 
-                await _context.SaveChangesAsync();
+                try
+                {
+                    await _context.SaveChangesAsync();
 
-                TempData["ThongBao"] = "Cập nhật đề tài thành công.";
-                return RedirectToAction(nameof(Index));
+                    TempData["ThongBao"] =
+                        "Cập nhật đề tài thành công.";
+
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException)
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Không thể cập nhật đề tài. Kiểm tra tên đề tài và các dữ liệu liên quan.");
+                }
             }
 
             await LoadLinhVuc(deTai.MaLinhVuc);
@@ -341,27 +380,38 @@ namespace QuanLyDeTaiDoAn.Controllers
             if (deTai == null)
                 return NotFound();
 
-            bool coDangKy = await _context.DangKyDeTaiModule2s
+            bool coDangKy = await _context.DangKyDeTais
                 .AnyAsync(x => x.MaDeTai == id);
 
             if (coDangKy)
             {
                 TempData["Loi"] =
-                    "Đề tài đã có đăng ký, không thể xóa. Hãy chuyển sang trạng thái Tạm khóa hoặc Kết thúc.";
+                    "Đề tài đã có đăng ký nên không thể xóa. Hãy chuyển sang trạng thái Tạm khóa hoặc Kết thúc.";
 
                 return RedirectToAction(nameof(Index));
             }
 
             _context.DeTais.Remove(deTai);
-            await _context.SaveChangesAsync();
 
-            TempData["ThongBao"] = "Xóa đề tài thành công.";
+            try
+            {
+                await _context.SaveChangesAsync();
+
+                TempData["ThongBao"] =
+                    "Xóa đề tài thành công.";
+            }
+            catch (DbUpdateException)
+            {
+                TempData["Loi"] =
+                    "Không thể xóa đề tài vì có dữ liệu liên quan.";
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
         private async Task<int> DemDangKyHopLe(int maDeTai)
         {
-            return await _context.DangKyDeTaiModule2s
+            return await _context.DangKyDeTais
                 .CountAsync(x =>
                     x.MaDeTai == maDeTai &&
                     (x.TrangThai == "Đã duyệt" ||
@@ -372,53 +422,82 @@ namespace QuanLyDeTaiDoAn.Controllers
             DeTai deTai,
             int? maDeTaiHienTai = null)
         {
+            deTai.TenDeTai = (deTai.TenDeTai ?? "").Trim();
+            deTai.NamHoc = (deTai.NamHoc ?? "").Trim();
+            deTai.TrangThai = (deTai.TrangThai ?? "").Trim();
+
+            ModelState.Remove(nameof(DeTai.TenDeTai));
+            ModelState.Remove(nameof(DeTai.NamHoc));
+            ModelState.Remove(nameof(DeTai.TrangThai));
+
             if (string.IsNullOrWhiteSpace(deTai.TenDeTai))
             {
                 ModelState.AddModelError(
-                    "TenDeTai",
+                    nameof(deTai.TenDeTai),
                     "Tên đề tài không được để trống.");
             }
-            else
+            else if (deTai.TenDeTai.Length > 200)
             {
-                deTai.TenDeTai = deTai.TenDeTai.Trim();
+                ModelState.AddModelError(
+                    nameof(deTai.TenDeTai),
+                    "Tên đề tài không được quá 200 ký tự.");
+            }
 
+            if (string.IsNullOrWhiteSpace(deTai.NamHoc))
+            {
+                ModelState.AddModelError(
+                    nameof(deTai.NamHoc),
+                    "Vui lòng nhập năm học.");
+            }
+            else if (deTai.NamHoc.Length > 20)
+            {
+                ModelState.AddModelError(
+                    nameof(deTai.NamHoc),
+                    "Năm học không được quá 20 ký tự.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(deTai.TenDeTai) &&
+                !string.IsNullOrWhiteSpace(deTai.NamHoc))
+            {
                 bool trungTen = await _context.DeTais
                     .AnyAsync(x =>
                         x.TenDeTai == deTai.TenDeTai &&
-                        (!maDeTaiHienTai.HasValue ||
-                         x.MaDeTai != maDeTaiHienTai.Value) &&
                         x.NamHoc == deTai.NamHoc &&
-                        x.HocKy == deTai.HocKy);
+                        x.HocKy == deTai.HocKy &&
+                        (!maDeTaiHienTai.HasValue ||
+                         x.MaDeTai != maDeTaiHienTai.Value));
 
                 if (trungTen)
                 {
                     ModelState.AddModelError(
-                        "TenDeTai",
+                        nameof(deTai.TenDeTai),
                         "Tên đề tài đã tồn tại trong năm học và học kỳ này.");
                 }
             }
 
-            bool linhVucTonTai = await _context.LinhVucs
-                .AnyAsync(x => x.MaLinhVuc == deTai.MaLinhVuc);
+            bool linhVucHopLe = await _context.LinhVucs
+                .AnyAsync(x =>
+                    x.MaLinhVuc == deTai.MaLinhVuc &&
+                    x.TrangThai);
 
-            if (!linhVucTonTai)
+            if (!linhVucHopLe)
             {
                 ModelState.AddModelError(
-                    "MaLinhVuc",
-                    "Vui lòng chọn lĩnh vực hợp lệ.");
+                    nameof(deTai.MaLinhVuc),
+                    "Vui lòng chọn lĩnh vực đang hoạt động.");
             }
 
-            if (deTai.SoSinhVienToiDa < 1)
+            if (deTai.SoSinhVienToiDa <= 0)
             {
                 ModelState.AddModelError(
-                    "SoSinhVienToiDa",
+                    nameof(deTai.SoSinhVienToiDa),
                     "Số sinh viên tối đa phải lớn hơn 0.");
             }
 
             if (deTai.HocKy < 1 || deTai.HocKy > 3)
             {
                 ModelState.AddModelError(
-                    "HocKy",
+                    nameof(deTai.HocKy),
                     "Học kỳ phải từ 1 đến 3.");
             }
 
@@ -428,7 +507,7 @@ namespace QuanLyDeTaiDoAn.Controllers
                 deTai.TrangThai != "Kết thúc")
             {
                 ModelState.AddModelError(
-                    "TrangThai",
+                    nameof(deTai.TrangThai),
                     "Trạng thái đề tài không hợp lệ.");
             }
         }
@@ -437,6 +516,9 @@ namespace QuanLyDeTaiDoAn.Controllers
         {
             var linhVucs = await _context.LinhVucs
                 .AsNoTracking()
+                .Where(x => x.TrangThai ||
+                    (maLinhVuc.HasValue &&
+                     x.MaLinhVuc == maLinhVuc.Value))
                 .OrderBy(x => x.TenLinhVuc)
                 .ToListAsync();
 

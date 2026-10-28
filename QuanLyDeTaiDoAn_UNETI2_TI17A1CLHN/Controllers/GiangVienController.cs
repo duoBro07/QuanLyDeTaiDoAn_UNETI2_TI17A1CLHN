@@ -2,11 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using QuanLyDeTaiDoAn.Data;
-using QuanLyDeTaiDoAn.Models;
+using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Data;
+using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models;
 
-namespace QuanLyDeTaiDoAn.Controllers
+namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
 {
+
     public class GiangVienController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -16,7 +17,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             _context = context;
         }
 
-        // DANH SÁCH, TÌM KIẾM, LỌC, PHÂN TRANG
         public async Task<IActionResult> Index(
             string? tuKhoa,
             int? maLinhVuc,
@@ -24,6 +24,7 @@ namespace QuanLyDeTaiDoAn.Controllers
             int trang = 1)
         {
             const int kichThuocTrang = 5;
+            trang = Math.Max(1, trang);
 
             var query = _context.GiangViens
                 .Include(g => g.LinhVuc)
@@ -58,8 +59,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             int tongTrang = (int)Math.Ceiling(
                 tongBanGhi / (double)kichThuocTrang);
 
-            trang = Math.Max(1, trang);
-
             if (tongTrang > 0)
                 trang = Math.Min(trang, tongTrang);
 
@@ -71,13 +70,13 @@ namespace QuanLyDeTaiDoAn.Controllers
                 .ToListAsync();
 
             ViewBag.LinhVucs = await _context.LinhVucs
+                .AsNoTracking()
                 .OrderBy(l => l.TenLinhVuc)
                 .ToListAsync();
 
             ViewBag.TuKhoa = tuKhoa;
             ViewBag.MaLinhVucLoc = maLinhVuc;
             ViewBag.TrangThaiLoc = trangThai;
-
             ViewBag.TrangHienTai = trang;
             ViewBag.TongTrang = tongTrang;
             ViewBag.TongBanGhi = tongBanGhi;
@@ -86,7 +85,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(danhSach);
         }
 
-        // XEM CHI TIẾT
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -103,14 +101,17 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(gv);
         }
 
-        // THÊM - GET
         public async Task<IActionResult> Create()
         {
             await NapLinhVuc();
-            return View();
+
+            return View(new GiangVien
+            {
+                TrangThai = "Đang công tác",
+                SoSinhVienHuongDanToiDa = 5
+            });
         }
 
-        // THÊM - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -118,6 +119,8 @@ namespace QuanLyDeTaiDoAn.Controllers
             GiangVien gv)
         {
             ChuanHoa(gv);
+            ModelState.Remove(nameof(GiangVien.LinhVuc));
+
             await KiemTraDuLieu(gv);
 
             if (ModelState.IsValid)
@@ -137,7 +140,7 @@ namespace QuanLyDeTaiDoAn.Controllers
                 {
                     ModelState.AddModelError(
                         "",
-                        "Không thể lưu giảng viên. Email có thể đã tồn tại hoặc dữ liệu không hợp lệ.");
+                        "Không thể thêm giảng viên. Email có thể đã tồn tại.");
                 }
             }
 
@@ -145,13 +148,13 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(gv);
         }
 
-        // SỬA - GET
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
                 return NotFound();
 
-            var gv = await _context.GiangViens.FindAsync(id);
+            var gv = await _context.GiangViens
+                .FindAsync(id);
 
             if (gv == null)
                 return NotFound();
@@ -160,7 +163,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(gv);
         }
 
-        // SỬA - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
@@ -171,16 +173,19 @@ namespace QuanLyDeTaiDoAn.Controllers
             if (id != gv.MaGiangVien)
                 return NotFound();
 
+            var gvCu = await _context.GiangViens
+                .FirstOrDefaultAsync(x => x.MaGiangVien == id);
+
+            if (gvCu == null)
+                return NotFound();
+
             ChuanHoa(gv);
+            ModelState.Remove(nameof(GiangVien.LinhVuc));
+
             await KiemTraDuLieu(gv, id);
 
             if (ModelState.IsValid)
             {
-                var gvCu = await _context.GiangViens.FindAsync(id);
-
-                if (gvCu == null)
-                    return NotFound();
-
                 gvCu.HoTen = gv.HoTen;
                 gvCu.HocVi = gv.HocVi;
                 gvCu.Email = gv.Email;
@@ -203,7 +208,7 @@ namespace QuanLyDeTaiDoAn.Controllers
                 {
                     ModelState.AddModelError(
                         "",
-                        "Không thể cập nhật giảng viên. Email có thể đã tồn tại hoặc dữ liệu không hợp lệ.");
+                        "Không thể cập nhật. Email có thể đã tồn tại.");
                 }
             }
 
@@ -211,7 +216,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(gv);
         }
 
-        // XÁC NHẬN NGỪNG HƯỚNG DẪN - GET
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -228,7 +232,6 @@ namespace QuanLyDeTaiDoAn.Controllers
             return View(gv);
         }
 
-        // TẠM NGỪNG THAY VÌ XÓA VĨNH VIỄN
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -241,7 +244,7 @@ namespace QuanLyDeTaiDoAn.Controllers
             if (gv.TrangThai == "Tạm ngừng hướng dẫn")
             {
                 TempData["ThongBao"] =
-                    "Giảng viên đã ở trạng thái tạm ngừng hướng dẫn.";
+                    "Giảng viên đã tạm ngừng hướng dẫn.";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -253,7 +256,7 @@ namespace QuanLyDeTaiDoAn.Controllers
                 await _context.SaveChangesAsync();
 
                 TempData["ThongBao"] =
-                    "Đã tạm ngừng hướng dẫn. Hồ sơ giảng viên vẫn được giữ lại.";
+                    "Đã tạm ngừng hướng dẫn. Dữ liệu giảng viên được giữ lại.";
             }
             catch (DbUpdateException)
             {
@@ -264,75 +267,112 @@ namespace QuanLyDeTaiDoAn.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // CHUẨN HÓA DỮ LIỆU
         private void ChuanHoa(GiangVien gv)
         {
             gv.HoTen = (gv.HoTen ?? "").Trim();
             gv.HocVi = (gv.HocVi ?? "").Trim();
             gv.Email = (gv.Email ?? "").Trim();
+            gv.TrangThai = (gv.TrangThai ?? "").Trim();
 
             gv.SoDienThoai =
                 string.IsNullOrWhiteSpace(gv.SoDienThoai)
                     ? null
                     : gv.SoDienThoai.Trim();
 
-            if (gv.HoTen.Length == 0)
+            ModelState.Remove(nameof(GiangVien.HoTen));
+            ModelState.Remove(nameof(GiangVien.HocVi));
+            ModelState.Remove(nameof(GiangVien.Email));
+            ModelState.Remove(nameof(GiangVien.SoDienThoai));
+            ModelState.Remove(nameof(GiangVien.TrangThai));
+
+            if (string.IsNullOrWhiteSpace(gv.HoTen))
                 ModelState.AddModelError(
                     nameof(gv.HoTen),
                     "Vui lòng nhập họ tên.");
 
-            if (gv.HocVi.Length == 0)
+            if (string.IsNullOrWhiteSpace(gv.HocVi))
                 ModelState.AddModelError(
                     nameof(gv.HocVi),
                     "Vui lòng nhập học vị.");
 
-            if (gv.Email.Length == 0)
+            if (string.IsNullOrWhiteSpace(gv.Email))
                 ModelState.AddModelError(
                     nameof(gv.Email),
                     "Vui lòng nhập Email.");
+            else if (!new System.ComponentModel.DataAnnotations.EmailAddressAttribute()
+                .IsValid(gv.Email))
+                ModelState.AddModelError(
+                    nameof(gv.Email),
+                    "Email không hợp lệ.");
+
+            if (gv.HoTen.Length > 100)
+                ModelState.AddModelError(
+                    nameof(gv.HoTen),
+                    "Họ tên không được quá 100 ký tự.");
+
+            if (gv.HocVi.Length > 50)
+                ModelState.AddModelError(
+                    nameof(gv.HocVi),
+                    "Học vị không được quá 50 ký tự.");
+
+            if (gv.Email.Length > 100)
+                ModelState.AddModelError(
+                    nameof(gv.Email),
+                    "Email không được quá 100 ký tự.");
+
+            if (gv.SoDienThoai?.Length > 20)
+                ModelState.AddModelError(
+                    nameof(gv.SoDienThoai),
+                    "Số điện thoại không được quá 20 ký tự.");
         }
 
-        // KIỂM TRA EMAIL, LĨNH VỰC, TRẠNG THÁI
         private async Task KiemTraDuLieu(
             GiangVien gv,
             int? idLoaiTru = null)
         {
-            bool trungEmail = await _context.GiangViens
-                .AnyAsync(g =>
-                    g.Email == gv.Email &&
-                    (!idLoaiTru.HasValue ||
-                     g.MaGiangVien != idLoaiTru.Value));
-
-            if (trungEmail)
+            if (!string.IsNullOrWhiteSpace(gv.Email))
             {
-                ModelState.AddModelError(
-                    nameof(gv.Email),
-                    "Email đã tồn tại.");
+                bool trungEmail = await _context.GiangViens
+                    .AnyAsync(g =>
+                        g.Email == gv.Email &&
+                        (!idLoaiTru.HasValue ||
+                         g.MaGiangVien != idLoaiTru.Value));
+
+                if (trungEmail)
+                    ModelState.AddModelError(
+                        nameof(gv.Email),
+                        "Email đã tồn tại.");
             }
 
-            bool linhVucTonTai = await _context.LinhVucs
-                .AnyAsync(l => l.MaLinhVuc == gv.MaLinhVuc);
+            bool linhVucHopLe = await _context.LinhVucs
+                .AnyAsync(l =>
+                    l.MaLinhVuc == gv.MaLinhVuc &&
+                    l.TrangThai);
 
-            if (!linhVucTonTai)
-            {
+            if (!linhVucHopLe)
                 ModelState.AddModelError(
                     nameof(gv.MaLinhVuc),
-                    "Lĩnh vực không tồn tại.");
-            }
+                    "Vui lòng chọn lĩnh vực đang hoạt động.");
+
+            if (gv.SoSinhVienHuongDanToiDa <= 0)
+                ModelState.AddModelError(
+                    nameof(gv.SoSinhVienHuongDanToiDa),
+                    "Số sinh viên hướng dẫn tối đa phải lớn hơn 0.");
 
             if (gv.TrangThai != "Đang công tác" &&
                 gv.TrangThai != "Tạm ngừng hướng dẫn")
-            {
                 ModelState.AddModelError(
                     nameof(gv.TrangThai),
-                    "Trạng thái không hợp lệ.");
-            }
+                    "Trạng thái giảng viên không hợp lệ.");
         }
 
-        // DROPDOWN LĨNH VỰC
         private async Task NapLinhVuc(int? selected = null)
         {
             var danhSach = await _context.LinhVucs
+                .AsNoTracking()
+                .Where(l => l.TrangThai ||
+                    (selected.HasValue &&
+                     l.MaLinhVuc == selected.Value))
                 .OrderBy(l => l.TenLinhVuc)
                 .ToListAsync();
 

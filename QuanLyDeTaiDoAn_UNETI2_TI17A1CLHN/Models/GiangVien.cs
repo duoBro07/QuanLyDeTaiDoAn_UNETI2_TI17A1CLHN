@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
 
-namespace QuanLyDeTaiDoAn.Models
+namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
 {
     public class GiangVien
     {
@@ -19,12 +20,12 @@ namespace QuanLyDeTaiDoAn.Models
         public string HocVi { get; set; } = "";
 
         [Required(ErrorMessage = "Vui lòng nhập Email")]
-        [EmailAddress(ErrorMessage = "Email không đúng định dạng")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
         [StringLength(100)]
         public string Email { get; set; } = "";
 
-        [StringLength(20)]
         [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
+        [StringLength(20)]
         [Display(Name = "Số điện thoại")]
         public string? SoDienThoai { get; set; }
 
@@ -34,12 +35,12 @@ namespace QuanLyDeTaiDoAn.Models
         public int MaLinhVuc { get; set; }
 
         [Range(1, int.MaxValue,
-            ErrorMessage =
-                "Số sinh viên hướng dẫn tối đa phải lớn hơn 0")]
+            ErrorMessage = "Số sinh viên tối đa phải lớn hơn 0")]
         [Display(Name = "Số sinh viên hướng dẫn tối đa")]
         public int SoSinhVienHuongDanToiDa { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn trạng thái")]
+        [StringLength(50)]
         [Display(Name = "Trạng thái")]
         public string TrangThai { get; set; } = "Đang công tác";
 

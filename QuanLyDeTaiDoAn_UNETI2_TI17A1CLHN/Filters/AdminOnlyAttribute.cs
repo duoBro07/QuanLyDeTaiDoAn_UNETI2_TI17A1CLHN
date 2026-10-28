@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace QuanLyDeTaiDoAn.Filters
+namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Filters
 {
     public class AdminOnlyAttribute : ActionFilterAttribute
     {

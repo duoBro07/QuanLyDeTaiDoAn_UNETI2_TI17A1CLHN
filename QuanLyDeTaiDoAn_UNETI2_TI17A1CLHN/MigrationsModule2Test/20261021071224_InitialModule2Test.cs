@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.MigrationsModule2Test
+namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN._UNETI2_TI17A1CLHN.MigrationsModule2Test
 {
     /// <inheritdoc />
     public partial class InitialModule2Test : Migration

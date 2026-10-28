@@ -1,21 +1,39 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 
-namespace QuanLyDeTaiDoAn.Data
+namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Data
 {
     public class ApplicationDbContextFactory
         : IDesignTimeDbContextFactory<ApplicationDbContext>
     {
         public ApplicationDbContext CreateDbContext(string[] args)
         {
-            var optionsBuilder =
-                new DbContextOptionsBuilder<ApplicationDbContext>();
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile(
+                    "appsettings.Development.json",
+                    optional: true)
+                .AddEnvironmentVariables()
+                .Build();
 
-            optionsBuilder.UseSqlServer(
-                "Server=localhost;Database=QuanLyDoAn_Module2_Test;Trusted_Connection=True;TrustServerCertificate=True;");
+            var connectionString =
+                configuration.GetConnectionString("DefaultConnection");
 
-            return new ApplicationDbContext(optionsBuilder.Options);
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidOperationException(
+                    "Chưa cấu hình DefaultConnection.");
+            }
+
+            var options =
+                new DbContextOptionsBuilder<ApplicationDbContext>()
+                    .UseSqlServer(connectionString)
+                    .Options;
+
+            return new ApplicationDbContext(options);
         }
     }
 }
