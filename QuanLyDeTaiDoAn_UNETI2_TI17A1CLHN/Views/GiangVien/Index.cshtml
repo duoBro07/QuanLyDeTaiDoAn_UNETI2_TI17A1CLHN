@@ -15,21 +15,31 @@
     int ketThuc = Math.Min(
         trangHienTai * kichThuocTrang,
         tongBanGhi);
+
+    string? thongBao = TempData["ThongBaoGiangVien"] as string;
+    string? loi = TempData["LoiGiangVien"] as string;
 }
 
 <div class="content-card">
 
-
     <div class="p-3">
 
-        <div class="d-flex justify-content-between
-            align-items-center mb-3">
+        @* TIÊU ĐỀ VÀ NÚT THÊM GIẢNG VIÊN *@
 
-            <h2 class="page-title">
-                Quản lý giảng viên
-            </h2>
+        <div class="d-flex justify-content-between align-items-center mb-3">
 
-            <a asp-action="Create"
+            <div>
+                <h2 class="page-title mb-1">
+                    Quản lý giảng viên
+                </h2>
+
+                <small class="text-muted">
+                    Danh sách giảng viên hướng dẫn đồ án
+                </small>
+            </div>
+
+            <a asp-controller="GiangVien"
+               asp-action="Create"
                class="btn btn-main">
 
                 <i class="fa-solid fa-plus me-1"></i>
@@ -39,18 +49,64 @@
 
         </div>
 
-        <form asp-action="Index"
+        @* THÔNG BÁO THÊM / SỬA / CẬP NHẬT THÀNH CÔNG *@
+
+        @if (!string.IsNullOrWhiteSpace(thongBao))
+        {
+            <div class="alert alert-success alert-dismissible fade show"
+                 role="alert">
+
+                <i class="fa-solid fa-circle-check me-2"></i>
+
+                <strong>Thành công!</strong>
+                @thongBao
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Đóng">
+                </button>
+
+            </div>
+        }
+
+        @* THÔNG BÁO LỖI *@
+
+        @if (!string.IsNullOrWhiteSpace(loi))
+        {
+            <div class="alert alert-danger alert-dismissible fade show"
+                 role="alert">
+
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+
+                <strong>Lỗi!</strong>
+                @loi
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Đóng">
+                </button>
+
+            </div>
+        }
+
+        @* FORM TÌM KIẾM VÀ LỌC GIẢNG VIÊN *@
+
+        <form asp-controller="GiangVien"
+              asp-action="Index"
               method="get">
 
             <div class="row g-2">
+
+                @* TÌM KIẾM *@
 
                 <div class="col-lg-6">
 
                     <div class="input-group">
 
                         <span class="input-group-text bg-white">
-                            <i class="fa-solid fa-magnifying-glass
-                            text-secondary"></i>
+                            <i class="fa-solid fa-magnifying-glass text-secondary"></i>
                         </span>
 
                         <input type="text"
@@ -63,6 +119,8 @@
 
                 </div>
 
+                @* LỌC THEO LĨNH VỰC *@
+
                 <div class="col-lg-3">
 
                     <select name="maLinhVuc"
@@ -73,26 +131,31 @@
                             Tất cả lĩnh vực
                         </option>
 
-                        @foreach (var lv in ViewBag.LinhVucs)
+                        @if (ViewBag.LinhVucs != null)
                         {
-                            if (ViewBag.MaLinhVucLoc != null &&
-                                (int)ViewBag.MaLinhVucLoc == lv.MaLinhVuc)
+                            foreach (var lv in ViewBag.LinhVucs)
                             {
-                                <option value="@lv.MaLinhVuc" selected>
-                                    @lv.TenLinhVuc
-                                </option>
-                            }
-                            else
-                            {
-                                <option value="@lv.MaLinhVuc">
-                                    @lv.TenLinhVuc
-                                </option>
+                                if (ViewBag.MaLinhVucLoc != null &&
+                                    (int)ViewBag.MaLinhVucLoc == lv.MaLinhVuc)
+                                {
+                                    <option value="@lv.MaLinhVuc" selected>
+                                        @lv.TenLinhVuc
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@lv.MaLinhVuc">
+                                        @lv.TenLinhVuc
+                                    </option>
+                                }
                             }
                         }
 
                     </select>
 
                 </div>
+
+                @* LỌC THEO TRẠNG THÁI *@
 
                 <div class="col-lg-3">
 
@@ -136,15 +199,13 @@
 
             </div>
 
-     
-            <button type="submit"
-                    style="display:none">
-            </button>
+            <button type="submit" style="display:none"></button>
 
         </form>
 
     </div>
 
+    @* BẢNG DANH SÁCH GIẢNG VIÊN *@
 
     <div class="table-responsive">
 
@@ -166,7 +227,7 @@
 
             <tbody>
 
-                @if (Model.Any())
+                @if (Model != null && Model.Any())
                 {
                     int stt = batDau;
 
@@ -195,7 +256,7 @@
                             </td>
 
                             <td>
-                                @item.LinhVuc?.TenLinhVuc
+                                @(item.LinhVuc?.TenLinhVuc ?? "Chưa xác định")
                             </td>
 
                             <td class="text-center">
@@ -221,28 +282,37 @@
 
                             <td class="text-center text-nowrap">
 
-                                <a asp-action="Edit"
+                                @* NÚT SỬA *@
+
+                                <a asp-controller="GiangVien"
+                                   asp-action="Edit"
                                    asp-route-id="@item.MaGiangVien"
                                    class="action-btn action-edit"
-                                   title="Sửa">
+                                   title="Sửa giảng viên">
 
                                     <i class="fa-solid fa-pen-to-square"></i>
 
                                 </a>
 
-                                <a asp-action="Details"
+                                @* NÚT CHI TIẾT *@
+
+                                <a asp-controller="GiangVien"
+                                   asp-action="Details"
                                    asp-route-id="@item.MaGiangVien"
                                    class="action-btn action-info"
-                                   title="Chi tiết">
+                                   title="Chi tiết giảng viên">
 
                                     <i class="fa-solid fa-circle-info"></i>
 
                                 </a>
 
-                                <a asp-action="Delete"
+                                @* NÚT XÓA / TẠM NGỪNG *@
+
+                                <a asp-controller="GiangVien"
+                                   asp-action="Delete"
                                    asp-route-id="@item.MaGiangVien"
                                    class="action-btn action-delete"
-                                   title="Xóa">
+                                   title="Tạm ngừng hướng dẫn">
 
                                     <i class="fa-solid fa-trash"></i>
 
@@ -258,12 +328,16 @@
                 else
                 {
                     <tr>
+
                         <td colspan="9"
                             class="text-center text-muted py-5">
 
-                            Chưa có dữ liệu giảng viên.
+                            <i class="fa-solid fa-users fa-2x mb-3 d-block"></i>
+
+                            Không tìm thấy dữ liệu giảng viên.
 
                         </td>
+
                     </tr>
                 }
 
@@ -273,9 +347,9 @@
 
     </div>
 
+    @* PHÂN TRANG *@
 
-    <div class="d-flex justify-content-between
-        align-items-center p-3 border-top">
+    <div class="d-flex justify-content-between align-items-center p-3 border-top flex-wrap gap-2">
 
         <nav>
 
@@ -283,26 +357,32 @@
             {
                 <ul class="pagination pagination-sm mb-0">
 
-                    <li class="page-item
-                        @(trangHienTai <= 1 ? "disabled" : "")">
+                    @* TRANG TRƯỚC *@
+
+                    <li class="page-item @(trangHienTai <= 1 ? "disabled" : "")">
 
                         <a class="page-link"
+                           asp-controller="GiangVien"
                            asp-action="Index"
                            asp-route-trang="@(trangHienTai - 1)"
                            asp-route-tuKhoa="@ViewBag.TuKhoa"
                            asp-route-maLinhVuc="@ViewBag.MaLinhVucLoc"
                            asp-route-trangThai="@ViewBag.TrangThaiLoc">
+
                             ‹
+
                         </a>
 
                     </li>
 
+                    @* DANH SÁCH SỐ TRANG *@
+
                     @for (int i = 1; i <= tongTrang; i++)
                     {
-                        <li class="page-item
-                            @(i == trangHienTai ? "active" : "")">
+                        <li class="page-item @(i == trangHienTai ? "active" : "")">
 
                             <a class="page-link"
+                               asp-controller="GiangVien"
                                asp-action="Index"
                                asp-route-trang="@i"
                                asp-route-tuKhoa="@ViewBag.TuKhoa"
@@ -316,16 +396,20 @@
                         </li>
                     }
 
-                    <li class="page-item
-                        @(trangHienTai >= tongTrang ? "disabled" : "")">
+                    @* TRANG TIẾP THEO *@
+
+                    <li class="page-item @(trangHienTai >= tongTrang ? "disabled" : "")">
 
                         <a class="page-link"
+                           asp-controller="GiangVien"
                            asp-action="Index"
                            asp-route-trang="@(trangHienTai + 1)"
                            asp-route-tuKhoa="@ViewBag.TuKhoa"
                            asp-route-maLinhVuc="@ViewBag.MaLinhVucLoc"
                            asp-route-trangThai="@ViewBag.TrangThaiLoc">
+
                             ›
+
                         </a>
 
                     </li>

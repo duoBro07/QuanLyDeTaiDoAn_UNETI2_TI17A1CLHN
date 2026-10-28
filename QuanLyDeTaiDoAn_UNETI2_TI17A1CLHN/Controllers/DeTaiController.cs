@@ -7,7 +7,6 @@ using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models;
 
 namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
 {
-
     public class DeTaiController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -45,8 +44,7 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             {
                 x.DeTai,
                 x.SoDaDangKy,
-                SoChoCon = x.DeTai.SoSinhVienToiDa
-                    - x.SoDaDangKy
+                SoChoCon = x.DeTai.SoSinhVienToiDa - x.SoDaDangKy
             });
 
             if (!string.IsNullOrWhiteSpace(tuKhoa))
@@ -83,13 +81,11 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
 
             if (choCon == "con")
             {
-                truyVan = truyVan.Where(x =>
-                    x.SoChoCon > 0);
+                truyVan = truyVan.Where(x => x.SoChoCon > 0);
             }
             else if (choCon == "het")
             {
-                truyVan = truyVan.Where(x =>
-                    x.SoChoCon <= 0);
+                truyVan = truyVan.Where(x => x.SoChoCon <= 0);
             }
 
             if (!string.IsNullOrWhiteSpace(trangThai))
@@ -261,10 +257,10 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
                 {
                     await _context.SaveChangesAsync();
 
-                    TempData["ThongBao"] =
-                        "Thêm đề tài thành công.";
+                    TempData["ThongBaoDeTai"] =
+                        "Thêm đề tài thành công!";
 
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Index", "DeTai");
                 }
                 catch (DbUpdateException)
                 {
@@ -289,7 +285,6 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
                 return NotFound();
 
             await LoadLinhVuc(deTai.MaLinhVuc);
-
             return View(deTai);
         }
 
@@ -338,10 +333,10 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
                 {
                     await _context.SaveChangesAsync();
 
-                    TempData["ThongBao"] =
-                        "Cập nhật đề tài thành công.";
+                    TempData["ThongBaoDeTai"] =
+                        "Cập nhật đề tài thành công!";
 
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Index", "DeTai");
                 }
                 catch (DbUpdateException)
                 {
@@ -385,10 +380,10 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
 
             if (coDangKy)
             {
-                TempData["Loi"] =
+                TempData["LoiDeTai"] =
                     "Đề tài đã có đăng ký nên không thể xóa. Hãy chuyển sang trạng thái Tạm khóa hoặc Kết thúc.";
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "DeTai");
             }
 
             _context.DeTais.Remove(deTai);
@@ -397,16 +392,16 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             {
                 await _context.SaveChangesAsync();
 
-                TempData["ThongBao"] =
-                    "Xóa đề tài thành công.";
+                TempData["ThongBaoDeTai"] =
+                    "Xóa đề tài thành công!";
             }
             catch (DbUpdateException)
             {
-                TempData["Loi"] =
+                TempData["LoiDeTai"] =
                     "Không thể xóa đề tài vì có dữ liệu liên quan.";
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "DeTai");
         }
 
         private async Task<int> DemDangKyHopLe(int maDeTai)

@@ -1,85 +1,84 @@
+
 @model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.DeTai
+@using Microsoft.AspNetCore.Mvc.Rendering
 
 @{
-    ViewData["Title"] = "Sửa đề tài";
+    ViewData["Title"] = "Chỉnh sửa đề tài";
+
+    var linhVucs = ViewBag.MaLinhVuc as IEnumerable<SelectListItem>
+        ?? ViewBag.LinhVucs as IEnumerable<SelectListItem>
+        ?? Enumerable.Empty<SelectListItem>();
 }
 
 <div class="content-card">
     <div class="p-4">
 
-        <h2 class="page-title mb-4">
-            Cập nhật đề tài
-        </h2>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="page-title mb-1">Chỉnh sửa đề tài</h2>
+                <small class="text-muted">
+                    Cập nhật thông tin đề tài đồ án
+                </small>
+            </div>
 
-        <form asp-action="Edit" method="post">
+            <a asp-controller="DeTai"
+               asp-action="Index"
+               class="btn btn-light border">
+                <i class="fa-solid fa-arrow-left me-1"></i>
+                Quay lại
+            </a>
+        </div>
 
-            <input type="hidden"
-                   asp-for="MaDeTai" />
+        <form id="formSuaDeTai"
+              asp-controller="DeTai"
+              asp-action="Edit"
+              asp-route-id="@Model.MaDeTai"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="MaDeTai" />
 
             <div asp-validation-summary="ModelOnly"
-                 class="alert alert-danger">
-            </div>
+                 class="text-danger mb-3"></div>
 
             <div class="row g-3">
 
-                <div class="col-md-8">
+                <div class="col-md-12">
                     <label asp-for="TenDeTai"
                            class="form-label fw-semibold">
-                        Tên đề tài *
+                        Tên đề tài <span class="text-danger">*</span>
                     </label>
 
                     <input asp-for="TenDeTai"
-                           class="form-control" />
+                           class="form-control"
+                           placeholder="Nhập tên đề tài" />
 
                     <span asp-validation-for="TenDeTai"
-                          class="text-danger small">
-                    </span>
+                          class="text-danger"></span>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label asp-for="MaLinhVuc"
                            class="form-label fw-semibold">
-                        Lĩnh vực *
+                        Lĩnh vực <span class="text-danger">*</span>
                     </label>
 
                     <select asp-for="MaLinhVuc"
-                            asp-items="ViewBag.MaLinhVuc"
+                            asp-items="linhVucs"
                             class="form-select">
+                        <option value="">-- Chọn lĩnh vực --</option>
                     </select>
 
                     <span asp-validation-for="MaLinhVuc"
-                          class="text-danger small">
-                    </span>
+                          class="text-danger"></span>
                 </div>
 
-                <div class="col-12">
-                    <label asp-for="MoTa"
-                           class="form-label fw-semibold">
-                        Mô tả
-                    </label>
-
-                    <textarea asp-for="MoTa"
-                              class="form-control"
-                              rows="4">
-                    </textarea>
-                </div>
-
-                <div class="col-12">
-                    <label asp-for="YeuCau"
-                           class="form-label fw-semibold">
-                        Yêu cầu
-                    </label>
-
-                    <textarea asp-for="YeuCau"
-                              class="form-control"
-                              rows="4">
-                    </textarea>
-                </div>
-
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <label asp-for="SoSinhVienToiDa"
                            class="form-label fw-semibold">
-                        Số SV tối đa *
+                        Số sinh viên tối đa
+                        <span class="text-danger">*</span>
                     </label>
 
                     <input asp-for="SoSinhVienToiDa"
@@ -88,109 +87,251 @@
                            class="form-control" />
 
                     <span asp-validation-for="SoSinhVienToiDa"
-                          class="text-danger small">
-                    </span>
+                          class="text-danger"></span>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <label asp-for="NamHoc"
                            class="form-label fw-semibold">
-                        Năm học *
+                        Năm học <span class="text-danger">*</span>
                     </label>
 
                     <input asp-for="NamHoc"
-                           class="form-control" />
+                           class="form-control"
+                           placeholder="Ví dụ: 2026-2027" />
 
                     <span asp-validation-for="NamHoc"
-                          class="text-danger small">
-                    </span>
+                          class="text-danger"></span>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <label asp-for="HocKy"
                            class="form-label fw-semibold">
-                        Học kỳ *
+                        Học kỳ <span class="text-danger">*</span>
                     </label>
 
-                    <select asp-for="HocKy"
-                            class="form-select">
-
-                        <option value="1">
-                            Học kỳ 1
-                        </option>
-
-                        <option value="2">
-                            Học kỳ 2
-                        </option>
-
-                        <option value="3">
-                            Học kỳ 3
-                        </option>
-
+                    <select asp-for="HocKy" class="form-select">
+                        <option value="1">Học kỳ 1</option>
+                        <option value="2">Học kỳ 2</option>
+                        <option value="3">Học kỳ 3</option>
                     </select>
 
                     <span asp-validation-for="HocKy"
-                          class="text-danger small">
-                    </span>
+                          class="text-danger"></span>
                 </div>
 
-                <div class="col-md-3">
-                    <label asp-for="TrangThai"
+                <div class="col-md-12">
+                    <label asp-for="MoTa"
                            class="form-label fw-semibold">
-                        Trạng thái *
+                        Mô tả đề tài
                     </label>
 
-                    <select asp-for="TrangThai"
-                            class="form-select">
+                    <textarea asp-for="MoTa"
+                              rows="4"
+                              class="form-control"
+                              placeholder="Nhập mô tả đề tài"></textarea>
 
-                        <option value="Mở đăng ký">
-                            Mở đăng ký
-                        </option>
+                    <span asp-validation-for="MoTa"
+                          class="text-danger"></span>
+                </div>
 
-                        <option value="Đủ số lượng">
-                            Đủ số lượng
-                        </option>
+                <div class="col-md-12">
+                    <label asp-for="YeuCau"
+                           class="form-label fw-semibold">
+                        Yêu cầu thực hiện
+                    </label>
 
-                        <option value="Tạm khóa">
-                            Tạm khóa
-                        </option>
+                    <textarea asp-for="YeuCau"
+                              rows="4"
+                              class="form-control"
+                              placeholder="Nhập yêu cầu thực hiện"></textarea>
 
-                        <option value="Kết thúc">
-                            Kết thúc
-                        </option>
+                    <span asp-validation-for="YeuCau"
+                          class="text-danger"></span>
+                </div>
 
-                    </select>
+                <div class="col-md-12">
+                    <label class="form-label fw-semibold">
+                        Trạng thái <span class="text-danger">*</span>
+                    </label>
+
+                    <div class="d-flex flex-wrap gap-4 mt-2">
+
+                        <div class="form-check">
+                            <input asp-for="TrangThai"
+                                   type="radio"
+                                   value="Mở đăng ký"
+                                   id="moDangKy"
+                                   class="form-check-input" />
+                            <label for="moDangKy"
+                                   class="form-check-label">
+                                Mở đăng ký
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input asp-for="TrangThai"
+                                   type="radio"
+                                   value="Đủ số lượng"
+                                   id="duSoLuong"
+                                   class="form-check-input" />
+                            <label for="duSoLuong"
+                                   class="form-check-label">
+                                Đủ số lượng
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input asp-for="TrangThai"
+                                   type="radio"
+                                   value="Tạm khóa"
+                                   id="tamKhoa"
+                                   class="form-check-input" />
+                            <label for="tamKhoa"
+                                   class="form-check-label">
+                                Tạm khóa
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input asp-for="TrangThai"
+                                   type="radio"
+                                   value="Kết thúc"
+                                   id="ketThuc"
+                                   class="form-check-input" />
+                            <label for="ketThuc"
+                                   class="form-check-label">
+                                Kết thúc
+                            </label>
+                        </div>
+
+                    </div>
 
                     <span asp-validation-for="TrangThai"
-                          class="text-danger small">
-                    </span>
+                          class="text-danger"></span>
                 </div>
 
             </div>
 
-            <div class="d-flex justify-content-end
-                gap-2 mt-4 pt-3 border-top">
+            <hr class="my-4" />
 
-                <a asp-action="Index"
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-controller="DeTai"
+                   asp-action="Index"
                    class="btn btn-light border px-4">
                     Hủy
                 </a>
 
                 <button type="submit"
                         class="btn btn-primary px-4">
+                    <i class="fa-solid fa-floppy-disk me-1"></i>
                     Lưu thay đổi
                 </button>
-
             </div>
 
         </form>
+    </div>
+</div>
 
+<!-- POPUP XÁC NHẬN CẬP NHẬT ĐỀ TÀI -->
+
+<div class="modal fade"
+     id="modalXacNhanDeTai"
+     tabindex="-1"
+     aria-labelledby="modalXacNhanDeTaiLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg"
+             style="border-radius:12px;overflow:hidden;">
+
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"
+                    id="modalXacNhanDeTaiLabel">
+                    Xác nhận cập nhật đề tài
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Đóng"></button>
+            </div>
+
+            <div class="modal-body py-4">
+                <div class="d-flex align-items-center gap-3">
+
+                    <i class="fa-solid fa-triangle-exclamation"
+                       style="font-size:40px;color:#ff9800;"></i>
+
+                    <div>
+                        Bạn có chắc chắn muốn
+                        <strong>lưu những thay đổi</strong>
+                        của đề tài này không?
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 pt-0">
+                <button type="button"
+                        class="btn btn-secondary px-4"
+                        data-bs-dismiss="modal">
+                    Hủy
+                </button>
+
+                <button type="button"
+                        id="btnDongYDeTai"
+                        class="btn btn-danger px-4">
+                    Đồng ý
+                </button>
+            </div>
+
+        </div>
     </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync(
-            "_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("formSuaDeTai");
+            const modalElement = document.getElementById("modalXacNhanDeTai");
+            const btnDongY = document.getElementById("btnDongYDeTai");
+
+            let daXacNhan = false;
+
+            form.addEventListener("submit", function (event) {
+                if (daXacNhan) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                if (window.jQuery &&
+                    jQuery.validator &&
+                    !jQuery(form).valid()) {
+                    return;
+                }
+
+                if (typeof bootstrap === "undefined") {
+                    alert("Chưa tải Bootstrap JavaScript.");
+                    return;
+                }
+
+                bootstrap.Modal.getOrCreateInstance(modalElement).show();
+            });
+
+            btnDongY.addEventListener("click", function () {
+                daXacNhan = true;
+                bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+                form.requestSubmit();
+            });
+        });
+    </script>
 }

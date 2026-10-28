@@ -1,130 +1,299 @@
 @model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.GiangVien
+@using Microsoft.AspNetCore.Mvc.Rendering
 
 @{
-    ViewData["Title"] = "Sửa giảng viên";
+    ViewData["Title"] = "Chỉnh sửa giảng viên";
+
+    var linhVucs = ViewBag.MaLinhVuc as IEnumerable<SelectListItem>
+        ?? ViewBag.LinhVucs as IEnumerable<SelectListItem>
+        ?? Enumerable.Empty<SelectListItem>();
 }
 
-<div class="content-card p-4">
+<div class="content-card">
+    <div class="p-4">
 
-    <h2 class="page-title mb-4">
-        Sửa giảng viên
-    </h2>
+        <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <form asp-action="Edit">
-
-        <input type="hidden"
-               asp-for="MaGiangVien" />
-
-        <div asp-validation-summary="ModelOnly"
-             class="text-danger"></div>
-
-        <div class="row g-3">
-
-            <div class="col-md-6">
-                <label asp-for="HoTen"
-                       class="form-label"></label>
-
-                <input asp-for="HoTen"
-                       class="form-control" />
-
-                <span asp-validation-for="HoTen"
-                      class="text-danger"></span>
+            <div>
+                <h2 class="page-title mb-1">Chỉnh sửa giảng viên</h2>
+                <small class="text-muted">
+                    Cập nhật thông tin giảng viên hướng dẫn
+                </small>
             </div>
 
-            <div class="col-md-6">
-                <label asp-for="HocVi"
-                       class="form-label"></label>
-
-                <input asp-for="HocVi"
-                       class="form-control" />
-
-                <span asp-validation-for="HocVi"
-                      class="text-danger"></span>
-            </div>
-
-            <div class="col-md-6">
-                <label asp-for="Email"
-                       class="form-label"></label>
-
-                <input asp-for="Email"
-                       class="form-control" />
-
-                <span asp-validation-for="Email"
-                      class="text-danger"></span>
-            </div>
-
-            <div class="col-md-6">
-                <label asp-for="SoDienThoai"
-                       class="form-label"></label>
-
-                <input asp-for="SoDienThoai"
-                       class="form-control" />
-
-                <span asp-validation-for="SoDienThoai"
-                      class="text-danger"></span>
-            </div>
-
-            <div class="col-md-6">
-                <label asp-for="MaLinhVuc"
-                       class="form-label"></label>
-
-                <select asp-for="MaLinhVuc"
-                        asp-items="ViewBag.MaLinhVuc"
-                        class="form-select">
-                </select>
-
-                <span asp-validation-for="MaLinhVuc"
-                      class="text-danger"></span>
-            </div>
-
-            <div class="col-md-6">
-                <label asp-for="SoSinhVienHuongDanToiDa"
-                       class="form-label"></label>
-
-                <input asp-for="SoSinhVienHuongDanToiDa"
-                       type="number"
-                       min="1"
-                       class="form-control" />
-
-                <span asp-validation-for="SoSinhVienHuongDanToiDa"
-                      class="text-danger"></span>
-            </div>
-
-            <div class="col-md-6">
-                <label asp-for="TrangThai"
-                       class="form-label"></label>
-
-                <select asp-for="TrangThai"
-                        class="form-select">
-                    <option value="Đang công tác">
-                        Đang công tác
-                    </option>
-
-                    <option value="Tạm ngừng hướng dẫn">
-                        Tạm ngừng hướng dẫn
-                    </option>
-                </select>
-            </div>
-
-        </div>
-
-        <div class="text-end mt-4">
-            <a asp-action="Index"
+            <a asp-controller="GiangVien"
+               asp-action="Index"
                class="btn btn-light border">
-                Hủy
+                <i class="fa-solid fa-arrow-left me-1"></i>
+                Quay lại
             </a>
-
-            <button class="btn btn-primary">
-                Lưu thay đổi
-            </button>
         </div>
 
-    </form>
+        <form id="formSuaGiangVien"
+              asp-controller="GiangVien"
+              asp-action="Edit"
+              asp-route-id="@Model.MaGiangVien"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="MaGiangVien" />
+
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger mb-3"></div>
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <label asp-for="HoTen"
+                           class="form-label fw-semibold">
+                        Họ và tên <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="HoTen"
+                           class="form-control"
+                           placeholder="Nhập họ tên giảng viên" />
+
+                    <span asp-validation-for="HoTen"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="HocVi"
+                           class="form-label fw-semibold">
+                        Học vị <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="HocVi"
+                           class="form-control"
+                           placeholder="Nhập học vị" />
+
+                    <span asp-validation-for="HocVi"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Email"
+                           class="form-label fw-semibold">
+                        Email <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="Email"
+                           type="email"
+                           class="form-control"
+                           placeholder="Nhập email giảng viên" />
+
+                    <span asp-validation-for="Email"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="SoDienThoai"
+                           class="form-label fw-semibold">
+                        Số điện thoại
+                    </label>
+
+                    <input asp-for="SoDienThoai"
+                           class="form-control"
+                           placeholder="Nhập số điện thoại" />
+
+                    <span asp-validation-for="SoDienThoai"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="MaLinhVuc"
+                           class="form-label fw-semibold">
+                        Lĩnh vực chuyên môn
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <select asp-for="MaLinhVuc"
+                            asp-items="linhVucs"
+                            class="form-select">
+                        <option value="">-- Chọn lĩnh vực --</option>
+                    </select>
+
+                    <span asp-validation-for="MaLinhVuc"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="SoSinhVienHuongDanToiDa"
+                           class="form-label fw-semibold">
+                        Số sinh viên hướng dẫn tối đa
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="SoSinhVienHuongDanToiDa"
+                           type="number"
+                           min="1"
+                           class="form-control" />
+
+                    <span asp-validation-for="SoSinhVienHuongDanToiDa"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label fw-semibold">
+                        Trạng thái <span class="text-danger">*</span>
+                    </label>
+
+                    <div class="d-flex flex-wrap gap-4 mt-2">
+
+                        <div class="form-check">
+                            <input asp-for="TrangThai"
+                                   type="radio"
+                                   value="Đang công tác"
+                                   id="dangCongTac"
+                                   class="form-check-input" />
+
+                            <label for="dangCongTac"
+                                   class="form-check-label">
+                                Đang công tác
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input asp-for="TrangThai"
+                                   type="radio"
+                                   value="Tạm ngừng hướng dẫn"
+                                   id="tamNgung"
+                                   class="form-check-input" />
+
+                            <label for="tamNgung"
+                                   class="form-check-label">
+                                Tạm ngừng hướng dẫn
+                            </label>
+                        </div>
+
+                    </div>
+
+                    <span asp-validation-for="TrangThai"
+                          class="text-danger"></span>
+                </div>
+
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-controller="GiangVien"
+                   asp-action="Index"
+                   class="btn btn-light border px-4">
+                    Hủy
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary px-4">
+                    <i class="fa-solid fa-floppy-disk me-1"></i>
+                    Lưu thay đổi
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- POPUP XÁC NHẬN CẬP NHẬT GIẢNG VIÊN -->
+
+<div class="modal fade"
+     id="modalXacNhanGiangVien"
+     tabindex="-1"
+     aria-labelledby="modalXacNhanGiangVienLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg"
+             style="border-radius:12px;overflow:hidden;">
+
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"
+                    id="modalXacNhanGiangVienLabel">
+                    Xác nhận cập nhật giảng viên
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Đóng"></button>
+            </div>
+
+            <div class="modal-body py-4">
+                <div class="d-flex align-items-center gap-3">
+
+                    <i class="fa-solid fa-triangle-exclamation"
+                       style="font-size:40px;color:#ff9800;"></i>
+
+                    <div>
+                        Bạn có chắc chắn muốn
+                        <strong>lưu những thay đổi</strong>
+                        của giảng viên này không?
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 pt-0">
+                <button type="button"
+                        class="btn btn-secondary px-4"
+                        data-bs-dismiss="modal">
+                    Hủy
+                </button>
+
+                <button type="button"
+                        id="btnDongYGiangVien"
+                        class="btn btn-danger px-4">
+                    Đồng ý
+                </button>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync(
-            "_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("formSuaGiangVien");
+            const modalElement = document.getElementById("modalXacNhanGiangVien");
+            const btnDongY = document.getElementById("btnDongYGiangVien");
+
+            let daXacNhan = false;
+
+            form.addEventListener("submit", function (event) {
+                if (daXacNhan) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                if (window.jQuery &&
+                    jQuery.validator &&
+                    !jQuery(form).valid()) {
+                    return;
+                }
+
+                if (typeof bootstrap === "undefined") {
+                    alert("Chưa tải Bootstrap JavaScript.");
+                    return;
+                }
+
+                bootstrap.Modal.getOrCreateInstance(modalElement).show();
+            });
+
+            btnDongY.addEventListener("click", function () {
+                daXacNhan = true;
+                bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+                form.requestSubmit();
+            });
+        });
+    </script>
 }

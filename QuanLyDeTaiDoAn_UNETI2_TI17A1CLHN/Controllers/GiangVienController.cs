@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Data;
 using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
 {
-
     public class GiangVienController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -34,7 +34,6 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             if (!string.IsNullOrWhiteSpace(tuKhoa))
             {
                 tuKhoa = tuKhoa.Trim();
-
                 query = query.Where(g =>
                     g.HoTen.Contains(tuKhoa) ||
                     g.Email.Contains(tuKhoa) ||
@@ -55,7 +54,6 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             }
 
             int tongBanGhi = await query.CountAsync();
-
             int tongTrang = (int)Math.Ceiling(
                 tongBanGhi / (double)kichThuocTrang);
 
@@ -131,10 +129,10 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
                 {
                     await _context.SaveChangesAsync();
 
-                    TempData["ThongBao"] =
-                        "Thêm giảng viên thành công.";
+                    TempData["ThongBaoGiangVien"] =
+                        "Thêm giảng viên thành công!";
 
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Index", "GiangVien");
                 }
                 catch (DbUpdateException)
                 {
@@ -153,8 +151,7 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             if (id == null)
                 return NotFound();
 
-            var gv = await _context.GiangViens
-                .FindAsync(id);
+            var gv = await _context.GiangViens.FindAsync(id);
 
             if (gv == null)
                 return NotFound();
@@ -199,10 +196,10 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
                 {
                     await _context.SaveChangesAsync();
 
-                    TempData["ThongBao"] =
-                        "Cập nhật giảng viên thành công.";
+                    TempData["ThongBaoGiangVien"] =
+                        "Cập nhật giảng viên thành công!";
 
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Index", "GiangVien");
                 }
                 catch (DbUpdateException)
                 {
@@ -243,10 +240,10 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
 
             if (gv.TrangThai == "Tạm ngừng hướng dẫn")
             {
-                TempData["ThongBao"] =
+                TempData["ThongBaoGiangVien"] =
                     "Giảng viên đã tạm ngừng hướng dẫn.";
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "GiangVien");
             }
 
             gv.TrangThai = "Tạm ngừng hướng dẫn";
@@ -255,16 +252,16 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             {
                 await _context.SaveChangesAsync();
 
-                TempData["ThongBao"] =
+                TempData["ThongBaoGiangVien"] =
                     "Đã tạm ngừng hướng dẫn. Dữ liệu giảng viên được giữ lại.";
             }
             catch (DbUpdateException)
             {
-                TempData["Loi"] =
+                TempData["LoiGiangVien"] =
                     "Không thể cập nhật trạng thái giảng viên.";
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "GiangVien");
         }
 
         private void ChuanHoa(GiangVien gv)
@@ -299,8 +296,7 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
                 ModelState.AddModelError(
                     nameof(gv.Email),
                     "Vui lòng nhập Email.");
-            else if (!new System.ComponentModel.DataAnnotations.EmailAddressAttribute()
-                .IsValid(gv.Email))
+            else if (!new EmailAddressAttribute().IsValid(gv.Email))
                 ModelState.AddModelError(
                     nameof(gv.Email),
                     "Email không hợp lệ.");
