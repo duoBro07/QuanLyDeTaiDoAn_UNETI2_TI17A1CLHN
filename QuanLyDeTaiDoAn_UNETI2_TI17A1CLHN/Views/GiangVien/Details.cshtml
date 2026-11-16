@@ -4,63 +4,103 @@
     ViewData["Title"] = "Chi tiết giảng viên";
 }
 
-<div class="container mt-4">
+<div class="content-card">
+    <div class="p-3 p-lg-4">
 
-    <h2 class="mb-4">CHI TIẾT GIẢNG VIÊN</h2>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="page-title mb-1">
+                    <i class="fa-solid fa-eye me-2"></i>
+                    Chi tiết giảng viên
+                </h2>
+                <p class="page-description mb-0">
+                    Thông tin hồ sơ giảng viên hướng dẫn
+                </p>
+            </div>
 
-    <table class="table table-bordered">
+            @if (Model.TrangThai == "Đang công tác")
+            {
+                <span class="uneti-status uneti-status-success">
+                    <i class="fa-solid fa-circle-check me-1"></i>
+                    Đang công tác
+                </span>
+            }
+            else
+            {
+                <span class="uneti-status uneti-status-warning">
+                    <i class="fa-solid fa-circle-pause me-1"></i>
+                    @Model.TrangThai
+                </span>
+            }
+        </div>
 
-        <tr>
-            <th style="width: 30%">Mã giảng viên</th>
-            <td>@Model.MaGiangVien</td>
-        </tr>
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Mã giảng viên</div>
+            <div class="uneti-details-value">@Model.MaGiangVien</div>
+        </div>
 
-        <tr>
-            <th>Họ tên</th>
-            <td>@Model.HoTen</td>
-        </tr>
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Họ và tên</div>
+            <div class="uneti-details-value fw-semibold">@Model.HoTen</div>
+        </div>
 
-        <tr>
-            <th>Học vị</th>
-            <td>@Model.HocVi</td>
-        </tr>
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Học vị</div>
+            <div class="uneti-details-value">@Model.HocVi</div>
+        </div>
 
-        <tr>
-            <th>Email</th>
-            <td>@Model.Email</td>
-        </tr>
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Email</div>
+            <div class="uneti-details-value">@Model.Email</div>
+        </div>
 
-        <tr>
-            <th>Số điện thoại</th>
-            <td>@Model.SoDienThoai</td>
-        </tr>
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Số điện thoại</div>
+            <div class="uneti-details-value">
+                @(string.IsNullOrWhiteSpace(Model.SoDienThoai)
+                    ? "Chưa cập nhật" : Model.SoDienThoai)
+            </div>
+        </div>
 
-        <tr>
-            <th>Lĩnh vực</th>
-            <td>@Model.LinhVuc?.TenLinhVuc</td>
-        </tr>
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Lĩnh vực</div>
+            <div class="uneti-details-value">
+                @(Model.LinhVuc?.TenLinhVuc ?? "Chưa có")
+            </div>
+        </div>
 
-        <tr>
-            <th>Số sinh viên hướng dẫn tối đa</th>
-            <td>@Model.SoSinhVienHuongDanToiDa</td>
-        </tr>
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">
+                Số sinh viên hướng dẫn tối đa
+            </div>
+            <div class="uneti-details-value">
+                @Model.SoSinhVienHuongDanToiDa
+            </div>
+        </div>
 
-        <tr>
-            <th>Trạng thái</th>
-            <td>@Model.TrangThai</td>
-        </tr>
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Trạng thái</div>
+            <div class="uneti-details-value">@Model.TrangThai</div>
+        </div>
 
-    </table>
+        <hr class="my-4" />
 
-    <a asp-action="Edit"
-       asp-route-id="@Model.MaGiangVien"
-       class="btn btn-warning">
-        Sửa
-    </a>
+        <div class="d-flex justify-content-end gap-2 flex-wrap">
+            <a asp-controller="GiangVien"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left"></i>
+                Quay lại
+            </a>
 
-    <a asp-action="Index"
-       class="btn btn-secondary">
-        Quay lại
-    </a>
+            <a asp-controller="GiangVien"
+               asp-action="Edit"
+               asp-route-id="@Model.MaGiangVien"
+               class="btn btn-main">
+                <i class="fa-solid fa-pen"></i>
+                Chỉnh sửa
+            </a>
+        </div>
 
+    </div>
 </div>

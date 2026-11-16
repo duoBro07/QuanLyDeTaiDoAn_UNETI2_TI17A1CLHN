@@ -1,27 +1,58 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
+using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Data;
 
 namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Filters
 {
-    public class AdminOnlyAttribute : ActionFilterAttribute
+    [AttributeUsage(
+        AttributeTargets.Class | AttributeTargets.Method,
+        AllowMultiple = false)]
+    public class AdminOnlyAttribute : Attribute, IAsyncActionFilter
     {
-        public override void OnActionExecuting(
-            ActionExecutingContext context)
+        public async Task OnActionExecutionAsync(
+            ActionExecutingContext context,
+            ActionExecutionDelegate next)
         {
-            var role = context.HttpContext.Session
-                .GetString("VaiTro");
+            var session = context.HttpContext.Session;
+            int? maTaiKhoan = session.GetInt32("MaTaiKhoan");
 
-            if (string.IsNullOrEmpty(role))
+            if (!maTaiKhoan.HasValue)
             {
                 context.Result = new RedirectToActionResult(
                     "Index", "DangNhap", null);
+                return;
             }
-            else if (role != "Admin")
+
+            var db = context.HttpContext.RequestServices
+                .GetRequiredService<ApplicationDbContext>();
+
+            var taiKhoan = await db.TaiKhoans
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.MaTaiKhoan == maTaiKhoan.Value);
+
+            if (taiKhoan == null || !taiKhoan.TrangThai)
+            {
+                session.Clear();
+
+                context.Result = new RedirectToActionResult(
+                    "Index", "DangNhap", null);
+                return;
+            }
+
+            session.SetString("VaiTro", taiKhoan.VaiTro);
+            session.SetString("HoTen", taiKhoan.HoTen);
+
+            if (taiKhoan.VaiTro != "Admin")
             {
                 context.Result = new RedirectToActionResult(
                     "KhongCoQuyen", "Home", null);
+                return;
             }
+
+            await next();
         }
     }
 }

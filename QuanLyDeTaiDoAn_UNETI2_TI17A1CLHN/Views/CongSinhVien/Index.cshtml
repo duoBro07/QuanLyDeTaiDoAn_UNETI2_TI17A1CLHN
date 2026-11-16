@@ -1,0 +1,228 @@
+@{
+    ViewData["Title"] = "Trang chủ sinh viên";
+    ViewData["UnifiedIndex"] = true;
+
+    string hoTen = ViewBag.HoTen as string ?? "Sinh viên";
+
+    int soDeTaiMo = ViewBag.SoDeTaiMo ?? 0;
+    int soDangKy = ViewBag.SoDangKy ?? 0;
+    int choDuyet = ViewBag.ChoDuyet ?? 0;
+    int daDuyet = ViewBag.DaDuyet ?? 0;
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+
+        <div class="mb-4">
+            <h2 class="page-title mb-1">
+                <i class="fa-solid fa-house me-2"></i>
+                Xin chào, @hoTen!
+            </h2>
+            <p class="page-description mb-0">
+                Chào mừng đến với hệ thống quản lý đề tài đồ án UNETI.
+                Tại đây bạn có thể tra cứu, đăng ký và theo dõi đồ án của mình.
+            </p>
+        </div>
+
+        <h5 class="fw-bold text-primary mb-3">
+            <i class="fa-solid fa-chart-simple me-2"></i>
+            Tổng quan của bạn
+        </h5>
+
+        <div class="row g-3 mb-4">
+
+            <div class="col-6 col-lg-3">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="d-flex justify-content-between gap-2">
+                            <span class="text-muted small">Đề tài đang mở</span>
+                            <i class="fa-solid fa-book-open text-primary"></i>
+                        </div>
+                        <div class="fs-3 fw-bold text-primary mt-2">
+                            @soDeTaiMo
+                        </div>
+                        <a asp-controller="CongSinhVien"
+                           asp-action="DeTai"
+                           class="small text-decoration-none">
+                            Xem danh sách
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="d-flex justify-content-between gap-2">
+                            <span class="text-muted small">Đăng ký của tôi</span>
+                            <i class="fa-solid fa-file-signature text-info"></i>
+                        </div>
+                        <div class="fs-3 fw-bold text-info mt-2">
+                            @soDangKy
+                        </div>
+                        <a asp-controller="DangKyDeTai"
+                           asp-action="Index"
+                           class="small text-decoration-none">
+                            Theo dõi đăng ký
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="d-flex justify-content-between gap-2">
+                            <span class="text-muted small">Chờ duyệt</span>
+                            <i class="fa-solid fa-clock text-warning"></i>
+                        </div>
+                        <div class="fs-3 fw-bold text-warning mt-2">
+                            @choDuyet
+                        </div>
+                        <span class="text-muted small">
+                            Đang chờ xét duyệt
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="d-flex justify-content-between gap-2">
+                            <span class="text-muted small">Đã duyệt</span>
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                        </div>
+                        <div class="fs-3 fw-bold text-success mt-2">
+                            @daDuyet
+                        </div>
+                        <span class="text-muted small">
+                            Hồ sơ được chấp thuận
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <h5 class="fw-bold text-primary mb-3">
+            <i class="fa-solid fa-layer-group me-2"></i>
+            Chức năng dành cho sinh viên
+        </h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-6 col-lg-3">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <i class="fa-solid fa-book-open-reader text-primary fs-3"></i>
+
+                        <h6 class="fw-bold mt-3">
+                            Danh sách đề tài
+                        </h6>
+
+                        <p class="text-muted small">
+                            Tìm kiếm, lọc và lựa chọn đề tài phù hợp với chuyên ngành.
+                        </p>
+
+                        <a asp-controller="CongSinhVien"
+                           asp-action="DeTai"
+                           class="btn btn-main btn-sm">
+                            <i class="fa-solid fa-eye me-1"></i>
+                            Xem đề tài
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <i class="fa-solid fa-clipboard-check text-success fs-3"></i>
+
+                        <h6 class="fw-bold mt-3">
+                            Đăng ký của tôi
+                        </h6>
+
+                        <p class="text-muted small">
+                            Theo dõi hồ sơ đăng ký, kết quả xét duyệt và trạng thái.
+                        </p>
+
+                        <a asp-controller="DangKyDeTai"
+                           asp-action="Index"
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fa-solid fa-list-check me-1"></i>
+                            Theo dõi đăng ký
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <i class="fa-solid fa-id-card text-info fs-3"></i>
+
+                        <h6 class="fw-bold mt-3">
+                            Hồ sơ cá nhân
+                        </h6>
+
+                        <p class="text-muted small">
+                            Xem thông tin sinh viên và trạng thái hồ sơ của bạn.
+                        </p>
+
+                        <a asp-controller="CongSinhVien"
+                           asp-action="HoSo"
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fa-solid fa-user me-1"></i>
+                            Xem hồ sơ
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <i class="fa-solid fa-chalkboard-user text-primary fs-3"></i>
+
+                        <h6 class="fw-bold mt-3">
+                            Giảng viên hướng dẫn
+                        </h6>
+
+                        <p class="text-muted small">
+                            Xem giảng viên được phân công và tiến độ thực hiện đồ án.
+                        </p>
+
+                        <a asp-controller="CongSinhVien"
+                           asp-action="PhanCongCuaToi"
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fa-solid fa-eye me-1"></i>
+                            Xem phân công
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @if (choDuyet > 0)
+        {
+            <div class="alert alert-info mt-4 mb-0">
+                <i class="fa-solid fa-circle-info me-2"></i>
+                Bạn đang có <strong>@choDuyet</strong> đăng ký chờ xét duyệt.
+                Hãy theo dõi kết quả tại mục Đăng ký của tôi.
+            </div>
+        }
+
+        @if (daDuyet > 0)
+        {
+            <div class="alert alert-success mt-3 mb-0">
+                <i class="fa-solid fa-circle-check me-2"></i>
+                Bạn đã có đăng ký được duyệt.
+                Hãy kiểm tra giảng viên hướng dẫn và tiến độ thực hiện.
+            </div>
+        }
+
+    </div>
+</div>

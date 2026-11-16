@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Không có quyền truy cập";
+}
+
+<div class="d-flex justify-content-center align-items-center"
+     style="min-height:65vh;">
+
+    <div class="content-card text-center p-5"
+         style="max-width:520px;width:100%;">
+
+        <div class="mb-3">
+            <i class="fa-solid fa-shield-halved"
+               style="font-size:55px;color:#e59b25;"></i>
+        </div>
+
+        <h2 style="font-size:23px;font-weight:700;color:#123d6b;">
+            Không có quyền truy cập
+        </h2>
+
+        <p class="text-muted mt-3 mb-4"
+           style="font-size:13px;">
+            Tài khoản của bạn không được phép sử dụng
+            chức năng này. Vui lòng liên hệ quản trị viên
+            nếu cần được cấp quyền.
+        </p>
+
+        <a asp-controller="Home"
+           asp-action="Index"
+           class="btn btn-primary px-4">
+
+            <i class="fa-solid fa-house me-2"></i>
+            Về trang chủ
+        </a>
+
+    </div>
+
+</div>

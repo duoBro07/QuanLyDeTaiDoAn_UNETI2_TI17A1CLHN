@@ -1,0 +1,134 @@
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.DeTai
+
+@{
+    ViewData["Title"] = "Chi tiết đề tài";
+
+    var vaiTro = Context.Session.GetString("VaiTro");
+    bool laAdmin = vaiTro == "Admin";
+    bool laSinhVien = vaiTro == "SinhVien";
+    bool dangMo = Model.TrangThai == "Mở đăng ký";
+}
+
+<div class="content-card p-4">
+
+    <!-- TIÊU ĐỀ -->
+    <div class="mb-4">
+        <h2 class="page-title">
+            <i class="fa-solid fa-file-lines me-2"></i>
+            Chi tiết đề tài
+        </h2>
+        <p class="text-muted mb-0">
+            Thông tin chi tiết đề tài đồ án
+        </p>
+    </div>
+
+    <!-- THÔNG TIN ĐỀ TÀI -->
+    <div class="row g-3">
+
+        <div class="col-md-6">
+            <label class="detail-label">Mã đề tài</label>
+            <div class="detail-field">@Model.MaDeTai</div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="detail-label">Tên đề tài</label>
+            <div class="detail-field">@Model.TenDeTai</div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="detail-label">Lĩnh vực</label>
+            <div class="detail-field">@(Model.LinhVuc?.TenLinhVuc ?? "Chưa cập nhật")</div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="detail-label">Số sinh viên tối đa</label>
+            <div class="detail-field">@Model.SoSinhVienToiDa</div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="detail-label">Năm học</label>
+            <div class="detail-field">@Model.NamHoc</div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="detail-label">Học kỳ</label>
+            <div class="detail-field">@Model.HocKy</div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="detail-label">Trạng thái</label>
+            <div class="detail-field">
+                @if (dangMo)
+                {
+                    <span class="status-active">
+                        <i class="fa-solid fa-circle-check me-1"></i>
+                        @Model.TrangThai
+                    </span>
+                }
+                else
+                {
+                    <span class="status-stop">@Model.TrangThai</span>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="detail-label">Tình trạng đăng ký</label>
+            <div class="detail-field">
+                @if (dangMo)
+                {
+                    <span class="text-success">Đang mở đăng ký</span>
+                }
+                else
+                {
+                    <span class="text-muted">Không nhận đăng ký</span>
+                }
+            </div>
+        </div>
+
+        <div class="col-12">
+            <label class="detail-label">Mô tả đề tài</label>
+            <div class="detail-field detail-field-multiline">@(string.IsNullOrWhiteSpace(Model.MoTa) ? "Chưa có mô tả" : Model.MoTa)</div>
+        </div>
+
+        <div class="col-12">
+            <label class="detail-label">Yêu cầu thực hiện</label>
+            <div class="detail-field detail-field-multiline">@(string.IsNullOrWhiteSpace(Model.YeuCau) ? "Chưa có yêu cầu" : Model.YeuCau)</div>
+        </div>
+
+    </div>
+
+    <!-- NÚT THAO TÁC -->
+    <div class="detail-actions">
+
+        <a asp-controller="DeTai"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i>
+            Quay lại
+        </a>
+
+        @if (laAdmin)
+        {
+            <a asp-controller="DeTai"
+               asp-action="Edit"
+               asp-route-id="@Model.MaDeTai"
+               class="btn btn-main">
+                <i class="fa-solid fa-pen-to-square me-1"></i>
+                Chỉnh sửa
+            </a>
+        }
+
+        @if (laSinhVien && dangMo)
+        {
+            <a asp-controller="DangKyDeTai"
+               asp-action="Create"
+               asp-route-id="@Model.MaDeTai"
+               class="btn btn-success">
+                <i class="fa-solid fa-file-signature me-1"></i>
+                Đăng ký đề tài
+            </a>
+        }
+
+    </div>
+</div>

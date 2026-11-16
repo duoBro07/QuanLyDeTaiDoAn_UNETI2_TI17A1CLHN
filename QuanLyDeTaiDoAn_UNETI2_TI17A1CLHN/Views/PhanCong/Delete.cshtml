@@ -1,0 +1,44 @@
+@{
+    ViewData["Title"] = "Quản lý phân công";
+    var id = ViewContext.RouteData.Values["id"]?.ToString();
+}
+
+<div class="content-card p-4">
+    <div class="mb-4">
+        <h2 class="page-title mb-1">
+            <i class="fa-solid fa-user-gear me-2"></i>
+            Quản lý phân công
+        </h2>
+
+        <p class="text-muted mb-0">
+            Quản lý thông tin phân công giảng viên hướng dẫn.
+        </p>
+    </div>
+
+    <div class="alert alert-warning">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+        Hệ thống hiện chưa hỗ trợ xóa trực tiếp phân công
+        tại trang này. Để thay đổi giảng viên hướng dẫn,
+        hãy sử dụng chức năng tại trang chi tiết phân công.
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+        @if (!string.IsNullOrWhiteSpace(id))
+        {
+            <a asp-controller="PhanCong"
+               asp-action="Details"
+               asp-route-id="@id"
+               class="btn btn-primary">
+                <i class="fa-solid fa-eye me-1"></i>
+                Đến trang chi tiết
+            </a>
+        }
+
+        <a asp-controller="PhanCong"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i>
+            Quay lại danh sách
+        </a>
+    </div>
+</div>

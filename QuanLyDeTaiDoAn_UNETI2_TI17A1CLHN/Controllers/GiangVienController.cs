@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Data;
+using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Filters;
 using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models;
-using System.ComponentModel.DataAnnotations;
 
 namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
 {
+    [PhanQuyen("Admin")]
     public class GiangVienController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -17,6 +18,23 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             _context = context;
         }
 
+        private async Task NapLinhVuc(int? maLinhVuc = null)
+        {
+            var danhSach = await _context.LinhVucs
+                .AsNoTracking()
+                .OrderBy(x => x.TenLinhVuc)
+                .ToListAsync();
+
+            ViewBag.MaLinhVuc = new SelectList(
+                danhSach,
+                "MaLinhVuc",
+                "TenLinhVuc",
+                maLinhVuc);
+
+            ViewBag.LinhVucs = ViewBag.MaLinhVuc;
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Index(
             string? tuKhoa,
             int? maLinhVuc,
@@ -27,71 +45,73 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             trang = Math.Max(1, trang);
 
             var query = _context.GiangViens
-                .Include(g => g.LinhVuc)
                 .AsNoTracking()
+                .Include(x => x.LinhVuc)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(tuKhoa))
             {
                 tuKhoa = tuKhoa.Trim();
-                query = query.Where(g =>
-                    g.HoTen.Contains(tuKhoa) ||
-                    g.Email.Contains(tuKhoa) ||
-                    (g.SoDienThoai != null &&
-                     g.SoDienThoai.Contains(tuKhoa)));
+
+                query = query.Where(x =>
+                    x.HoTen.Contains(tuKhoa) ||
+                    x.Email.Contains(tuKhoa) ||
+                    (x.SoDienThoai != null &&
+                     x.SoDienThoai.Contains(tuKhoa)));
             }
 
             if (maLinhVuc.HasValue)
             {
-                query = query.Where(g =>
-                    g.MaLinhVuc == maLinhVuc.Value);
+                query = query.Where(x =>
+                    x.MaLinhVuc == maLinhVuc.Value);
             }
 
             if (!string.IsNullOrWhiteSpace(trangThai))
             {
-                query = query.Where(g =>
-                    g.TrangThai == trangThai);
+                query = query.Where(x =>
+                    x.TrangThai == trangThai);
             }
 
-            int tongBanGhi = await query.CountAsync();
-            int tongTrang = (int)Math.Ceiling(
-                tongBanGhi / (double)kichThuocTrang);
+            int tong = await query.CountAsync();
 
-            if (tongTrang > 0)
-                trang = Math.Min(trang, tongTrang);
+            int tongTrang = Math.Max(
+                1,
+                (int)Math.Ceiling(
+                    tong / (double)kichThuocTrang));
+
+            trang = Math.Min(trang, tongTrang);
 
             var danhSach = await query
-                .OrderBy(g => g.HoTen)
-                .ThenBy(g => g.MaGiangVien)
+                .OrderBy(x => x.HoTen)
+                .ThenBy(x => x.MaGiangVien)
                 .Skip((trang - 1) * kichThuocTrang)
                 .Take(kichThuocTrang)
                 .ToListAsync();
 
-            ViewBag.LinhVucs = await _context.LinhVucs
-                .AsNoTracking()
-                .OrderBy(l => l.TenLinhVuc)
-                .ToListAsync();
-
-            ViewBag.TuKhoa = tuKhoa;
-            ViewBag.MaLinhVucLoc = maLinhVuc;
-            ViewBag.TrangThaiLoc = trangThai;
             ViewBag.TrangHienTai = trang;
             ViewBag.TongTrang = tongTrang;
-            ViewBag.TongBanGhi = tongBanGhi;
+            ViewBag.TongBanGhi = tong;
             ViewBag.KichThuocTrang = kichThuocTrang;
+            ViewBag.TuKhoa = tuKhoa ?? "";
+            ViewBag.MaLinhVucLoc = maLinhVuc;
+            ViewBag.TrangThaiLoc = trangThai ?? "";
+
+            ViewBag.LinhVucs = await _context.LinhVucs
+                .AsNoTracking()
+                .OrderBy(x => x.TenLinhVuc)
+                .ToListAsync();
 
             return View(danhSach);
         }
 
-        public async Task<IActionResult> Details(int? id)
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-                return NotFound();
-
             var gv = await _context.GiangViens
-                .Include(g => g.LinhVuc)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(g => g.MaGiangVien == id);
+                .Include(x => x.LinhVuc)
+                .FirstOrDefaultAsync(x =>
+                    x.MaGiangVien == id);
 
             if (gv == null)
                 return NotFound();
@@ -99,13 +119,13 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             return View(gv);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
             await NapLinhVuc();
 
             return View(new GiangVien
             {
-                TrangThai = "Đang công tác",
                 SoSinhVienHuongDanToiDa = 5
             });
         }
@@ -114,43 +134,42 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             [Bind("HoTen,HocVi,Email,SoDienThoai,MaLinhVuc,SoSinhVienHuongDanToiDa,TrangThai")]
-            GiangVien gv)
+            GiangVien model)
         {
-            ChuanHoa(gv);
-            ModelState.Remove(nameof(GiangVien.LinhVuc));
+            if (await _context.GiangViens.AnyAsync(x =>
+                x.Email == model.Email))
+            {
+                ModelState.AddModelError(
+                    nameof(model.Email),
+                    "Email đã được sử dụng.");
+            }
 
-            await KiemTraDuLieu(gv);
+            if (!await _context.LinhVucs.AnyAsync(x =>
+                x.MaLinhVuc == model.MaLinhVuc))
+            {
+                ModelState.AddModelError(
+                    nameof(model.MaLinhVuc),
+                    "Lĩnh vực không tồn tại.");
+            }
 
             if (ModelState.IsValid)
             {
-                _context.GiangViens.Add(gv);
+                _context.GiangViens.Add(model);
+                await _context.SaveChangesAsync();
 
-                try
-                {
-                    await _context.SaveChangesAsync();
+                TempData["ThongBaoGiangVien"] =
+                    "Đã thêm giảng viên thành công.";
 
-                    TempData["ThongBaoGiangVien"] =
-                        "Thêm giảng viên thành công!";
-
-                    return RedirectToAction("Index", "GiangVien");
-                }
-                catch (DbUpdateException)
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "Không thể thêm giảng viên. Email có thể đã tồn tại.");
-                }
+                return RedirectToAction(nameof(Index));
             }
 
-            await NapLinhVuc(gv.MaLinhVuc);
-            return View(gv);
+            await NapLinhVuc(model.MaLinhVuc);
+            return View(model);
         }
 
-        public async Task<IActionResult> Edit(int? id)
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-                return NotFound();
-
             var gv = await _context.GiangViens.FindAsync(id);
 
             if (gv == null)
@@ -165,63 +184,90 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
         public async Task<IActionResult> Edit(
             int id,
             [Bind("MaGiangVien,HoTen,HocVi,Email,SoDienThoai,MaLinhVuc,SoSinhVienHuongDanToiDa,TrangThai")]
-            GiangVien gv)
+            GiangVien model)
         {
-            if (id != gv.MaGiangVien)
+            if (id != model.MaGiangVien)
+                return BadRequest();
+
+            var gv = await _context.GiangViens
+                .FirstOrDefaultAsync(x =>
+                    x.MaGiangVien == id);
+
+            if (gv == null)
                 return NotFound();
 
-            var gvCu = await _context.GiangViens
-                .FirstOrDefaultAsync(x => x.MaGiangVien == id);
+            if (await _context.GiangViens.AnyAsync(x =>
+                x.Email == model.Email &&
+                x.MaGiangVien != id))
+            {
+                ModelState.AddModelError(
+                    nameof(model.Email),
+                    "Email đã được sử dụng.");
+            }
 
-            if (gvCu == null)
-                return NotFound();
-
-            ChuanHoa(gv);
-            ModelState.Remove(nameof(GiangVien.LinhVuc));
-
-            await KiemTraDuLieu(gv, id);
+            if (!await _context.LinhVucs.AnyAsync(x =>
+                x.MaLinhVuc == model.MaLinhVuc))
+            {
+                ModelState.AddModelError(
+                    nameof(model.MaLinhVuc),
+                    "Lĩnh vực không tồn tại.");
+            }
 
             if (ModelState.IsValid)
             {
-                gvCu.HoTen = gv.HoTen;
-                gvCu.HocVi = gv.HocVi;
-                gvCu.Email = gv.Email;
-                gvCu.SoDienThoai = gv.SoDienThoai;
-                gvCu.MaLinhVuc = gv.MaLinhVuc;
-                gvCu.SoSinhVienHuongDanToiDa =
-                    gv.SoSinhVienHuongDanToiDa;
-                gvCu.TrangThai = gv.TrangThai;
+                int tai = await _context.PhanCongHuongDans
+                    .CountAsync(x =>
+                        x.MaGiangVien == id &&
+                        x.DangHieuLuc &&
+                        x.TrangThaiThucHien != "Hoàn thành");
 
-                try
-                {
-                    await _context.SaveChangesAsync();
-
-                    TempData["ThongBaoGiangVien"] =
-                        "Cập nhật giảng viên thành công!";
-
-                    return RedirectToAction("Index", "GiangVien");
-                }
-                catch (DbUpdateException)
+                if (model.SoSinhVienHuongDanToiDa < tai)
                 {
                     ModelState.AddModelError(
-                        "",
-                        "Không thể cập nhật. Email có thể đã tồn tại.");
+                        nameof(model.SoSinhVienHuongDanToiDa),
+                        $"Giảng viên đang hướng dẫn {tai} sinh viên; không thể đặt giới hạn thấp hơn.");
+                }
+
+                if (model.TrangThai != "Đang công tác" &&
+                    tai > 0)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.TrangThai),
+                        "Cần xử lý các phân công đang hiệu lực trước khi tạm ngừng giảng viên.");
                 }
             }
 
-            await NapLinhVuc(gv.MaLinhVuc);
-            return View(gv);
+            if (ModelState.IsValid)
+            {
+                gv.HoTen = model.HoTen.Trim();
+                gv.HocVi = model.HocVi.Trim();
+                gv.Email = model.Email.Trim();
+                gv.SoDienThoai = model.SoDienThoai?.Trim();
+                gv.MaLinhVuc = model.MaLinhVuc;
+                gv.SoSinhVienHuongDanToiDa =
+                    model.SoSinhVienHuongDanToiDa;
+                gv.TrangThai = model.TrangThai;
+
+                await _context.SaveChangesAsync();
+
+                TempData["ThongBaoGiangVien"] =
+                    "Đã cập nhật giảng viên thành công.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            await NapLinhVuc(model.MaLinhVuc);
+            return View(model);
         }
 
-        public async Task<IActionResult> Delete(int? id)
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-                return NotFound();
-
             var gv = await _context.GiangViens
-                .Include(g => g.LinhVuc)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(g => g.MaGiangVien == id);
+                .Include(x => x.LinhVuc)
+                .FirstOrDefaultAsync(x =>
+                    x.MaGiangVien == id);
 
             if (gv == null)
                 return NotFound();
@@ -229,7 +275,8 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             return View(gv);
         }
 
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
+        [ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -238,145 +285,28 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             if (gv == null)
                 return NotFound();
 
-            if (gv.TrangThai == "Tạm ngừng hướng dẫn")
-            {
-                TempData["ThongBaoGiangVien"] =
-                    "Giảng viên đã tạm ngừng hướng dẫn.";
+            int tai = await _context.PhanCongHuongDans
+                .CountAsync(x =>
+                    x.MaGiangVien == id &&
+                    x.DangHieuLuc &&
+                    x.TrangThaiThucHien != "Hoàn thành");
 
-                return RedirectToAction("Index", "GiangVien");
+            if (tai > 0)
+            {
+                TempData["LoiGiangVien"] =
+                    $"Giảng viên đang hướng dẫn {tai} sinh viên. Hãy xử lý phân công trước khi tạm ngừng.";
+
+                return RedirectToAction(nameof(Index));
             }
 
             gv.TrangThai = "Tạm ngừng hướng dẫn";
 
-            try
-            {
-                await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-                TempData["ThongBaoGiangVien"] =
-                    "Đã tạm ngừng hướng dẫn. Dữ liệu giảng viên được giữ lại.";
-            }
-            catch (DbUpdateException)
-            {
-                TempData["LoiGiangVien"] =
-                    "Không thể cập nhật trạng thái giảng viên.";
-            }
+            TempData["ThongBaoGiangVien"] =
+                "Đã tạm ngừng giảng viên, hồ sơ và lịch sử được giữ nguyên.";
 
-            return RedirectToAction("Index", "GiangVien");
-        }
-
-        private void ChuanHoa(GiangVien gv)
-        {
-            gv.HoTen = (gv.HoTen ?? "").Trim();
-            gv.HocVi = (gv.HocVi ?? "").Trim();
-            gv.Email = (gv.Email ?? "").Trim();
-            gv.TrangThai = (gv.TrangThai ?? "").Trim();
-
-            gv.SoDienThoai =
-                string.IsNullOrWhiteSpace(gv.SoDienThoai)
-                    ? null
-                    : gv.SoDienThoai.Trim();
-
-            ModelState.Remove(nameof(GiangVien.HoTen));
-            ModelState.Remove(nameof(GiangVien.HocVi));
-            ModelState.Remove(nameof(GiangVien.Email));
-            ModelState.Remove(nameof(GiangVien.SoDienThoai));
-            ModelState.Remove(nameof(GiangVien.TrangThai));
-
-            if (string.IsNullOrWhiteSpace(gv.HoTen))
-                ModelState.AddModelError(
-                    nameof(gv.HoTen),
-                    "Vui lòng nhập họ tên.");
-
-            if (string.IsNullOrWhiteSpace(gv.HocVi))
-                ModelState.AddModelError(
-                    nameof(gv.HocVi),
-                    "Vui lòng nhập học vị.");
-
-            if (string.IsNullOrWhiteSpace(gv.Email))
-                ModelState.AddModelError(
-                    nameof(gv.Email),
-                    "Vui lòng nhập Email.");
-            else if (!new EmailAddressAttribute().IsValid(gv.Email))
-                ModelState.AddModelError(
-                    nameof(gv.Email),
-                    "Email không hợp lệ.");
-
-            if (gv.HoTen.Length > 100)
-                ModelState.AddModelError(
-                    nameof(gv.HoTen),
-                    "Họ tên không được quá 100 ký tự.");
-
-            if (gv.HocVi.Length > 50)
-                ModelState.AddModelError(
-                    nameof(gv.HocVi),
-                    "Học vị không được quá 50 ký tự.");
-
-            if (gv.Email.Length > 100)
-                ModelState.AddModelError(
-                    nameof(gv.Email),
-                    "Email không được quá 100 ký tự.");
-
-            if (gv.SoDienThoai?.Length > 20)
-                ModelState.AddModelError(
-                    nameof(gv.SoDienThoai),
-                    "Số điện thoại không được quá 20 ký tự.");
-        }
-
-        private async Task KiemTraDuLieu(
-            GiangVien gv,
-            int? idLoaiTru = null)
-        {
-            if (!string.IsNullOrWhiteSpace(gv.Email))
-            {
-                bool trungEmail = await _context.GiangViens
-                    .AnyAsync(g =>
-                        g.Email == gv.Email &&
-                        (!idLoaiTru.HasValue ||
-                         g.MaGiangVien != idLoaiTru.Value));
-
-                if (trungEmail)
-                    ModelState.AddModelError(
-                        nameof(gv.Email),
-                        "Email đã tồn tại.");
-            }
-
-            bool linhVucHopLe = await _context.LinhVucs
-                .AnyAsync(l =>
-                    l.MaLinhVuc == gv.MaLinhVuc &&
-                    l.TrangThai);
-
-            if (!linhVucHopLe)
-                ModelState.AddModelError(
-                    nameof(gv.MaLinhVuc),
-                    "Vui lòng chọn lĩnh vực đang hoạt động.");
-
-            if (gv.SoSinhVienHuongDanToiDa <= 0)
-                ModelState.AddModelError(
-                    nameof(gv.SoSinhVienHuongDanToiDa),
-                    "Số sinh viên hướng dẫn tối đa phải lớn hơn 0.");
-
-            if (gv.TrangThai != "Đang công tác" &&
-                gv.TrangThai != "Tạm ngừng hướng dẫn")
-                ModelState.AddModelError(
-                    nameof(gv.TrangThai),
-                    "Trạng thái giảng viên không hợp lệ.");
-        }
-
-        private async Task NapLinhVuc(int? selected = null)
-        {
-            var danhSach = await _context.LinhVucs
-                .AsNoTracking()
-                .Where(l => l.TrangThai ||
-                    (selected.HasValue &&
-                     l.MaLinhVuc == selected.Value))
-                .OrderBy(l => l.TenLinhVuc)
-                .ToListAsync();
-
-            ViewBag.MaLinhVuc = new SelectList(
-                danhSach,
-                "MaLinhVuc",
-                "TenLinhVuc",
-                selected);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Data;
 using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models;
+using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Filters;
 
 namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
 {
+    [PhanQuyen("Admin")]
     public class DeTaiController : Controller
     {
         private readonly ApplicationDbContext _context;

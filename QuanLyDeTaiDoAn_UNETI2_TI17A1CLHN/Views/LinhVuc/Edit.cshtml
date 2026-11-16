@@ -1,0 +1,220 @@
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.LinhVuc
+
+@{
+    ViewData["Title"] = "Chỉnh sửa lĩnh vực";
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+
+        <div class="mb-4">
+            <h2 class="page-title mb-1">
+                <i class="fa-solid fa-pen me-2"></i>
+                Chỉnh sửa lĩnh vực
+            </h2>
+
+            <p class="page-description mb-0">
+                Cập nhật thông tin lĩnh vực đề tài đồ án
+            </p>
+        </div>
+
+        <form asp-controller="LinhVuc"
+              asp-action="Edit"
+              asp-route-id="@Model.MaLinhVuc"
+              method="post"
+              id="formCapNhatLinhVuc">
+
+            @Html.AntiForgeryToken()
+
+            <input asp-for="MaLinhVuc" type="hidden" />
+
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger mb-3"></div>
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">
+                        Mã lĩnh vực
+                    </label>
+
+                    <input class="form-control"
+                           value="@Model.MaLinhVuc"
+                           readonly />
+                </div>
+
+                <div class="col-md-8">
+                    <label asp-for="TenLinhVuc"
+                           class="form-label">
+                        Tên lĩnh vực
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="TenLinhVuc"
+                           class="form-control"
+                           placeholder="Nhập tên lĩnh vực..." />
+
+                    <span asp-validation-for="TenLinhVuc"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="MoTa" class="form-label">
+                        Mô tả
+                    </label>
+
+                    <textarea asp-for="MoTa"
+                              rows="4"
+                              class="form-control"
+                              placeholder="Nhập mô tả lĩnh vực..."></textarea>
+
+                    <span asp-validation-for="MoTa"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label d-block">
+                        Trạng thái
+                    </label>
+
+                    <div class="form-check form-check-inline">
+                        <input asp-for="TrangThai"
+                               type="radio"
+                               value="true"
+                               id="editActive"
+                               class="form-check-input" />
+
+                        <label for="editActive"
+                               class="form-check-label">
+                            Hoạt động
+                        </label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                        <input asp-for="TrangThai"
+                               type="radio"
+                               value="false"
+                               id="editInactive"
+                               class="form-check-input" />
+
+                        <label for="editInactive"
+                               class="form-check-label">
+                            Ngừng hoạt động
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="d-flex justify-content-end gap-2 flex-wrap">
+
+                <a asp-controller="LinhVuc"
+                   asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Quay lại
+                </a>
+
+                <button type="button"
+                        id="btnMoXacNhanCapNhat"
+                        class="btn btn-main">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Cập nhật lĩnh vực
+                </button>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL XAC NHAN CAP NHAT -->
+
+<div class="modal fade"
+     id="xacNhanCapNhatModal"
+     tabindex="-1"
+     aria-labelledby="xacNhanCapNhatLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title"
+                    id="xacNhanCapNhatLabel">
+                    <i class="fa-solid fa-circle-question me-2"></i>
+                    Xác nhận cập nhật
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Đóng"></button>
+            </div>
+
+            <div class="modal-body">
+                Bạn có chắc chắn muốn cập nhật thông tin
+                lĩnh vực này không?
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                    Hủy
+                </button>
+
+                <button type="button"
+                        class="btn btn-main"
+                        id="btnXacNhanCapNhat">
+                    <i class="fa-solid fa-check"></i>
+                    Xác nhận
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form = document.getElementById("formCapNhatLinhVuc");
+            const btnMo = document.getElementById("btnMoXacNhanCapNhat");
+            const btnXacNhan = document.getElementById("btnXacNhanCapNhat");
+            const modalElement = document.getElementById("xacNhanCapNhatModal");
+
+            if (!form || !btnMo || !btnXacNhan || !modalElement) {
+                return;
+            }
+
+            btnMo.addEventListener("click", function () {
+
+                if (window.jQuery &&
+                    typeof window.jQuery.fn.valid === "function") {
+
+                    if (!window.jQuery(form).valid()) {
+                        return;
+                    }
+                }
+                else if (!form.reportValidity()) {
+                    return;
+                }
+
+                const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+                modal.show();
+            });
+
+            btnXacNhan.addEventListener("click", function () {
+                btnXacNhan.disabled = true;
+                form.requestSubmit();
+            });
+
+        });
+    </script>
+}

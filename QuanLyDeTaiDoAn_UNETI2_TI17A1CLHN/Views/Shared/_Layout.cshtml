@@ -1,577 +1,753 @@
-﻿@{
-    var currentController =
-        ViewContext.RouteData.Values["controller"]?.ToString();
+@using Microsoft.AspNetCore.Http
+
+@{
+    string currentController =
+        ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+
+    string currentAction =
+        ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+
+    string vaiTro =
+        (Context.Session.GetString("VaiTro") ?? "").Trim();
+
+    string hoTen =
+        Context.Session.GetString("HoTen")
+        ?? Context.Session.GetString("TenDangNhap")
+        ?? "Người dùng";
+
+    bool laAdmin = vaiTro.Equals(
+        "Admin", StringComparison.OrdinalIgnoreCase);
+
+    bool laSinhVien = vaiTro.Equals(
+        "SinhVien", StringComparison.OrdinalIgnoreCase);
+
+    bool daDangNhap =
+        Context.Session.GetInt32("MaTaiKhoan").HasValue
+        && (laAdmin || laSinhVien);
+
+    string Active(string tenController)
+    {
+        return currentController.Equals(
+            tenController,
+            StringComparison.OrdinalIgnoreCase)
+            ? "active" : "";
+    }
+
+    string ActiveAction(string tenController, string tenAction)
+    {
+        return currentController.Equals(
+            tenController,
+            StringComparison.OrdinalIgnoreCase)
+            && currentAction.Equals(
+                tenAction,
+                StringComparison.OrdinalIgnoreCase)
+            ? "active" : "";
+    }
 }
 
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="utf-8" />
+
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0" />
 
-    <title>
-        @ViewData["Title"] - Quản lý đề tài đồ án
-    </title>
+    <title>@ViewData["Title"] - UNETI</title>
 
-    <!-- Bootstrap -->
     <link rel="stylesheet"
-          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
 
-    <!-- Font Awesome -->
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <!-- DUNG LAI CSS CHUNG CUA DU AN -->
+    <link rel="stylesheet"
+          href="~/css/uneti-common.css"
+          asp-append-version="true" />
 
     <style>
+            :root {
+                --uneti-navy: #142f50;
+                --uneti-blue: #1d5389;
+                --uneti-bg: #f3f6fa;
+                --uneti-header-height: 76px;
+                --uneti-sidebar-width: 280px;
+            }
 
             * {
                 box-sizing: border-box;
             }
 
-            body {
+            html, body {
                 margin: 0;
-                background: #f4f7fb;
-                font-family: Arial, Helvetica, sans-serif;
-                color: #263238;
+                min-height: 100%;
+                font-family: "Segoe UI", Arial, sans-serif;
+                background: var(--uneti-bg);
             }
 
-            /* =========================
-                       HEADER
-                    ========================= */
+            /* HEADER */
 
-            .top-header {
-                height: 92px;
-                background: linear-gradient( 90deg, #0755a5, #0876d1 );
-                color: white;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 0 22px;
+            .uneti-header {
                 position: fixed;
                 top: 0;
                 left: 0;
                 right: 0;
-                z-index: 1000;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
-            }
-
-            .header-left {
+                height: var(--uneti-header-height);
+                background: #1b548f;
+                color: white;
+                z-index: 1050;
                 display: flex;
                 align-items: center;
-                gap: 16px;
+                justify-content: space-between;
+                padding: 0 26px;
+                box-shadow: 0 2px 10px rgba(0,0,0,.08);
             }
 
-            .logo-box {
-                width: 62px;
-                height: 62px;
-                background: white;
-                border-radius: 50%;
-                color: #0866bd;
+            .uneti-header-title {
+                font-size: 21px;
+                font-weight: 750;
+                color: white;
+                text-decoration: none;
+            }
+
+                .uneti-header-title:hover {
+                    color: white;
+                }
+
+            .uneti-header-actions {
                 display: flex;
                 align-items: center;
-                justify-content: center;
-                font-size: 30px;
+                gap: 18px;
             }
 
-            .header-title h3 {
-                margin: 0;
-                font-size: 28px;
-                font-weight: 700;
-            }
-
-            .header-title small {
-                font-size: 15px;
-                opacity: .95;
-            }
-
-            .admin-box {
-                display: flex;
-                align-items: center;
-                gap: 20px;
-            }
-
-            .admin-label {
-                border: 1px solid rgba(255,255,255,.8);
-                padding: 9px 18px;
-                border-radius: 9px;
+            .uneti-user {
                 font-size: 14px;
+                color: #f0f5fa;
+                white-space: nowrap;
             }
 
-            .admin-user {
-                display: flex;
+            .uneti-logout {
+                display: inline-flex;
                 align-items: center;
-                gap: 9px;
-                font-size: 16px;
+                gap: 8px;
+                border: 1px solid rgba(255,255,255,.65);
+                border-radius: 8px;
+                padding: 9px 14px;
+                color: white;
+                font-size: 13px;
+                font-weight: 600;
+                background: transparent;
+                cursor: pointer;
             }
 
-            /* =========================
-                       SIDEBAR
-                    ========================= */
+                .uneti-logout:hover {
+                    background: rgba(255,255,255,.12);
+                    color: white;
+                }
 
-            .sidebar {
+            .uneti-mobile-toggle {
+                display: none;
+                border: 0;
+                background: transparent;
+                color: white;
+                font-size: 20px;
+            }
+
+            /* SIDEBAR */
+
+            .uneti-sidebar {
                 position: fixed;
-                top: 92px;
+                top: var(--uneti-header-height);
                 left: 0;
                 bottom: 0;
-                width: 254px;
-                background: #0c467c;
-                padding-top: 13px;
-                overflow-y: auto;
-                z-index: 900;
+                width: var(--uneti-sidebar-width);
+                background: var(--uneti-navy);
+                color: white;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                z-index: 1040;
+                transition: transform .2s ease;
             }
 
             .sidebar-brand {
-                color: white;
-                font-size: 14px;
-                padding: 17px 18px 23px;
-                opacity: .95;
-            }
-
-                .sidebar-brand i {
-                    margin-right: 8px;
-                }
-
-            .sidebar a {
                 display: flex;
                 align-items: center;
-                gap: 15px;
-                color: #ffffff;
-                text-decoration: none;
-                padding: 17px 20px;
-                font-size: 16px;
-                border-left: 4px solid transparent;
-                transition: .2s;
+                gap: 12px;
+                padding: 22px 19px 18px;
+                border-bottom: 1px solid rgba(255,255,255,.1);
             }
 
-                .sidebar a:hover {
-                    background: #155b98;
-                    color: white;
+            .sidebar-brand-icon {
+                width: 42px;
+                height: 42px;
+                border-radius: 11px;
+                background: #315c83;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 19px;
+                flex-shrink: 0;
+            }
+
+            .sidebar-brand-name {
+                font-size: 19px;
+                font-weight: 800;
+                letter-spacing: .6px;
+            }
+
+            .sidebar-brand-subtitle {
+                font-size: 9px;
+                color: #b9cbdc;
+                letter-spacing: .6px;
+                margin-top: 3px;
+            }
+
+            .sidebar-navigation {
+                flex: 1;
+                overflow-y: auto;
+                padding: 12px;
+                scrollbar-width: thin;
+                scrollbar-color: #476783 transparent;
+            }
+
+            .sidebar-group-title {
+                padding: 20px 12px 9px;
+                color: #91abc2;
+                font-size: 10px;
+                font-weight: 750;
+                letter-spacing: 1.2px;
+            }
+
+                .sidebar-group-title:first-child {
+                    padding-top: 8px;
                 }
 
-                /*
-                       MENU ĐANG ĐƯỢC CHỌN
-                    */
-                .sidebar a.active {
-                    background: #087ddd;
-                    border-left-color: #ffffff;
-                    color: #ffffff;
-                    font-weight: 600;
-                }
-
-            .sidebar i {
-                width: 20px;
-                text-align: center;
-            }
-
-            /* =========================
-                       MAIN CONTENT
-                    ========================= */
-
-            .main-content {
-                margin-left: 254px;
-                padding: 123px 28px 35px;
-                min-height: 100vh;
-            }
-
-            /* =========================
-                       CARD
-                    ========================= */
-
-            .content-card {
-                background: white;
-                border: 1px solid #dfe7ef;
+            .sidebar-link {
+                display: flex;
+                align-items: center;
+                gap: 13px;
+                min-height: 44px;
+                padding: 11px 14px;
+                margin: 3px 0;
                 border-radius: 9px;
-                box-shadow: 0 2px 8px rgba(0,0,0,.06);
-                overflow: hidden;
-            }
-
-            /* =========================
-                       TITLE
-                    ========================= */
-
-            .page-title {
-                font-size: 27px;
-                font-weight: 700;
-                color: #172b4d;
-                margin: 0;
-            }
-
-            /* =========================
-                       BUTTON
-                    ========================= */
-
-            .btn-main {
-                background: #0878e5;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 10px 17px;
+                color: #d7e3ee;
+                text-decoration: none;
                 font-size: 14px;
+                font-weight: 500;
+                transition: background .18s, color .18s;
             }
 
-                .btn-main:hover {
-                    background: #0565c3;
+                .sidebar-link i {
+                    width: 20px;
+                    text-align: center;
+                    font-size: 16px;
+                    color: #b7cde0;
+                    flex-shrink: 0;
+                }
+
+                .sidebar-link:hover {
+                    background: #24496e;
                     color: white;
                 }
 
-            /* =========================
-                       INPUT
-                    ========================= */
+                    .sidebar-link:hover i {
+                        color: white;
+                    }
 
-            .form-control,
-            .form-select {
-                font-size: 14px;
-                min-height: 43px;
-            }
-
-            /* =========================
-                       TABLE
-                    ========================= */
-
-            .table {
-                font-size: 14px;
-            }
-
-                .table thead th {
-                    background: #f7f9fc;
-                    color: #42526e;
-                    font-size: 13px;
-                    border-bottom: 1px solid #dfe3e8;
-                    white-space: nowrap;
-                    padding-top: 14px;
-                    padding-bottom: 14px;
+                .sidebar-link.active {
+                    background: #315c83;
+                    color: white;
+                    font-weight: 650;
+                    box-shadow: inset 3px 0 0 #9fc7e6;
                 }
 
-                .table td {
-                    vertical-align: middle;
-                    padding-top: 13px;
-                    padding-bottom: 13px;
-                }
+                    .sidebar-link.active i {
+                        color: white;
+                    }
 
-            /* =========================
-                       STATUS
-                    ========================= */
-
-            .status-active {
-                display: inline-block;
-                background: #d9f8e5;
-                color: #168344;
-                padding: 6px 10px;
-                border-radius: 6px;
+            .sidebar-footer {
+                padding: 16px 20px;
+                border-top: 1px solid rgba(255,255,255,.1);
+                color: #9fb6cb;
                 font-size: 12px;
-                font-weight: 600;
             }
 
-            .status-stop {
-                display: inline-block;
-                background: #fff0dc;
-                color: #e27416;
-                padding: 6px 10px;
-                border-radius: 6px;
-                font-size: 12px;
-                font-weight: 600;
+            /* MAIN */
+
+            .uneti-main {
+                margin-left: var(--uneti-sidebar-width);
+                margin-top: var(--uneti-header-height);
+                padding: 30px 32px;
+                min-height: calc(100vh - var(--uneti-header-height));
+                width: calc(100% - var(--uneti-sidebar-width));
+                background: var(--uneti-bg);
             }
 
-            /* =========================
-                       ACTION BUTTON
-                    ========================= */
-
-            .action-btn {
-                border: 0;
-                background: transparent;
-                padding: 5px;
-                text-decoration: none;
-                font-size: 16px;
+            .uneti-main-inner {
+                max-width: 1600px;
+                margin: 0 auto;
             }
 
-            .action-edit {
-                color: #0878e5;
+            /* TRANG CHUA DANG NHAP */
+
+            .uneti-main.no-sidebar {
+                margin-left: 0;
+                width: 100%;
             }
 
-            .action-info {
-                color: #12a0a0;
+            /* HOP THOAI DANG XUAT */
+
+            #xacNhanDangXuat .modal-content {
+                border: none;
+                border-radius: 14px;
+                overflow: hidden;
+                box-shadow: 0 14px 45px rgba(0,0,0,.16);
             }
 
-            .action-delete {
-                color: #f44336;
+            #xacNhanDangXuat .modal-header {
+                background: #f1f5fa;
+                border-bottom: 1px solid #e2e8f0;
+                padding: 17px 20px;
             }
 
-            .action-edit:hover {
-                color: #005bbb;
+            #xacNhanDangXuat .modal-title {
+                color: #1b4b7a;
+                font-size: 17px;
+                font-weight: 700;
             }
 
-            .action-info:hover {
-                color: #087b7b;
+            #xacNhanDangXuat .modal-body {
+                padding: 22px 20px;
+                font-size: 14px;
+                color: #46576a;
+                line-height: 1.7;
             }
 
-            .action-delete:hover {
-                color: #c62828;
+            #xacNhanDangXuat .modal-footer {
+                border-top: 1px solid #e2e8f0;
+                padding: 14px 20px;
+                gap: 8px;
             }
 
-            /* =========================
-                       PAGINATION
-                    ========================= */
-
-            .pagination .page-link {
+            #xacNhanDangXuat .btn {
                 font-size: 13px;
+                font-weight: 600;
+                border-radius: 8px;
+                padding: 9px 15px;
             }
 
-            /* =========================
-                       RESPONSIVE
-                    ========================= */
+            #xacNhanDangXuat .btn-primary {
+                background: #20558d;
+                border-color: #20558d;
+            }
 
-            @@media (max-width: 900px) {
+            /* MOBILE */
 
-                .sidebar {
-                    width: 180px;
+            @@media (max-width: 991px) {
+                .uneti-mobile-toggle {
+                    display: inline-block;
                 }
 
-                .main-content {
-                    margin-left: 180px;
+                .uneti-header {
+                    padding: 0 16px;
                 }
 
-                .header-title h3 {
-                    font-size: 20px;
+                .uneti-header-title {
+                    font-size: 16px;
                 }
 
-                .header-title small {
-                    display: none;
+                .uneti-sidebar {
+                    transform: translateX(-100%);
                 }
 
-                .admin-label {
+                    .uneti-sidebar.show {
+                        transform: translateX(0);
+                    }
+
+                .uneti-main {
+                    margin-left: 0;
+                    width: 100%;
+                    padding: 20px 16px;
+                }
+
+                .uneti-user {
                     display: none;
                 }
             }
 
+            @@media (max-width: 520px) {
+                .uneti-header-title {
+                    font-size: 13px;
+                }
+
+                .uneti-header-actions {
+                    gap: 8px;
+                }
+
+                .uneti-logout {
+                    padding: 8px 10px;
+                    font-size: 12px;
+                }
+            }
+
+            @@media print {
+                .uneti-header,
+                .uneti-sidebar {
+                    display: none !important;
+                }
+
+                .uneti-main {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    width: 100% !important;
+                    min-height: 0 !important;
+                    background: white !important;
+                }
+
+                .uneti-main-inner {
+                    max-width: none !important;
+                }
+            }
     </style>
 
-    @await RenderSectionAsync(
-        "Styles",
-        required: false)
-
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 
 <body>
 
-    <!-- ======================================
-         HEADER
-    ======================================= -->
+    <!-- HEADER -->
+    <header class="uneti-header">
 
-    <header class="top-header">
+        <div class="d-flex align-items-center gap-3">
 
-        <div class="header-left">
+            <button type="button"
+                    class="uneti-mobile-toggle"
+                    id="sidebarToggle"
+                    aria-label="Mở menu"
+                    aria-controls="unetiSidebar"
+                    aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
 
-            <div class="logo-box">
-                <i class="fa-solid fa-book-open"></i>
-            </div>
-
-            <div class="header-title">
-
-                <h3>
-                    Hệ thống Quản lý đề tài đồ án
-                </h3>
-
-                <small>
-                    Quản lý đề tài và phân công
-                    giảng viên hướng dẫn
-                </small>
-
-            </div>
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="uneti-header-title">
+                UNETI | Quản lý đề tài đồ án
+            </a>
 
         </div>
 
-        <div class="admin-box">
+        <div class="uneti-header-actions">
 
-            <span class="admin-label">
-                Dành cho Admin
-            </span>
+            @if (daDangNhap)
+            {
+                <div class="uneti-user">
+                    <i class="fa-solid fa-user me-2"></i>
+                    @hoTen
+                </div>
 
-            <div class="admin-user">
+                <button type="button"
+                        class="uneti-logout"
+                        data-bs-toggle="modal"
+                        data-bs-target="#xacNhanDangXuat">
 
-                <i class="fa-solid
-                    fa-circle-user fs-3">
-                </i>
-
-                <span>
-                    Admin
-                </span>
-
-                <i class="fa-solid
-                    fa-chevron-down small">
-                </i>
-
-            </div>
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Đăng xuất
+                </button>
+            }
+            else
+            {
+                <a asp-controller="DangNhap"
+                   asp-action="Index"
+                   class="uneti-logout text-decoration-none">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    Đăng nhập
+                </a>
+            }
 
         </div>
-
     </header>
 
+    <!-- SIDEBAR -->
+    @if (daDangNhap)
+    {
+        <aside class="uneti-sidebar" id="unetiSidebar">
 
-    <!-- ======================================
-         SIDEBAR
-    ======================================= -->
+            <div class="sidebar-brand">
+                <div class="sidebar-brand-icon">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
 
-    <aside class="sidebar">
+                <div>
+                    <div class="sidebar-brand-name">UNETI</div>
+                    <div class="sidebar-brand-subtitle">
+                        QUẢN LÝ ĐỀ TÀI ĐỒ ÁN
+                    </div>
+                </div>
+            </div>
 
-        <div class="sidebar-brand">
+            <nav class="sidebar-navigation">
 
-            <i class="fa-solid fa-circle-dot"></i>
+                @if (laSinhVien)
+                {
+                    <!-- CỔNG SINH VIÊN -->
 
-            QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.
+                    <div class="sidebar-group-title">
+                        CỔNG SINH VIÊN
+                    </div>
 
+                    <!-- TRANG CHỦ SINH VIÊN -->
+                    <a asp-controller="CongSinhVien"
+                       asp-action="Index"
+                       class="sidebar-link @ActiveAction("CongSinhVien", "Index")">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Trang chủ sinh viên</span>
+                    </a>
+
+                    <!-- DANH SÁCH ĐỀ TÀI -->
+                    <a asp-controller="CongSinhVien"
+                       asp-action="DeTai"
+                       class="sidebar-link @ActiveAction("CongSinhVien", "DeTai")">
+                        <i class="fa-solid fa-book-open"></i>
+                        <span>Danh sách đề tài</span>
+                    </a>
+
+                    <!-- ĐĂNG KÝ CỦA TÔI -->
+                    <a asp-controller="DangKyDeTai"
+                       asp-action="Index"
+                       class="sidebar-link @ActiveAction("DangKyDeTai", "Index")">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                        <span>Đăng ký của tôi</span>
+                    </a>
+
+                    <!-- HỒ SƠ CÁ NHÂN -->
+                    <a asp-controller="CongSinhVien"
+                       asp-action="HoSo"
+                       class="sidebar-link @ActiveAction("CongSinhVien", "HoSo")">
+                        <i class="fa-solid fa-id-card"></i>
+                        <span>Hồ sơ cá nhân</span>
+                    </a>
+
+                    <!-- GIẢNG VIÊN HƯỚNG DẪN -->
+                    <a asp-controller="CongSinhVien"
+                       asp-action="PhanCongCuaToi"
+                       class="sidebar-link @ActiveAction("CongSinhVien", "PhanCongCuaToi")">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                        <span>Giảng viên hướng dẫn</span>
+                    </a>
+                }
+                else if (laAdmin)
+                {
+                    <!-- ADMIN -->
+
+                    <div class="sidebar-group-title">
+                        TỔNG QUAN
+                    </div>
+
+                    <!-- TRANG CHỦ ADMIN -->
+                    <a asp-controller="Home"
+                       asp-action="Index"
+                       class="sidebar-link @Active("Home")">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Trang chủ</span>
+                    </a>
+
+                    <div class="sidebar-group-title">
+                        QUẢN LÝ HỆ THỐNG
+                    </div>
+
+                    <!-- TÀI KHOẢN -->
+                    <a asp-controller="TaiKhoan"
+                       asp-action="Index"
+                       class="sidebar-link @Active("TaiKhoan")">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>Tài khoản</span>
+                    </a>
+
+                    <!-- LĨNH VỰC -->
+                    <a asp-controller="LinhVuc"
+                       asp-action="Index"
+                       class="sidebar-link @Active("LinhVuc")">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span>Lĩnh vực đề tài</span>
+                    </a>
+
+                    <!-- GIẢNG VIÊN -->
+                    <a asp-controller="GiangVien"
+                       asp-action="Index"
+                       class="sidebar-link @Active("GiangVien")">
+                        <i class="fa-solid fa-user-tie"></i>
+                        <span>Giảng viên</span>
+                    </a>
+
+                    <!-- ĐỀ TÀI -->
+                    <a asp-controller="DeTai"
+                       asp-action="Index"
+                       class="sidebar-link @Active("DeTai")">
+                        <i class="fa-solid fa-book-open"></i>
+                        <span>Đề tài</span>
+                    </a>
+
+                    <!-- SINH VIÊN -->
+                    <a asp-controller="SinhVien"
+                       asp-action="Index"
+                       class="sidebar-link @Active("SinhVien")">
+                        <i class="fa-solid fa-user-graduate"></i>
+                        <span>Sinh viên</span>
+                    </a>
+
+                    <div class="sidebar-group-title">
+                        QUẢN LÝ NGHIỆP VỤ
+                    </div>
+
+                    <!-- CẤU HÌNH ĐỢT ĐĂNG KÝ -->
+                    <a asp-controller="DotDangKy"
+                       asp-action="Index"
+                       class="sidebar-link @Active("DotDangKy")">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <span>Cấu hình đợt đăng ký</span>
+                    </a>
+
+                    <!-- DUYỆT ĐĂNG KÝ -->
+                    <a asp-controller="DuyetDangKy"
+                       asp-action="Index"
+                       class="sidebar-link @Active("DuyetDangKy")">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                        <span>Duyệt đăng ký</span>
+                    </a>
+
+                    <!-- PHÂN CÔNG GIẢNG VIÊN -->
+                    <a asp-controller="PhanCong"
+                       asp-action="Index"
+                       class="sidebar-link @Active("PhanCong")">
+                        <i class="fa-solid fa-user-check"></i>
+                        <span>Phân công giảng viên</span>
+                    </a>
+
+                    <div class="sidebar-group-title">
+                        BÁO CÁO
+                    </div>
+
+                    <!-- THỐNG KÊ -->
+                    <a asp-controller="ThongKe"
+                       asp-action="Index"
+                       class="sidebar-link @Active("ThongKe")">
+                        <i class="fa-solid fa-chart-column"></i>
+                        <span>Thống kê</span>
+                    </a>
+                }
+
+            </nav>
+
+            <div class="sidebar-footer">
+                <i class="fa-solid fa-shield-halved me-2"></i>
+                Hệ thống quản lý UNETI
+            </div>
+
+        </aside>
+    }
+
+    <!-- MAIN CONTENT -->
+    <main class="uneti-main @(daDangNhap ? "" : "no-sidebar")">
+        <div class="uneti-main-inner">
+            @RenderBody()
         </div>
-
-
-        <!-- TRANG CHỦ -->
-
-        <a asp-controller="Home"
-           asp-action="Index"
-           class="@(currentController == "Home"
-                               ? "active"
-                               : "")">
-
-            <i class="fa-solid fa-house"></i>
-
-            Trang chủ
-
-        </a>
-
-
-        <!-- TÀI KHOẢN -->
-
-        <a href="#">
-
-            <i class="fa-solid fa-user"></i>
-
-            Tài khoản
-
-        </a>
-
-
-        <!-- LĨNH VỰC -->
-
-        <a href="#">
-
-            <i class="fa-solid fa-layer-group"></i>
-
-            Lĩnh vực đề tài
-
-        </a>
-
-
-        <!-- GIẢNG VIÊN -->
-
-        <a asp-controller="GiangVien"
-           asp-action="Index"
-           class="@(currentController == "GiangVien"
-                               ? "active"
-                               : "")">
-
-            <i class="fa-solid fa-user-tie"></i>
-
-            Giảng viên
-
-        </a>
-
-
-        <!-- ĐỀ TÀI -->
-
-        <a asp-controller="DeTai"
-           asp-action="Index"
-           class="@(currentController == "DeTai"
-                               ? "active"
-                               : "")">
-
-            <i class="fa-solid fa-file-lines"></i>
-
-            Đề tài
-
-        </a>
-
-
-        <!-- ĐĂNG KÝ ĐỀ TÀI -->
-
-        <a href="#">
-
-            <i class="fa-solid fa-list-check"></i>
-
-            Đăng ký đề tài
-
-        </a>
-
-
-        <!-- DUYỆT ĐĂNG KÝ -->
-
-        <a href="#">
-
-            <i class="fa-solid fa-circle-check"></i>
-
-            Duyệt đăng ký
-
-        </a>
-
-
-        <!-- PHÂN CÔNG -->
-
-        <a href="#">
-
-            <i class="fa-solid fa-user-pen"></i>
-
-            Phân công giảng viên
-
-        </a>
-
-
-        <!-- THỐNG KÊ -->
-
-        <a href="#">
-
-            <i class="fa-solid fa-chart-column"></i>
-
-            Thống kê
-
-        </a>
-
-
-        <!-- CÀI ĐẶT -->
-
-        <a href="#">
-
-            <i class="fa-solid fa-gear"></i>
-
-            Cài đặt
-
-        </a>
-
-    </aside>
-
-
-    <!-- ======================================
-         NỘI DUNG
-    ======================================= -->
-
-    <main class="main-content">
-
-        @RenderBody()
-
     </main>
 
+    <!-- HOP THOAI XAC NHAN DANG XUAT -->
+    @if (daDangNhap)
+    {
+        <div class="modal fade"
+             id="xacNhanDangXuat"
+             tabindex="-1"
+             aria-labelledby="tieuDeDangXuat"
+             aria-hidden="true">
 
-    <!-- ======================================
-         JAVASCRIPT
-    ======================================= -->
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
 
-    <script src="~/lib/jquery/dist/jquery.min.js">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="tieuDeDangXuat">
+                            <i class="fa-solid fa-right-from-bracket me-2"></i>
+                            Xác nhận đăng xuất
+                        </h5>
+
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Đóng">
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn đăng xuất khỏi
+                        hệ thống quản lý đề tài đồ án UNETI không?
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">
+                            Hủy
+                        </button>
+
+                        <!-- DUNG LAI ACTION DANG XUAT -->
+                        <form asp-controller="DangNhap"
+                              asp-action="DangXuat"
+                              method="post"
+                              class="m-0">
+
+                            @Html.AntiForgeryToken()
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                <i class="fa-solid fa-check me-1"></i>
+                                Đồng ý đăng xuất
+                            </button>
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const toggle = document.getElementById("sidebarToggle");
+        const sidebar = document.getElementById("unetiSidebar");
+
+        if (!toggle || !sidebar) return;
+
+        toggle.addEventListener("click", function () {
+        const opened = sidebar.classList.toggle("show");
+        toggle.setAttribute("aria-expanded", String(opened));
+        });
+
+        document.addEventListener("click", function (event) {
+        if (window.innerWidth > 991) return;
+
+        if (!sidebar.contains(event.target) &&
+        !toggle.contains(event.target)) {
+        sidebar.classList.remove("show");
+        toggle.setAttribute("aria-expanded", "false");
+        }
+        });
+        });
     </script>
 
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js">
-    </script>
-
-    @await RenderSectionAsync(
-        "Scripts",
-        required: false)
-
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
-
 </html>

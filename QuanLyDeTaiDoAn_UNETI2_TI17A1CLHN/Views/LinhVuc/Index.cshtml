@@ -1,0 +1,435 @@
+@model IEnumerable<QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.LinhVuc>
+
+@{
+    ViewData["Title"] = "Quản lý lĩnh vực đề tài";
+    ViewData["UnifiedIndex"] = true;
+
+    int trang = ViewBag.TrangHienTai ?? 1;
+    int tongTrang = ViewBag.TongTrang ?? 1;
+    int tong = ViewBag.TongBanGhi ?? 0;
+    int kichThuocTrang = ViewBag.KichThuocTrang ?? 8;
+
+    string tuKhoa = ViewBag.TuKhoa ?? "";
+    string trangThai = ViewBag.TrangThai ?? "";
+
+    int batDau = tong == 0
+        ? 0
+        : (trang - 1) * kichThuocTrang + 1;
+
+    int ketThuc = Math.Min(
+        trang * kichThuocTrang,
+        tong
+    );
+}
+
+<div class="content-card">
+
+    <div class="p-3 p-lg-4">
+
+        <!-- TIEU DE -->
+
+        <div class="d-flex justify-content-between
+            align-items-center flex-wrap gap-3 mb-4">
+
+            <div>
+                <h2 class="page-title mb-1">
+                    <i class="fa-solid fa-layer-group me-2"></i>
+                    Quản lý lĩnh vực đề tài
+                </h2>
+
+                <p class="page-description mb-0">
+                    Quản lý các lĩnh vực nghiên cứu và đồ án
+                </p>
+            </div>
+
+            <a asp-controller="LinhVuc"
+               asp-action="Create"
+               class="btn btn-main">
+
+                <i class="fa-solid fa-plus"></i>
+                Thêm lĩnh vực
+            </a>
+
+        </div>
+
+        <!-- THONG BAO -->
+        @if (TempData["ThongBaoLinhVuc"] != null)
+        {
+            <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check me-2"></i>
+                @TempData["ThongBaoLinhVuc"]
+            </div>
+        }
+
+        @if (TempData["LoiLinhVuc"] != null)
+        {
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                @TempData["LoiLinhVuc"]
+            </div>
+        }
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check me-2"></i>
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                @TempData["Error"]
+            </div>
+        }
+
+        <!-- TIM KIEM VA LOC -->
+
+        <form asp-controller="LinhVuc"
+              asp-action="Index"
+              method="get"
+              class="uneti-filter-bar">
+
+            <div class="row g-3">
+
+                <div class="col-lg-6">
+
+                    <label for="tuKhoa"
+                           class="form-label">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i>
+                        Tìm kiếm
+                    </label>
+
+                    <input type="text"
+                           id="tuKhoa"
+                           name="tuKhoa"
+                           value="@tuKhoa"
+                           class="form-control"
+                           placeholder="Nhập tên lĩnh vực hoặc mô tả..." />
+
+                </div>
+
+                <div class="col-lg-3">
+
+                    <label for="trangThai"
+                           class="form-label">
+                        <i class="fa-solid fa-filter me-1"></i>
+                        Trạng thái
+                    </label>
+
+                    <select id="trangThai"
+                            name="trangThai"
+                            class="form-select">
+
+                        <option value="">
+                            Tất cả trạng thái
+                        </option>
+
+                        <option value="HoatDong"
+                                selected="@(trangThai == "HoatDong")">
+                            Hoạt động
+                        </option>
+
+                        <option value="NgungHoatDong"
+                                selected="@(trangThai == "NgungHoatDong")">
+                            Ngừng hoạt động
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-lg-3 d-flex align-items-end gap-2">
+
+                    <button type="submit"
+                            class="btn btn-main flex-fill">
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        Tìm kiếm
+                    </button>
+
+                    <a asp-controller="LinhVuc"
+                       asp-action="Index"
+                       class="btn btn-outline-secondary"
+                       title="Xóa bộ lọc">
+
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Đặt lại
+                    </a>
+
+                </div>
+
+            </div>
+
+        </form>
+
+        <!-- TIEU DE DANH SACH -->
+
+        <div class="d-flex justify-content-between
+            align-items-center flex-wrap gap-2 mb-3">
+
+            <h5 class="fw-bold mb-0"
+                style="color:#17477e">
+
+                <i class="fa-solid fa-list me-2"></i>
+                Danh sách lĩnh vực (@tong)
+
+            </h5>
+
+            <span class="text-muted small">
+                @kichThuocTrang bản ghi / trang
+            </span>
+
+        </div>
+
+    </div>
+
+    <!-- BANG DU LIEU -->
+
+    <div class="table-responsive">
+
+        <table class="table uneti-table table-hover mb-0">
+
+            <thead>
+                <tr>
+                    <th class="ps-3">STT</th>
+                    <th>Mã lĩnh vực</th>
+                    <th>Tên lĩnh vực</th>
+                    <th>Mô tả</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if (Model != null && Model.Any())
+                {
+                    int stt = batDau;
+
+                    foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <td class="ps-3">
+                                @stt
+                            </td>
+
+                            <td>
+                                @item.MaLinhVuc
+                            </td>
+
+                            <td class="fw-semibold">
+                                <i class="fa-solid fa-layer-group
+                                text-primary me-2"></i>
+                                @item.TenLinhVuc
+                            </td>
+
+                            <td>
+                                @(string.IsNullOrWhiteSpace(item.MoTa)
+                                    ? "Chưa có mô tả"
+                                    : item.MoTa)
+                            </td>
+
+                            <td class="text-center">
+
+                                @if (item.TrangThai)
+                                {
+                                    <span class="uneti-status
+                                        uneti-status-success">
+
+                                        <i class="fa-solid fa-circle-check me-1"></i>
+                                        Hoạt động
+
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="uneti-status
+                                        uneti-status-danger">
+
+                                        <i class="fa-solid fa-circle-pause me-1"></i>
+                                        Ngừng hoạt động
+
+                                    </span>
+                                }
+
+                            </td>
+
+                            <!-- BA ICON DUNG CHUNG -->
+
+                            <td class="text-center">
+
+                                <div class="uneti-actions">
+
+                                    <!-- XEM -->
+
+                                    <a asp-controller="LinhVuc"
+                                       asp-action="Details"
+                                       asp-route-id="@item.MaLinhVuc"
+                                       class="btn btn-outline-primary btn-sm"
+                                       title="Xem chi tiết"
+                                       aria-label="Xem lĩnh vực @item.TenLinhVuc">
+
+                                        <i class="fa-solid fa-eye"></i>
+
+                                    </a>
+
+                                    <!-- SUA -->
+
+                                    <a asp-controller="LinhVuc"
+                                       asp-action="Edit"
+                                       asp-route-id="@item.MaLinhVuc"
+                                       class="btn btn-outline-primary btn-sm"
+                                       title="Chỉnh sửa"
+                                       aria-label="Sửa lĩnh vực @item.TenLinhVuc">
+
+                                        <i class="fa-solid fa-pen"></i>
+
+                                    </a>
+
+                                    <!-- XOA -->
+
+                                    <a asp-controller="LinhVuc"
+                                       asp-action="Delete"
+                                       asp-route-id="@item.MaLinhVuc"
+                                       class="btn btn-outline-danger btn-sm"
+                                       title="Xóa hoặc ngừng hoạt động"
+                                       aria-label="Xóa hoặc ngừng lĩnh vực @item.TenLinhVuc">
+
+                                        <i class="fa-solid fa-trash"></i>
+
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        stt++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6"
+                            class="text-center text-muted py-5">
+
+                            <i class="fa-solid fa-inbox
+                            fa-2x d-block mb-3"></i>
+
+                            Không tìm thấy lĩnh vực phù hợp.
+
+                            <div class="mt-3">
+                                <a asp-controller="LinhVuc"
+                                   asp-action="Index"
+                                   class="btn btn-outline-secondary">
+
+                                    <i class="fa-solid fa-rotate-left"></i>
+                                    Xóa bộ lọc
+
+                                </a>
+                            </div>
+
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- PHAN TRANG -->
+
+    <div class="d-flex justify-content-between
+        align-items-center flex-wrap gap-3 p-3 border-top">
+
+        <div class="uneti-pagination-info">
+
+            Hiển thị
+            <strong>@batDau - @ketThuc</strong>
+            trong tổng số
+            <strong>@tong</strong>
+            lĩnh vực
+
+        </div>
+
+        @if (tongTrang > 1)
+        {
+            <nav aria-label="Phân trang lĩnh vực">
+
+                <ul class="pagination pagination-sm mb-0">
+
+                    <!-- TRANG TRUOC -->
+
+                    <li class="page-item @(trang <= 1 ? "disabled" : "")">
+
+                        <a class="page-link"
+                           asp-controller="LinhVuc"
+                           asp-action="Index"
+                           asp-route-trang="@(trang - 1)"
+                           asp-route-tuKhoa="@tuKhoa"
+                           asp-route-trangThai="@trangThai"
+                           tabindex="@(trang <= 1 ? -1 : 0)"
+                           aria-disabled="@(trang <= 1 ? "true" : "false")">
+
+                            <i class="fa-solid fa-chevron-left"></i>
+                            Trước
+
+                        </a>
+
+                    </li>
+
+                    <!-- CAC TRANG -->
+                    @for (int i = 1; i <= tongTrang; i++)
+                    {
+                        <li class="page-item @(i == trang ? "active" : "")">
+
+                            <a class="page-link"
+                               asp-controller="LinhVuc"
+                               asp-action="Index"
+                               asp-route-trang="@i"
+                               asp-route-tuKhoa="@tuKhoa"
+                               asp-route-trangThai="@trangThai"
+                               aria-current="@(i == trang ? "page" : null)">
+
+                                @i
+
+                            </a>
+
+                        </li>
+                    }
+
+                    <!-- TRANG SAU -->
+
+                    <li class="page-item @(trang >= tongTrang ? "disabled" : "")">
+
+                        <a class="page-link"
+                           asp-controller="LinhVuc"
+                           asp-action="Index"
+                           asp-route-trang="@(trang + 1)"
+                           asp-route-tuKhoa="@tuKhoa"
+                           asp-route-trangThai="@trangThai"
+                           tabindex="@(trang >= tongTrang ? -1 : 0)"
+                           aria-disabled="@(trang >= tongTrang ? "true" : "false")">
+
+                            Sau
+                            <i class="fa-solid fa-chevron-right"></i>
+
+                        </a>
+
+                    </li>
+
+                </ul>
+
+            </nav>
+        }
+
+    </div>
+
+</div>

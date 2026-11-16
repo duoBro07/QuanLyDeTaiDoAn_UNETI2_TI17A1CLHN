@@ -1,0 +1,534 @@
+﻿
+/* =====================================================
+   UNETI - MODERN ADMIN UI
+   Dùng chung: Dashboard - Giảng viên - Đề tài
+   ===================================================== */
+
+:root {
+    --ui-primary: #1268bd;
+    --ui-primary-dark: #0b477f;
+    --ui-navy: #123e69;
+    --ui-text: #263d55;
+    --ui-muted: #75869a;
+    --ui-border: #e2eaf3;
+    --ui-bg: #f3f7fc;
+    --ui-white: #ffffff;
+    --ui-radius: 10px;
+}
+
+/* ==========================
+   1. FONT TOÀN HỆ THỐNG
+   ========================== */
+
+html {
+    font-size: 14px;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ui-text);
+    background-color: var(--ui-bg);
+}
+
+/* ==========================
+   2. HEADER
+   ========================== */
+
+header h1,
+header .system-title,
+.header-title,
+.topbar h1,
+.top-header h1 {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+    letter-spacing: 0 !important;
+}
+
+header h2,
+header .system-name {
+    font-size: 19px !important;
+    line-height: 1.3 !important;
+}
+
+header p,
+header .system-subtitle,
+.header-subtitle,
+.topbar p,
+.top-header p {
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+}
+
+header .user-name,
+header .admin-name {
+    font-size: 13px !important;
+}
+
+/* ==========================
+   3. SIDEBAR
+   ========================== */
+
+.sidebar,
+.side-menu,
+.left-sidebar {
+    font-size: 13px;
+    max-width: 100%;
+    overflow-x: hidden !important;
+}
+
+    .sidebar *,
+    .side-menu *,
+    .left-sidebar * {
+        box-sizing: border-box;
+    }
+
+    .sidebar a,
+    .sidebar .nav-link,
+    .sidebar .menu-item,
+    .side-menu a,
+    .left-sidebar a {
+        font-size: 13px !important;
+        font-weight: 500;
+        line-height: 1.45;
+        max-width: 100%;
+    }
+
+    .sidebar .nav-link,
+    .sidebar .menu-item,
+    .side-menu a,
+    .left-sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        min-width: 0;
+    }
+
+        .sidebar a i,
+        .sidebar .nav-link i,
+        .side-menu a i,
+        .left-sidebar a i {
+            flex-shrink: 0;
+            font-size: 15px;
+        }
+
+    .sidebar .brand,
+    .sidebar .sidebar-brand,
+    .sidebar .brand-name,
+    .sidebar .project-name,
+    .side-menu .brand {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        font-size: 12px !important;
+        line-height: 1.5 !important;
+    }
+
+    .sidebar .nav,
+    .sidebar ul,
+    .side-menu ul {
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    /* Không cho chữ dài làm tràn menu */
+
+    .sidebar a,
+    .sidebar span,
+    .side-menu a,
+    .left-sidebar a {
+        overflow-wrap: break-word;
+    }
+
+/* ==========================
+   4. KHU VỰC NỘI DUNG
+   ========================== */
+
+main,
+.main-content,
+.content-wrapper,
+.page-content {
+    min-width: 0;
+}
+
+.dashboard-page {
+    padding: 12px 5px 28px;
+    font-size: 13px;
+}
+
+.dashboard-heading {
+    margin-bottom: 19px;
+}
+
+    .dashboard-heading h2,
+    .page-title,
+    .content-header h1 {
+        font-size: 23px !important;
+        font-weight: 700 !important;
+        line-height: 1.35 !important;
+        color: var(--ui-navy);
+    }
+
+    .dashboard-heading p,
+    .page-description {
+        font-size: 12px !important;
+        color: var(--ui-muted);
+    }
+
+/* ==========================
+   5. CARD
+   ========================== */
+
+.dashboard-card,
+.stat-card,
+.card {
+    border-radius: var(--ui-radius);
+}
+
+.dashboard-card,
+.stat-card {
+    border: 1px solid var(--ui-border);
+    background: var(--ui-white);
+    box-shadow: 0 3px 12px rgba(28, 68, 112, 0.045);
+}
+
+.card-heading {
+    padding: 15px 18px;
+}
+
+    .card-heading h3,
+    .card-title,
+    .features-title {
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        line-height: 1.4 !important;
+    }
+
+/* ==========================
+   6. DASHBOARD - THỐNG KÊ
+   ========================== */
+
+.stat-grid {
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    gap: 12px;
+    padding: 17px;
+}
+
+.stat-icon {
+    width: 46px;
+    height: 46px;
+    font-size: 19px;
+    border-radius: 10px;
+}
+
+.stat-info span {
+    font-size: 12px !important;
+    line-height: 1.4;
+}
+
+.stat-info strong {
+    font-size: 26px !important;
+    font-weight: 750 !important;
+    line-height: 1.2;
+}
+
+.chart-grid {
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.chart-body {
+    height: 280px;
+    padding: 18px;
+}
+
+/* ==========================
+   7. DANH SÁCH GIẢNG VIÊN
+   VÀ DANH SÁCH ĐỀ TÀI
+   ========================== */
+
+.table-responsive,
+.table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+table,
+.table,
+.dashboard-table {
+    width: 100%;
+    font-size: 12.5px !important;
+    border-collapse: collapse;
+}
+
+    table thead th,
+    .table thead th,
+    .dashboard-table th {
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        line-height: 1.4;
+        vertical-align: middle;
+    }
+
+    table tbody td,
+    .table tbody td,
+    .dashboard-table td {
+        font-size: 12.5px !important;
+        line-height: 1.5;
+        vertical-align: middle;
+    }
+
+    .dashboard-table th {
+        padding: 12px 14px;
+    }
+
+    .dashboard-table td {
+        padding: 12px 14px;
+    }
+
+    /* Giữ tên giảng viên, đề tài dễ đọc */
+
+    table a,
+    .table a,
+    .topic-name {
+        font-size: inherit;
+    }
+
+/* ==========================
+   8. TÌM KIẾM VÀ BỘ LỌC
+   ========================== */
+
+input,
+select,
+textarea,
+.form-control,
+.form-select {
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 13px !important;
+}
+
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    input[type="password"],
+    input[type="date"],
+    input[type="search"],
+    select,
+    .form-control,
+    .form-select {
+        min-height: 36px;
+        border-radius: 7px;
+    }
+
+    textarea,
+    textarea.form-control {
+        min-height: 90px;
+    }
+
+        input:focus,
+        select:focus,
+        textarea:focus,
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #72a9e8;
+            box-shadow: 0 0 0 3px rgba(18, 104, 189, 0.09);
+        }
+
+/* ==========================
+   9. FORM THÊM / SỬA
+   ========================== */
+
+label,
+.form-label {
+    font-size: 12.5px !important;
+    font-weight: 600;
+}
+
+.form-text,
+small,
+.text-muted {
+    font-size: 12px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+/* ==========================
+   10. NÚT CHỨC NĂNG
+   ========================== */
+
+button,
+.btn,
+input[type="submit"],
+input[type="button"] {
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 12.5px !important;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.btn {
+    border-radius: 7px;
+}
+
+.btn-sm {
+    font-size: 12px !important;
+}
+
+.btn-primary {
+    background-color: var(--ui-primary);
+    border-color: var(--ui-primary);
+}
+
+    .btn-primary:hover {
+        background-color: var(--ui-primary-dark);
+        border-color: var(--ui-primary-dark);
+    }
+
+/* ==========================
+   11. TRẠNG THÁI
+   ========================== */
+
+.badge,
+.status-badge,
+.trang-thai,
+.status-label {
+    font-size: 11px !important;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+/* ==========================
+   12. PHÂN TRANG
+   ========================== */
+
+.pagination {
+    gap: 4px;
+}
+
+    .pagination .page-link {
+        font-size: 12px !important;
+        border-radius: 6px;
+    }
+
+/* ==========================
+   13. THÔNG BÁO VÀ MODAL
+   ========================== */
+
+.alert {
+    font-size: 13px;
+    border-radius: 8px;
+}
+
+.modal-title {
+    font-size: 17px !important;
+    font-weight: 700;
+}
+
+.modal-body {
+    font-size: 13px;
+}
+
+.modal-footer button {
+    font-size: 12.5px !important;
+}
+
+/* ==========================
+   14. FOOTER
+   ========================== */
+
+footer,
+.footer,
+.main-footer {
+    font-size: 12px;
+}
+
+/* ==========================
+   15. RESPONSIVE
+   ========================== */
+
+@media (max-width: 1200px) {
+
+    .stat-info strong {
+        font-size: 24px !important;
+    }
+
+    .stat-card {
+        padding: 14px;
+    }
+}
+
+@media (max-width: 992px) {
+
+    header h1,
+    .header-title,
+    .topbar h1 {
+        font-size: 19px !important;
+    }
+
+    .dashboard-heading h2,
+    .page-title {
+        font-size: 21px !important;
+    }
+
+    .sidebar a,
+    .sidebar .nav-link {
+        font-size: 12.5px !important;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .dashboard-page {
+        padding: 10px 0 22px;
+    }
+
+    .dashboard-heading h2,
+    .page-title {
+        font-size: 20px !important;
+    }
+
+    .stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .chart-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-body {
+        height: 260px;
+    }
+
+    .stat-info strong {
+        font-size: 23px !important;
+    }
+
+    table,
+    .table {
+        font-size: 12px !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .dashboard-heading h2 {
+        font-size: 19px !important;
+    }
+}

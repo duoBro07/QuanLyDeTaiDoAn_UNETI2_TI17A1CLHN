@@ -1,0 +1,413 @@
+﻿
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers.TaiKhoanForm
+
+@{
+    ViewData["Title"] = "Thêm tài khoản";
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+
+        <div class="mb-4">
+            <h2 class="page-title mb-1">
+                <i class="fa-solid fa-user-plus me-2"></i>
+                Thêm tài khoản
+            </h2>
+
+            <p class="page-description mb-0">
+                Tạo tài khoản đăng nhập và phân quyền người dùng
+            </p>
+        </div>
+
+        @if (TempData["LoiTaiKhoan"] != null)
+        {
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                @TempData["LoiTaiKhoan"]
+            </div>
+        }
+
+        <form asp-controller="TaiKhoan"
+              asp-action="Create"
+              method="post"
+              id="formThemTaiKhoan"
+              novalidate>
+
+            @Html.AntiForgeryToken()
+
+            <!-- HIEN THI TOAN BO LOI VALIDATION -->
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger mb-4">
+                    <div class="fw-bold mb-2">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                        Không thể lưu tài khoản
+                    </div>
+
+                    <div asp-validation-summary="All"
+                         class="mb-0">
+                    </div>
+                </div>
+            }
+
+            <div class="row g-3">
+
+                <!-- TEN DANG NHAP -->
+                <div class="col-md-6">
+                    <label asp-for="TenDangNhap" class="form-label">
+                        Tên đăng nhập
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="TenDangNhap"
+                           class="form-control"
+                           autocomplete="username"
+                           maxlength="50"
+                           required
+                           placeholder="Nhập tên đăng nhập" />
+
+                    <span asp-validation-for="TenDangNhap"
+                          class="text-danger small"></span>
+                </div>
+
+                <!-- HO TEN -->
+                <div class="col-md-6">
+                    <label asp-for="HoTen" class="form-label">
+                        Họ và tên
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="HoTen"
+                           class="form-control"
+                           required
+                           placeholder="Nhập họ tên người dùng" />
+
+                    <span asp-validation-for="HoTen"
+                          class="text-danger small"></span>
+                </div>
+
+                <!-- EMAIL -->
+                <div class="col-md-6">
+                    <label asp-for="Email" class="form-label">
+                        Email
+                    </label>
+
+                    <input asp-for="Email"
+                           type="email"
+                           class="form-control"
+                           placeholder="example@uneti.edu.vn" />
+
+                    <span asp-validation-for="Email"
+                          class="text-danger small"></span>
+                </div>
+
+                <!-- MAT KHAU -->
+                <div class="col-md-6">
+                    <label asp-for="MatKhau" class="form-label">
+                        Mật khẩu
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <div class="input-group">
+                        <input asp-for="MatKhau"
+                               type="password"
+                               class="form-control"
+                               id="MatKhau"
+                               minlength="6"
+                               maxlength="100"
+                               autocomplete="new-password"
+                               required
+                               placeholder="Tối thiểu 6 ký tự" />
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                id="btnHienMatKhau"
+                                title="Hiện hoặc ẩn mật khẩu">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+
+                    <span asp-validation-for="MatKhau"
+                          class="text-danger small"></span>
+                </div>
+
+                <!-- VAI TRO -->
+                <div class="col-md-6">
+                    <label asp-for="VaiTro" class="form-label">
+                        Vai trò
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <select asp-for="VaiTro"
+                            class="form-select"
+                            required>
+                        <option value="SinhVien">Sinh viên</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+
+                    <span asp-validation-for="VaiTro"
+                          class="text-danger small"></span>
+                </div>
+
+                <!-- TRANG THAI -->
+                <div class="col-md-6">
+                    <label class="form-label d-block">
+                        Trạng thái
+                    </label>
+
+                    <div class="pt-2">
+                        <div class="form-check form-check-inline">
+                            <input asp-for="TrangThai"
+                                   type="radio"
+                                   value="true"
+                                   id="createHoatDong"
+                                   class="form-check-input" />
+
+                            <label for="createHoatDong"
+                                   class="form-check-label">
+                                Hoạt động
+                            </label>
+                        </div>
+
+                        <div class="form-check form-check-inline">
+                            <input asp-for="TrangThai"
+                                   type="radio"
+                                   value="false"
+                                   id="createDaKhoa"
+                                   class="form-check-input" />
+
+                            <label for="createDaKhoa"
+                                   class="form-check-label">
+                                Đã khóa
+                            </label>
+                        </div>
+                    </div>
+
+                    <span asp-validation-for="TrangThai"
+                          class="text-danger small"></span>
+                </div>
+
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- NUT THAO TAC -->
+            <div class="d-flex justify-content-end gap-2 flex-wrap">
+
+                <a asp-controller="TaiKhoan"
+                   asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left me-1"></i>
+                    Quay lại
+                </a>
+
+                <button type="button"
+                        id="btnMoXacNhan"
+                        class="btn btn-main">
+                    <i class="fa-solid fa-floppy-disk me-1"></i>
+                    Lưu tài khoản
+                </button>
+
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<!-- MODAL XAC NHAN THEM TAI KHOAN -->
+<div class="modal fade"
+     id="modalXacNhanThem"
+     tabindex="-1"
+     aria-labelledby="tieuDeXacNhanThem"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="tieuDeXacNhanThem">
+                    <i class="fa-solid fa-user-plus text-primary me-2"></i>
+                    Xác nhận thêm tài khoản
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Đóng">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p>
+                    Bạn có chắc chắn muốn thêm tài khoản này?
+                </p>
+
+                <div class="border rounded p-3">
+                    <div class="mb-2">
+                        <strong>Tên đăng nhập:</strong>
+                        <span id="xacNhanTenDangNhap"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <strong>Họ và tên:</strong>
+                        <span id="xacNhanHoTen"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <strong>Vai trò:</strong>
+                        <span id="xacNhanVaiTro"></span>
+                    </div>
+
+                    <div>
+                        <strong>Trạng thái:</strong>
+                        <span id="xacNhanTrangThai"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                    Hủy
+                </button>
+
+                <button type="button"
+                        id="btnXacNhanLuu"
+                        class="btn btn-main">
+                    <i class="fa-solid fa-check me-1"></i>
+                    Xác nhận thêm
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form = document.getElementById("formThemTaiKhoan");
+            const btnMo = document.getElementById("btnMoXacNhan");
+            const btnLuu = document.getElementById("btnXacNhanLuu");
+            const modalElement = document.getElementById("modalXacNhanThem");
+
+            const matKhau = document.getElementById("MatKhau");
+            const btnHien = document.getElementById("btnHienMatKhau");
+
+            let dangGui = false;
+
+            // HIEN / AN MAT KHAU
+            if (matKhau && btnHien) {
+                btnHien.addEventListener("click", function () {
+                    const hien = matKhau.type === "password";
+
+                    matKhau.type = hien ? "text" : "password";
+
+                    const icon = btnHien.querySelector("i");
+
+                    if (icon) {
+                        icon.className = hien
+                            ? "fa-solid fa-eye-slash"
+                            : "fa-solid fa-eye";
+                    }
+                });
+            }
+
+            if (!form || !btnMo || !btnLuu || !modalElement) {
+                return;
+            }
+
+            // KIEM TRA DU LIEU
+            function kiemTraForm() {
+
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return false;
+                }
+
+                if (window.jQuery &&
+                    typeof window.jQuery.fn.valid === "function") {
+
+                    if (!window.jQuery(form).valid()) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            // MO HOP THOAI XAC NHAN
+            btnMo.addEventListener("click", function () {
+
+                if (dangGui) return;
+
+                if (!kiemTraForm()) return;
+
+                const tenDangNhap =
+                    document.getElementById("TenDangNhap");
+
+                const hoTen =
+                    document.getElementById("HoTen");
+
+                const vaiTro =
+                    document.getElementById("VaiTro");
+
+                const trangThai =
+                    form.querySelector(
+                        'input[name="TrangThai"]:checked'
+                    );
+
+                document.getElementById("xacNhanTenDangNhap")
+                    .textContent = tenDangNhap?.value || "";
+
+                document.getElementById("xacNhanHoTen")
+                    .textContent = hoTen?.value || "";
+
+                document.getElementById("xacNhanVaiTro")
+                    .textContent =
+                        vaiTro?.value === "Admin"
+                            ? "Admin"
+                            : "Sinh viên";
+
+                document.getElementById("xacNhanTrangThai")
+                    .textContent =
+                        trangThai?.value === "true"
+                            ? "Hoạt động"
+                            : "Đã khóa";
+
+                bootstrap.Modal
+                    .getOrCreateInstance(modalElement)
+                    .show();
+            });
+
+            // XAC NHAN GUI FORM
+            btnLuu.addEventListener("click", function () {
+
+                if (dangGui) return;
+
+                if (!kiemTraForm()) {
+                    bootstrap.Modal
+                        .getOrCreateInstance(modalElement)
+                        .hide();
+                    return;
+                }
+
+                dangGui = true;
+
+                btnLuu.disabled = true;
+                btnLuu.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin me-1"></i>' +
+                    'Đang lưu...';
+
+                // Gui truc tiep form, tranh kich hoat lai
+                // su kien submit cua JavaScript dung chung.
+                HTMLFormElement.prototype.submit.call(form);
+            });
+
+        });
+    </script>
+}

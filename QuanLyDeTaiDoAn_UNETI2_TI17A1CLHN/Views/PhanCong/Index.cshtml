@@ -1,0 +1,252 @@
+@model IEnumerable<QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.PhanCongHuongDan>
+@using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
+
+@{
+    ViewData["Title"] = "Phân công giảng viên";
+    ViewData["UnifiedIndex"] = true;
+
+    var danhSach = Model?.ToList() ?? new List<PhanCongHuongDan>();
+
+    var chuaPhanCong = ViewBag.ChuaPhanCong as IEnumerable<DangKyDeTai>
+        ?? Enumerable.Empty<DangKyDeTai>();
+
+    int dangHuongDan = danhSach.Count(x => x.DangHieuLuc);
+    int hoanThanh = danhSach.Count(x =>
+        x.TrangThaiThucHien == "Hoàn thành");
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="page-title mb-1">
+                    <i class="fa-solid fa-chalkboard-user me-2"></i>
+                    Phân công giảng viên
+                </h2>
+                <p class="page-description mb-0">
+                    Quản lý giảng viên hướng dẫn, tiến độ và lịch sử phân công
+                </p>
+            </div>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check me-2"></i>
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                @TempData["Error"]
+            </div>
+        }
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-6">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-2">Tổng phân công</div>
+                        <div class="fs-3 fw-bold text-primary">
+                            @danhSach.Count
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-2">Đang hiệu lực</div>
+                        <div class="fs-3 fw-bold text-success">
+                            @dangHuongDan
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-2">Hoàn thành</div>
+                        <div class="fs-3 fw-bold text-info">
+                            @hoanThanh
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-2">Chưa phân công</div>
+                        <div class="fs-3 fw-bold text-warning">
+                            @chuaPhanCong.Count()
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="fw-bold mb-3" style="color:#17477e">
+            <i class="fa-solid fa-user-clock me-2"></i>
+            Đăng ký đã duyệt chưa phân công
+        </h5>
+
+        <div class="table-responsive mb-4">
+            <table class="table uneti-table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Sinh viên</th>
+                        <th>Lớp</th>
+                        <th>Đề tài</th>
+                        <th>Ngày duyệt đăng ký</th>
+                        <th class="text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (chuaPhanCong.Any())
+                    {
+                        int sttChua = 0;
+                        foreach (var dk in chuaPhanCong)
+                        {
+                            sttChua++;
+                            <tr>
+                                <td>@sttChua</td>
+                                <td class="fw-semibold">
+                                    @(dk.SinhVien?.HoTen ?? "—")
+                                </td>
+                                <td>@(dk.SinhVien?.Lop ?? "—")</td>
+                                <td>@(dk.DeTai?.TenDeTai ?? "—")</td>
+                                <td>
+                                    @dk.NgayDangKy.ToString("dd/MM/yyyy")
+                                </td>
+                                <td class="text-center">
+                                    <a asp-controller="PhanCong"
+                                       asp-action="Create"
+                                       asp-route-id="@dk.MaDangKy"
+                                       class="btn btn-main btn-sm">
+                                        <i class="fa-solid fa-plus"></i>
+                                        Phân công
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                Không có hồ sơ đang chờ phân công.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <h5 class="fw-bold mb-3" style="color:#17477e">
+            <i class="fa-solid fa-list-check me-2"></i>
+            Danh sách phân công hiện tại
+        </h5>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table uneti-table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th class="ps-3">STT</th>
+                    <th>Mã PC</th>
+                    <th>Sinh viên</th>
+                    <th>Đề tài</th>
+                    <th>Giảng viên hướng dẫn</th>
+                    <th>Ngày phân công</th>
+                    <th class="text-center">Tiến độ</th>
+                    <th class="text-center">Hiệu lực</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (danhSach.Any())
+                {
+                    int stt = 0;
+                    foreach (var pc in danhSach)
+                    {
+                        stt++;
+
+                        string lopTienDo = pc.TrangThaiThucHien switch
+                        {
+                            "Hoàn thành" => "uneti-status-success",
+                            "Đang thực hiện" => "uneti-status-info",
+                            _ => "uneti-status-warning"
+                        };
+
+                        <tr>
+                            <td class="ps-3">@stt</td>
+                            <td>@pc.MaPhanCong</td>
+                            <td class="fw-semibold">
+                                @(pc.DangKyDeTai?.SinhVien?.HoTen ?? "—")
+                            </td>
+                            <td>
+                                @(pc.DangKyDeTai?.DeTai?.TenDeTai ?? "—")
+                            </td>
+                            <td>@(pc.GiangVien?.HoTen ?? "—")</td>
+                            <td>
+                                @pc.NgayPhanCong.ToString("dd/MM/yyyy")
+                            </td>
+                            <td class="text-center">
+                                <span class="uneti-status @lopTienDo">
+                                    @pc.TrangThaiThucHien
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                @if (pc.DangHieuLuc)
+                                {
+                                    <span class="uneti-status uneti-status-success">
+                                        Hiệu lực
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="uneti-status uneti-status-info">
+                                        Kết thúc
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <div class="uneti-actions">
+                                    <a asp-controller="PhanCong"
+                                       asp-action="Details"
+                                       asp-route-id="@pc.MaPhanCong"
+                                       class="btn btn-outline-primary btn-sm"
+                                       title="Xem chi tiết và quản lý">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-5">
+                            <i class="fa-solid fa-inbox fa-2x d-block mb-3"></i>
+                            Chưa có phân công giảng viên.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="p-3 border-top text-muted small">
+        Hiển thị <strong>@danhSach.Count</strong> phân công đang hiệu lực
+        hoặc đã hoàn thành.
+    </div>
+</div>

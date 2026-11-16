@@ -5,83 +5,168 @@
 }
 
 <div class="content-card">
+    <div class="p-3 p-lg-4">
 
-    <div class="p-4">
-
-        <h2 class="page-title text-danger mb-3">
-            Xóa đề tài
-        </h2>
-
-        <div class="alert alert-warning">
-            Bạn có chắc chắn muốn xóa đề tài này không?
+        <div class="mb-4">
+            <h2 class="page-title mb-1">
+                <i class="fa-solid fa-trash text-danger me-2"></i>
+                Xóa đề tài
+            </h2>
+            <p class="page-description mb-0">
+                Kiểm tra thông tin trước khi thực hiện thao tác xóa
+            </p>
         </div>
 
-        <table class="table">
-
-            <tr>
-                <th style="width:220px">
-                    Mã đề tài
-                </th>
-
-                <td>
-                    @Model.MaDeTai
-                </td>
-            </tr>
-
-            <tr>
-                <th>Tên đề tài</th>
-                <td>@Model.TenDeTai</td>
-            </tr>
-
-            <tr>
-                <th>Lĩnh vực</th>
-
-                <td>
-                    @Model.LinhVuc?.TenLinhVuc
-                </td>
-            </tr>
-
-            <tr>
-                <th>Năm học</th>
-                <td>@Model.NamHoc</td>
-            </tr>
-
-            <tr>
-                <th>Học kỳ</th>
-                <td>@Model.HocKy</td>
-            </tr>
-
-            <tr>
-                <th>Trạng thái</th>
-                <td>@Model.TrangThai</td>
-            </tr>
-
-        </table>
-
-        <form asp-action="Delete"
-              method="post">
-
-            <input type="hidden"
-                   asp-for="MaDeTai" />
-
-            <div class="d-flex justify-content-end gap-2">
-
-                <a asp-action="Index"
-                   class="btn btn-light border">
-                    Hủy
-                </a>
-
-                <button type="submit"
-                        class="btn btn-danger">
-
-                    <i class="fa-solid fa-trash me-1"></i>
-                    Xóa đề tài
-
-                </button>
-
+        <div class="uneti-delete-warning">
+            <div class="fw-bold mb-2">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                Xác nhận xóa đề tài
             </div>
 
+            Bạn có chắc chắn muốn xóa đề tài
+            <strong>@Model.TenDeTai</strong>?
+
+            <div class="mt-2">
+                Đề tài đã có đăng ký sẽ không được xóa
+                để bảo toàn lịch sử sinh viên.
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Mã đề tài</div>
+            <div class="uneti-details-value">@Model.MaDeTai</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Tên đề tài</div>
+            <div class="uneti-details-value fw-semibold">
+                @Model.TenDeTai
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Lĩnh vực</div>
+            <div class="uneti-details-value">
+                @(Model.LinhVuc?.TenLinhVuc ?? "Chưa có")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Năm học</div>
+            <div class="uneti-details-value">@Model.NamHoc</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Học kỳ</div>
+            <div class="uneti-details-value">Học kỳ @Model.HocKy</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Số sinh viên tối đa</div>
+            <div class="uneti-details-value">
+                @Model.SoSinhVienToiDa
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Trạng thái</div>
+            <div class="uneti-details-value">@Model.TrangThai</div>
+        </div>
+
+        <form asp-controller="DeTai"
+              asp-action="Delete"
+              asp-route-id="@Model.MaDeTai"
+              method="post"
+              id="formXoaDeTai">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden"
+                   name="id"
+                   value="@Model.MaDeTai" />
+
+            <div class="uneti-delete-actions justify-content-end">
+                <a asp-controller="DeTai"
+                   asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Quay lại
+                </a>
+
+                <button type="button"
+                        class="btn btn-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalXoaDeTai">
+                    <i class="fa-solid fa-trash"></i>
+                    Xóa đề tài
+                </button>
+            </div>
         </form>
 
     </div>
 </div>
+
+<div class="modal fade"
+     id="modalXoaDeTai"
+     tabindex="-1"
+     aria-labelledby="tieuDeXoaDeTai"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="tieuDeXoaDeTai">
+                    <i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>
+                    Xác nhận xóa
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Đóng"></button>
+            </div>
+
+            <div class="modal-body">
+                Bạn chắc chắn muốn xóa đề tài
+                <strong>@Model.TenDeTai</strong>?
+
+                <p class="text-danger mt-2 mb-0">
+                    Thao tác này không thể hoàn tác nếu xóa thành công.
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                    Hủy
+                </button>
+
+                <button type="button"
+                        id="btnXacNhanXoaDeTai"
+                        class="btn btn-danger">
+                    <i class="fa-solid fa-trash"></i>
+                    Xác nhận xóa
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const btn = document.getElementById("btnXacNhanXoaDeTai");
+            const form = document.getElementById("formXoaDeTai");
+
+            if (!btn || !form) return;
+
+            btn.addEventListener("click", function () {
+                btn.disabled = true;
+                form.requestSubmit();
+            });
+        });
+    </script>
+}

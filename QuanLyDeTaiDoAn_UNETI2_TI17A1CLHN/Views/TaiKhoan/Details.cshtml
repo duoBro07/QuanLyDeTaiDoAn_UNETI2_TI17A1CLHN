@@ -1,0 +1,150 @@
+﻿@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.TaiKhoan
+
+@{
+    ViewData["Title"] = "Chi tiết tài khoản";
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+
+            <div>
+                <h2 class="page-title mb-1">
+                    <i class="fa-solid fa-eye me-2"></i>
+                    Chi tiết tài khoản
+                </h2>
+
+                <p class="page-description mb-0">
+                    Thông tin tài khoản và quyền truy cập hệ thống
+                </p>
+            </div>
+
+            @if (Model.TrangThai)
+            {
+                <span class="uneti-status uneti-status-success">
+                    <i class="fa-solid fa-circle-check me-1"></i>
+                    Hoạt động
+                </span>
+            }
+            else
+            {
+                <span class="uneti-status uneti-status-danger">
+                    <i class="fa-solid fa-lock me-1"></i>
+                    Đã khóa
+                </span>
+            }
+
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">
+                Mã tài khoản
+            </div>
+
+            <div class="uneti-details-value">
+                @Model.MaTaiKhoan
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">
+                Tên đăng nhập
+            </div>
+
+            <div class="uneti-details-value fw-semibold">
+                @Model.TenDangNhap
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">
+                Họ và tên
+            </div>
+
+            <div class="uneti-details-value">
+                @Model.HoTen
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">
+                Email
+            </div>
+
+            <div class="uneti-details-value">
+                @(string.IsNullOrWhiteSpace(Model.Email)
+                    ? "Chưa cập nhật"
+                    : Model.Email)
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">
+                Vai trò
+            </div>
+
+            <div class="uneti-details-value">
+
+                @if (Model.VaiTro == "Admin")
+                {
+                    <span class="uneti-status uneti-status-info">
+                        <i class="fa-solid fa-user-shield me-1"></i>
+                        Admin
+                    </span>
+                }
+                else
+                {
+                    <span class="uneti-status uneti-status-warning">
+                        <i class="fa-solid fa-user-graduate me-1"></i>
+                        Sinh viên
+                    </span>
+                }
+
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">
+                Trạng thái
+            </div>
+
+            <div class="uneti-details-value">
+                @(Model.TrangThai ? "Hoạt động" : "Đã khóa")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">
+                Mật khẩu
+            </div>
+
+            <div class="uneti-details-value text-muted">
+                <i class="fa-solid fa-shield-halved me-1"></i>
+                Được bảo vệ và không hiển thị
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <div class="d-flex justify-content-end gap-2 flex-wrap">
+
+            <a asp-controller="TaiKhoan"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left"></i>
+                Quay lại
+            </a>
+
+            <a asp-controller="TaiKhoan"
+               asp-action="Edit"
+               asp-route-id="@Model.MaTaiKhoan"
+               class="btn btn-main">
+                <i class="fa-solid fa-pen"></i>
+                Chỉnh sửa
+            </a>
+
+        </div>
+
+    </div>
+</div>

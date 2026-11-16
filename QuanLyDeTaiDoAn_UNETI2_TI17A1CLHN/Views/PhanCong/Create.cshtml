@@ -1,0 +1,324 @@
+@using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
+
+@{
+    ViewData["Title"] = "Phân công giảng viên";
+
+    var dangKy = ViewBag.DangKy as DangKyDeTai;
+    var giangViens = ViewBag.GiangViens as IEnumerable<GiangVien>
+        ?? Enumerable.Empty<GiangVien>();
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="page-title mb-1">
+                    <i class="fa-solid fa-user-plus me-2"></i>
+                    Phân công giảng viên hướng dẫn
+                </h2>
+                <p class="page-description mb-0">
+                    Lựa chọn giảng viên đúng lĩnh vực và còn khả năng hướng dẫn
+                </p>
+            </div>
+
+            <a asp-controller="PhanCong"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left"></i>
+                Quay lại
+            </a>
+        </div>
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                @TempData["Error"]
+            </div>
+        }
+
+        @if (dangKy == null)
+        {
+            <div class="alert alert-danger">
+                Không tìm thấy hồ sơ đăng ký cần phân công.
+            </div>
+        }
+        else
+        {
+            <h5 class="fw-bold mb-3" style="color:#17477e">
+                <i class="fa-solid fa-clipboard-list me-2"></i>
+                Thông tin đăng ký
+            </h5>
+
+            <div class="uneti-details-row">
+                <div class="uneti-details-label">Mã đăng ký</div>
+                <div class="uneti-details-value">
+                    @dangKy.MaDangKy
+                </div>
+            </div>
+
+            <div class="uneti-details-row">
+                <div class="uneti-details-label">Sinh viên</div>
+                <div class="uneti-details-value fw-semibold">
+                    @(dangKy.SinhVien?.HoTen ?? "—")
+                </div>
+            </div>
+
+            <div class="uneti-details-row">
+                <div class="uneti-details-label">Lớp</div>
+                <div class="uneti-details-value">
+                    @(dangKy.SinhVien?.Lop ?? "—")
+                </div>
+            </div>
+
+            <div class="uneti-details-row">
+                <div class="uneti-details-label">Tên đề tài</div>
+                <div class="uneti-details-value fw-semibold">
+                    @(dangKy.DeTai?.TenDeTai ?? "—")
+                </div>
+            </div>
+
+            <div class="uneti-details-row">
+                <div class="uneti-details-label">Lĩnh vực</div>
+                <div class="uneti-details-value">
+                    @(dangKy.DeTai?.LinhVuc?.TenLinhVuc ?? "—")
+                </div>
+            </div>
+
+            <div class="uneti-details-row">
+                <div class="uneti-details-label">Năm học / Học kỳ</div>
+                <div class="uneti-details-value">
+                    @(dangKy.DeTai?.NamHoc ?? "—")
+                    / Học kỳ @(dangKy.DeTai?.HocKy.ToString() ?? "—")
+                </div>
+            </div>
+
+            <div class="uneti-details-row">
+                <div class="uneti-details-label">Trạng thái đăng ký</div>
+                <div class="uneti-details-value">
+                    <span class="uneti-status uneti-status-success">
+                        @dangKy.TrangThai
+                    </span>
+                </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <h5 class="fw-bold mb-3" style="color:#17477e">
+                <i class="fa-solid fa-chalkboard-user me-2"></i>
+                Thông tin phân công
+            </h5>
+
+            @if (!giangViens.Any())
+            {
+                <div class="alert alert-warning">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    Hiện không có giảng viên phù hợp lĩnh vực và còn tải hướng dẫn.
+                    Bạn cần kiểm tra danh sách giảng viên trước khi phân công.
+                </div>
+            }
+
+            <form asp-controller="PhanCong"
+                  asp-action="Create"
+                  asp-route-id="@dangKy.MaDangKy"
+                  method="post"
+                  id="formTaoPhanCong"
+                  data-no-confirm="true">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="id"
+                       value="@dangKy.MaDangKy" />
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label for="maGiangVien" class="form-label">
+                            Giảng viên hướng dẫn
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <select id="maGiangVien"
+                                name="maGiangVien"
+                                class="form-select"
+                                required
+                                disabled="@(!giangViens.Any())">
+
+                            <option value="">-- Chọn giảng viên --</option>
+
+                            @foreach (var gv in giangViens)
+                            {
+                                <option value="@gv.MaGiangVien">
+                                    @gv.HoTen - Tối đa
+                                    @gv.SoSinhVienHuongDanToiDa sinh viên
+                                </option>
+                            }
+                        </select>
+
+                        <div class="form-text">
+                            Danh sách chỉ gồm giảng viên đang công tác,
+                            đúng lĩnh vực và chưa vượt tải hướng dẫn.
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="ghiChu" class="form-label">
+                            Ghi chú phân công
+                        </label>
+
+                        <textarea id="ghiChu"
+                                  name="ghiChu"
+                                  class="form-control"
+                                  rows="4"
+                                  maxlength="500"
+                                  placeholder="Nhập ghi chú nếu có..."></textarea>
+
+                        <div class="form-text">
+                            Tối đa 500 ký tự.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info mt-4">
+                    <i class="fa-solid fa-circle-info me-2"></i>
+                    Sau khi lưu, tiến độ sẽ được thiết lập là
+                    <strong>Chưa bắt đầu</strong>.
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 flex-wrap mt-4">
+
+                    <a asp-controller="PhanCong"
+                       asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Quay lại
+                    </a>
+
+                    <button type="button"
+                            id="btnMoXacNhan"
+                            class="btn btn-main"
+                            disabled="@(!giangViens.Any())">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Lưu phân công
+                    </button>
+                </div>
+            </form>
+
+            <!-- HỘP THOẠI XÁC NHẬN -->
+            <div class="modal fade"
+                 id="modalXacNhan"
+                 tabindex="-1"
+                 aria-labelledby="tieuDeXacNhan"
+                 aria-hidden="true">
+
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="tieuDeXacNhan">
+                                Xác nhận phân công
+                            </h5>
+
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Đóng">
+                            </button>
+                        </div>
+
+                        <div class="modal-body">
+                            Bạn có chắc chắn muốn phân công
+
+                            <strong id="tenGiangVien"></strong>
+
+                            hướng dẫn sinh viên
+
+                            <strong>
+                                @(dangKy.SinhVien?.HoTen ?? "—")
+                            </strong>?
+                        </div>
+
+                        <div class="modal-footer">
+
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    data-bs-dismiss="modal">
+                                Hủy
+                            </button>
+
+                            <button type="button"
+                                    id="btnXacNhan"
+                                    class="btn btn-main">
+                                <i class="fa-solid fa-check"></i>
+                                Xác nhận
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form = document.getElementById("formTaoPhanCong");
+            const select = document.getElementById("maGiangVien");
+            const btnMo = document.getElementById("btnMoXacNhan");
+            const btnXacNhan = document.getElementById("btnXacNhan");
+            const modal = document.getElementById("modalXacNhan");
+            const tenGiangVien = document.getElementById("tenGiangVien");
+
+            if (!form || !select || !btnMo || !btnXacNhan || !modal) {
+                return;
+            }
+
+            let dangGui = false;
+
+            // Bấm Lưu phân công: mở xác nhận
+            btnMo.addEventListener("click", function () {
+
+                if (!form.reportValidity()) {
+                    return;
+                }
+
+                if (select.selectedIndex <= 0) {
+                    select.focus();
+                    return;
+                }
+
+                tenGiangVien.textContent =
+                    select.options[select.selectedIndex].text;
+
+                bootstrap.Modal
+                    .getOrCreateInstance(modal)
+                    .show();
+            });
+
+            // Bấm Xác nhận: gửi dữ liệu đến Controller
+            btnXacNhan.addEventListener("click", function () {
+
+                if (dangGui) {
+                    return;
+                }
+
+                if (!form.reportValidity()) {
+                    return;
+                }
+
+                dangGui = true;
+
+                btnXacNhan.disabled = true;
+                btnXacNhan.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin"></i> Đang lưu...';
+
+                // Gửi form POST trực tiếp, không bật xác nhận lần hai
+                form.requestSubmit();
+            });
+
+        });
+    </script>
+}

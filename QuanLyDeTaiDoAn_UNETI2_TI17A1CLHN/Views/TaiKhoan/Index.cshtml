@@ -1,0 +1,478 @@
+@model IEnumerable<QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.TaiKhoan>
+
+@{
+    ViewData["Title"] = "Quản lý tài khoản";
+    ViewData["UnifiedIndex"] = true;
+
+    int trang = ViewBag.Trang ?? 1;
+    int tongTrang = ViewBag.TongTrang ?? 1;
+    int tong = ViewBag.Tong ?? 0;
+    int kichThuoc = 8;
+
+    string tuKhoa = ViewBag.TuKhoa ?? "";
+    string vaiTro = ViewBag.VaiTro ?? "";
+    string trangThai = ViewBag.TrangThai ?? "";
+
+    int batDau = tong == 0 ? 0 : (trang - 1) * kichThuoc + 1;
+    int ketThuc = Math.Min(trang * kichThuoc, tong);
+}
+
+<div class="content-card">
+
+    <div class="p-3 p-lg-4">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+
+            <div>
+                <h2 class="page-title mb-1">
+                    <i class="fa-solid fa-users-gear me-2"></i>
+                    Quản lý tài khoản
+                </h2>
+
+                <p class="page-description mb-0">
+                    Quản lý thông tin đăng nhập, phân quyền và trạng thái tài khoản
+                </p>
+            </div>
+
+            <a asp-controller="TaiKhoan"
+               asp-action="Create"
+               class="btn btn-main">
+                <i class="fa-solid fa-plus"></i>
+                Thêm tài khoản
+            </a>
+
+        </div>
+
+        @if (TempData["ThongBaoTaiKhoan"] != null)
+        {
+            <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check me-2"></i>
+                @TempData["ThongBaoTaiKhoan"]
+            </div>
+        }
+
+        @if (TempData["LoiTaiKhoan"] != null)
+        {
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                @TempData["LoiTaiKhoan"]
+            </div>
+        }
+
+        <form asp-controller="TaiKhoan"
+              asp-action="Index"
+              method="get"
+              class="uneti-filter-bar">
+
+            <div class="row g-3">
+
+                <div class="col-lg-5">
+                    <label for="tuKhoa" class="form-label">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i>
+                        Tìm kiếm
+                    </label>
+
+                    <input type="text"
+                           id="tuKhoa"
+                           name="tuKhoa"
+                           value="@tuKhoa"
+                           class="form-control"
+                           placeholder="Tên đăng nhập, họ tên, email..." />
+                </div>
+
+                <div class="col-lg-2">
+                    <label for="vaiTro" class="form-label">
+                        Vai trò
+                    </label>
+
+                    <select id="vaiTro"
+                            name="vaiTro"
+                            class="form-select">
+
+                        <option value="">Tất cả vai trò</option>
+
+                        <option value="Admin"
+                                selected="@(vaiTro == "Admin")">
+                            Admin
+                        </option>
+
+                        <option value="SinhVien"
+                                selected="@(vaiTro == "SinhVien")">
+                            Sinh viên
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="col-lg-2">
+                    <label for="trangThai" class="form-label">
+                        Trạng thái
+                    </label>
+
+                    <select id="trangThai"
+                            name="trangThai"
+                            class="form-select">
+
+                        <option value="">Tất cả</option>
+
+                        <option value="HoatDong"
+                                selected="@(trangThai == "HoatDong")">
+                            Hoạt động
+                        </option>
+
+                        <option value="DaKhoa"
+                                selected="@(trangThai == "DaKhoa")">
+                            Đã khóa
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="col-lg-3 d-flex align-items-end gap-2">
+
+                    <button type="submit"
+                            class="btn btn-main flex-fill">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        Tìm kiếm
+                    </button>
+
+                    <a asp-controller="TaiKhoan"
+                       asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Đặt lại
+                    </a>
+
+                </div>
+
+            </div>
+        </form>
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+            <h5 class="fw-bold mb-0" style="color:#17477e">
+                <i class="fa-solid fa-list me-2"></i>
+                Danh sách tài khoản (@tong)
+            </h5>
+
+            <span class="text-muted small">
+                @kichThuoc bản ghi / trang
+            </span>
+
+        </div>
+
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table uneti-table table-hover mb-0">
+
+            <thead>
+                <tr>
+                    <th class="ps-3">STT</th>
+                    <th>Mã TK</th>
+                    <th>Tên đăng nhập</th>
+                    <th>Họ và tên</th>
+                    <th>Email</th>
+                    <th class="text-center">Vai trò</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if (Model != null && Model.Any())
+                {
+                    int stt = batDau;
+
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-3">@stt</td>
+
+                            <td>@item.MaTaiKhoan</td>
+
+                            <td class="fw-semibold">
+                                <i class="fa-solid fa-user text-primary me-2"></i>
+                                @item.TenDangNhap
+                            </td>
+
+                            <td>@item.HoTen</td>
+
+                            <td>
+                                @(string.IsNullOrWhiteSpace(item.Email)
+                                    ? "Chưa cập nhật"
+                                    : item.Email)
+                            </td>
+
+                            <td class="text-center">
+                                @if (item.VaiTro == "Admin")
+                                {
+                                    <span class="uneti-status uneti-status-info">
+                                        <i class="fa-solid fa-user-shield me-1"></i>
+                                        Admin
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="uneti-status uneti-status-warning">
+                                        <i class="fa-solid fa-user-graduate me-1"></i>
+                                        Sinh viên
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="text-center">
+                                @if (item.TrangThai)
+                                {
+                                    <span class="uneti-status uneti-status-success">
+                                        <i class="fa-solid fa-circle-check me-1"></i>
+                                        Hoạt động
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="uneti-status uneti-status-danger">
+                                        <i class="fa-solid fa-lock me-1"></i>
+                                        Đã khóa
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="text-center">
+
+                                <div class="uneti-actions">
+
+                                    <a asp-controller="TaiKhoan"
+                                       asp-action="Details"
+                                       asp-route-id="@item.MaTaiKhoan"
+                                       class="btn btn-outline-primary btn-sm"
+                                       title="Xem chi tiết"
+                                       aria-label="Xem tài khoản @item.TenDangNhap">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+
+                                    <a asp-controller="TaiKhoan"
+                                       asp-action="Edit"
+                                       asp-route-id="@item.MaTaiKhoan"
+                                       class="btn btn-outline-primary btn-sm"
+                                       title="Chỉnh sửa"
+                                       aria-label="Sửa tài khoản @item.TenDangNhap">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+
+                                    <button type="button"
+                                            class="btn @(item.TrangThai ? "btn-outline-danger" : "btn-outline-primary") btn-sm"
+                                            title="@(item.TrangThai ? "Khóa tài khoản" : "Mở khóa tài khoản")"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalTaiKhoan"
+                                            data-id="@item.MaTaiKhoan"
+                                            data-name="@item.TenDangNhap"
+                                            data-action="@(item.TrangThai ? "khóa" : "mở khóa")">
+
+                                        <i class="fa-solid @(item.TrangThai ? "fa-lock" : "fa-lock-open")"></i>
+
+                                    </button>
+
+                                </div>
+
+                            </td>
+                        </tr>
+
+                        stt++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-5">
+                            <i class="fa-solid fa-inbox fa-2x d-block mb-3"></i>
+                            Không tìm thấy tài khoản phù hợp.
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 p-3 border-top">
+
+        <div class="uneti-pagination-info">
+            Hiển thị <strong>@batDau - @ketThuc</strong>
+            trong tổng số <strong>@tong</strong> tài khoản
+        </div>
+
+        @if (tongTrang > 1)
+        {
+            <nav aria-label="Phân trang tài khoản">
+
+                <ul class="pagination pagination-sm mb-0">
+
+                    <li class="page-item @(trang <= 1 ? "disabled" : "")">
+
+                        @if (trang > 1)
+                        {
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-trang="@(trang - 1)"
+                               asp-route-tuKhoa="@tuKhoa"
+                               asp-route-vaiTro="@vaiTro"
+                               asp-route-trangThai="@trangThai">
+                                <i class="fa-solid fa-chevron-left"></i>
+                                Trước
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="page-link">Trước</span>
+                        }
+
+                    </li>
+
+                    @for (int i = Math.Max(1, trang - 2);
+                          i <= Math.Min(tongTrang, trang + 2);
+                          i++)
+                    {
+                        <li class="page-item @(i == trang ? "active" : "")">
+
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-trang="@i"
+                               asp-route-tuKhoa="@tuKhoa"
+                               asp-route-vaiTro="@vaiTro"
+                               asp-route-trangThai="@trangThai">
+                                @i
+                            </a>
+
+                        </li>
+                    }
+
+                    <li class="page-item @(trang >= tongTrang ? "disabled" : "")">
+
+                        @if (trang < tongTrang)
+                        {
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-trang="@(trang + 1)"
+                               asp-route-tuKhoa="@tuKhoa"
+                               asp-route-vaiTro="@vaiTro"
+                               asp-route-trangThai="@trangThai">
+                                Sau
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="page-link">Sau</span>
+                        }
+
+                    </li>
+
+                </ul>
+
+            </nav>
+        }
+
+    </div>
+
+</div>
+
+<!-- MODAL KHOA / MO KHOA -->
+
+<div class="modal fade"
+     id="modalTaiKhoan"
+     tabindex="-1"
+     aria-labelledby="modalTaiKhoanTitle"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTaiKhoanTitle">
+                    <i class="fa-solid fa-circle-question me-2"></i>
+                    Xác nhận thay đổi trạng thái
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Đóng"></button>
+            </div>
+
+            <div class="modal-body">
+
+                Bạn có chắc chắn muốn
+                <strong id="tenHanhDong"></strong>
+                tài khoản
+                <strong id="tenTaiKhoan"></strong>?
+
+                <p class="text-muted small mt-2 mb-0">
+                    Hệ thống sẽ giữ nguyên thông tin và lịch sử tài khoản.
+                </p>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                    Hủy
+                </button>
+
+                <form asp-controller="TaiKhoan"
+                      asp-action="DoiTrangThai"
+                      method="post"
+                      id="formDoiTrangThaiTaiKhoan"
+                      class="m-0">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="id"
+                           id="maTaiKhoanXacNhan" />
+
+                    <button type="submit" class="btn btn-main">
+                        <i class="fa-solid fa-check"></i>
+                        Xác nhận
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const modal = document.getElementById("modalTaiKhoan");
+
+            if (!modal) return;
+
+            modal.addEventListener("show.bs.modal", function (event) {
+
+                const button = event.relatedTarget;
+                if (!button) return;
+
+                document.getElementById("maTaiKhoanXacNhan").value =
+                    button.getAttribute("data-id");
+
+                document.getElementById("tenTaiKhoan").textContent =
+                    button.getAttribute("data-name");
+
+                document.getElementById("tenHanhDong").textContent =
+                    button.getAttribute("data-action");
+
+            });
+
+        });
+    </script>
+}
