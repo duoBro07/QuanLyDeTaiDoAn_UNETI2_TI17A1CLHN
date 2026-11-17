@@ -8,7 +8,7 @@
         const btnDongY = document.getElementById("btnDongYXacNhanChung");
 
         if (!modalElement || !noiDungElement || !btnDongY) {
-            console.error("Không tìm thấy thành phần của modal xác nhận chung.");
+            console.error("Không tìm thấy modal xác nhận chung.");
             return;
         }
 
@@ -30,33 +30,27 @@
                 .normalize("NFD")
                 .replace(/[\u0300-\u036f]/g, "")
                 .replace(/đ/g, "d")
+                .replace(/\s+/g, "")
                 .trim();
         }
 
-        // Chỉ lấy URL được khai báo trong HTML.
-        // Không sử dụng form.action vì nó có thể trả về URL trang hiện tại.
-        function layThongTinForm(form, submitter) {
-            const actionForm = form.getAttribute("action") || "";
-            const actionButton =
-                submitter?.getAttribute("formaction") || "";
+        function layThongTin(form, submitter) {
+            return boDau([
+                form.getAttribute("action"),
+                form.getAttribute("asp-action"),
+                submitter?.getAttribute("formaction"),
+                submitter?.formAction,
+                submitter?.textContent,
+                submitter?.value,
+                submitter?.getAttribute("title"),
+                submitter?.getAttribute("aria-label")
+            ].join(" "));
+        }
 
-            const noiDungNut = [
-                submitter?.textContent || "",
-                submitter?.value || "",
-                submitter?.getAttribute("title") || "",
-                submitter?.getAttribute("aria-label") || "",
-                submitter?.getAttribute("name") || ""
-            ].join(" ");
+        function laDangXuat(form, submitter) {
+            const thongTin = layThongTin(form, submitter);
 
-            return {
-                action: boDau(actionButton || actionForm),
-                button: boDau(noiDungNut),
-                all: boDau([
-                    actionButton,
-                    actionForm,
-                    noiDungNut
-                ].join(" "))
-            };
+            return /dangxuat|logout|signout/.test(thongTin);
         }
 
         function layNoiDungXacNhan(form, submitter) {
@@ -64,55 +58,45 @@
                 return form.dataset.confirmMessage;
             }
 
-            const thongTin = layThongTinForm(form, submitter);
+            const thongTin = layThongTin(form, submitter);
 
-            // 1. Đăng xuất: ưu tiên nhận diện trước tất cả thao tác khác.
-            if (
-                /dangxuat|logout|signout/.test(thongTin.all) ||
-                /dang-xuat|sign-out/.test(thongTin.all)
-            ) {
+            // Đăng xuất luôn được ưu tiên nhận diện.
+            if (laDangXuat(form, submitter)) {
                 return "Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?";
             }
 
-            // 2. Xóa dữ liệu.
-            if (/xoa|delete|remove/.test(thongTin.all)) {
+            if (/xoa|delete|remove/.test(thongTin)) {
                 return "Bạn có chắc chắn muốn xóa dữ liệu này không?";
             }
 
-            // 3. Từ chối.
-            if (/tuchoi|reject/.test(thongTin.all)) {
+            if (/tuchoi|reject/.test(thongTin)) {
                 return "Bạn có chắc chắn muốn từ chối yêu cầu này không?";
             }
 
-            // 4. Duyệt.
-            if (/duyet|approve/.test(thongTin.all)) {
+            if (/duyet|approve/.test(thongTin)) {
                 return "Bạn có chắc chắn muốn duyệt yêu cầu này không?";
             }
 
-            // 5. Hủy.
-            if (/huy|cancel/.test(thongTin.all)) {
+            if (/huy|cancel/.test(thongTin)) {
                 return "Bạn có chắc chắn muốn hủy thao tác này không?";
             }
 
-            // 6. Phân công.
-            if (/phancong|assign/.test(thongTin.all)) {
+            if (/phancong|assign/.test(thongTin)) {
                 return "Bạn có chắc chắn muốn lưu thông tin phân công này không?";
             }
 
-            // 7. Thêm mới.
-            if (/them|create|add/.test(thongTin.all)) {
+            if (/them|create|add/.test(thongTin)) {
                 return "Bạn có chắc chắn muốn thêm dữ liệu này không?";
             }
 
-            // 8. Cập nhật.
-            if (/sua|edit|update|capnhat/.test(thongTin.all)) {
+            if (/sua|edit|update|capnhat/.test(thongTin)) {
                 return "Bạn có chắc chắn muốn cập nhật dữ liệu này không?";
             }
 
             return "Bạn có chắc chắn muốn thực hiện thao tác này không?";
         }
 
-        function boQuaXacNhan(form) {
+        function boQuaXacNhan(form, submitter) {
             if (
                 form.dataset.confirm === "false" ||
                 form.dataset.noConfirm === "true"
@@ -120,7 +104,7 @@
                 return true;
             }
 
-            // Không can thiệp các form nằm trong modal nghiệp vụ riêng.
+            // Không can thiệp form thuộc modal nghiệp vụ riêng.
             if (
                 form.closest(".modal") &&
                 !form.closest("#modalXacNhanChung")
@@ -128,10 +112,15 @@
                 return true;
             }
 
-            // Đăng nhập không cần xác nhận.
-            const action = boDau(form.getAttribute("action") || "");
+            const thongTin = layThongTin(form, submitter);
 
-            if (/dangnhap|login|sign-in/.test(action)) {
+            // Đăng xuất không được bỏ qua xác nhận.
+            if (/dangxuat|logout|signout/.test(thongTin)) {
+                return false;
+            }
+
+            // Đăng nhập không cần xác nhận.
+            if (/dangnhap|login|signin/.test(thongTin)) {
                 return true;
             }
 
@@ -157,11 +146,11 @@
                 return;
             }
 
-            if (boQuaXacNhan(form)) {
+            if (boQuaXacNhan(form, submitter)) {
                 return;
             }
 
-            // Cho phép lần gửi thật sau khi đã xác nhận.
+            // Cho phép gửi thật sau khi đã xác nhận.
             if (form.dataset.unetiConfirmed === "1") {
                 delete form.dataset.unetiConfirmed;
                 return;
@@ -189,7 +178,6 @@
 
             chapNhanGuiForm = true;
             dangDongModal = true;
-
             btnDongY.disabled = true;
 
             modal.hide();
@@ -237,11 +225,7 @@
                 }
             } catch (error) {
                 delete form.dataset.unetiConfirmed;
-
-                console.error(
-                    "Không thể gửi biểu mẫu sau khi xác nhận:",
-                    error
-                );
+                console.error("Lỗi gửi form:", error);
             }
         });
     });
