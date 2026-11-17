@@ -1,191 +1,326 @@
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Data;
 using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Filters;
 using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models;
-using System.Data;
 
 namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
 {
-    // Người thực hiện: Phạm Tùng Dương - MSSV: [điền MSSV]
-    // Module 1: quản lý lĩnh vực đề tài.
-    [SessionAuthorize("Admin")]
+    [PhanQuyen("Admin")]
     public class LinhVucController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _db;
 
-        public LinhVucController(ApplicationDbContext context)
+        public LinhVucController(ApplicationDbContext db)
         {
-            _context = context;
+            _db = db;
         }
 
-        public async Task<IActionResult> Index()
+        // 1. DANH SÁCH - TÌM KIẾM - LỌC - PHÂN TRANG
+        [HttpGet]
+        public async Task<IActionResult> Index(
+            string? tuKhoa,
+            string? trangThai,
+            int trang = 1)
         {
-            return View(await _context.LinhVucs
+            const int kichThuocTrang = 8;
+            trang = Math.Max(1, trang);
+
+            var query = _db.LinhVucs
                 .AsNoTracking()
-                .OrderBy(x => x.TenLinhVuc)
-                .ToListAsync());
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(tuKhoa))
+            {
+                tuKhoa = tuKhoa.Trim();
+
+                query = query.Where(x =>
+                    x.TenLinhVuc.Contains(tuKhoa) ||
+                    (x.MoTa != null && x.MoTa.Contains(tuKhoa)));
+            }
+
+            if (trangThai == "HoatDong")
+            {
+                query = query.Where(x => x.TrangThai);
+            }
+            else if (trangThai == "NgungHoatDong")
+            {
+                query = query.Where(x => !x.TrangThai);
+            }
+
+            int tong = await query.CountAsync();
+
+            int tongTrang = Math.Max(
+                1,
+                (int)Math.Ceiling(tong / (double)kichThuocTrang));
+
+            trang = Math.Min(trang, tongTrang);
+
+            var danhSach = await query
+                .OrderBy(x => x.MaLinhVuc)
+                .Skip((trang - 1) * kichThuocTrang)
+                .Take(kichThuocTrang)
+                .ToListAsync();
+
+            ViewBag.TuKhoa = tuKhoa ?? "";
+            ViewBag.TrangThai = trangThai ?? "";
+            ViewBag.Trang = trang;
+            ViewBag.TongTrang = tongTrang;
+            ViewBag.Tong = tong;
+
+            ViewBag.TrangHienTai = trang;
+            ViewBag.TongBanGhi = tong;
+            ViewBag.KichThuocTrang = kichThuocTrang;
+
+            return View(danhSach);
         }
 
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var linhVuc = await _context.LinhVucs
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.MaLinhVuc == id);
-
-            if (linhVuc == null) return NotFound();
-            return View(linhVuc);
-        }
-
+        // 2. THÊM - GET
         [HttpGet]
         public IActionResult Create()
         {
-            return View(new LinhVuc { TrangThai = true });
+            return View(new LinhVuc());
         }
 
+        // 3. THÊM - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(LinhVuc model)
+        public async Task<IActionResult> Create(
+            [Bind("TenLinhVuc,MoTa,TrangThai")] LinhVuc linhVuc)
         {
-            model.TenLinhVuc = model.TenLinhVuc?.Trim() ?? string.Empty;
-            model.MoTa = string.IsNullOrWhiteSpace(model.MoTa) ? null : model.MoTa.Trim();
+            linhVuc.TenLinhVuc =
+                linhVuc.TenLinhVuc?.Trim() ?? "";
 
-            if (await _context.LinhVucs.AnyAsync(x => x.TenLinhVuc == model.TenLinhVuc))
+            linhVuc.MoTa = string.IsNullOrWhiteSpace(linhVuc.MoTa)
+                ? null
+                : linhVuc.MoTa.Trim();
+
+            ModelState.Remove(nameof(LinhVuc.TenLinhVuc));
+            TryValidateModel(linhVuc);
+
+            if (string.IsNullOrWhiteSpace(linhVuc.TenLinhVuc))
             {
-                ModelState.AddModelError(nameof(model.TenLinhVuc), "Tên lĩnh vực đã tồn tại.");
+                ModelState.AddModelError(
+                    nameof(LinhVuc.TenLinhVuc),
+                    "Vui lòng nhập tên lĩnh vực.");
             }
 
-            if (!ModelState.IsValid) return View(model);
-
-            _context.LinhVucs.Add(model);
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = "Thêm lĩnh vực thành công.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var linhVuc = await _context.LinhVucs.FindAsync(id);
-            if (linhVuc == null) return NotFound();
-
-            return View(linhVuc);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, LinhVuc model)
-        {
-            if (id != model.MaLinhVuc) return NotFound();
-
-            model.TenLinhVuc = model.TenLinhVuc?.Trim() ?? string.Empty;
-            model.MoTa = string.IsNullOrWhiteSpace(model.MoTa) ? null : model.MoTa.Trim();
-
-            if (await _context.LinhVucs.AnyAsync(x =>
-                    x.TenLinhVuc == model.TenLinhVuc && x.MaLinhVuc != model.MaLinhVuc))
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError(nameof(model.TenLinhVuc), "Tên lĩnh vực đã tồn tại.");
+                bool trungTen = await _db.LinhVucs
+                    .AnyAsync(x => x.TenLinhVuc == linhVuc.TenLinhVuc);
+
+                if (trungTen)
+                {
+                    ModelState.AddModelError(
+                        nameof(LinhVuc.TenLinhVuc),
+                        "Tên lĩnh vực đã tồn tại.");
+                }
             }
 
-            if (!ModelState.IsValid) return View(model);
-
-            var entity = await _context.LinhVucs.FindAsync(id);
-            if (entity == null) return NotFound();
-
-            entity.TenLinhVuc = model.TenLinhVuc;
-            entity.MoTa = model.MoTa;
-            entity.TrangThai = model.TrangThai;
-
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = "Cập nhật lĩnh vực thành công.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var linhVuc = await _context.LinhVucs
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.MaLinhVuc == id);
-
-            if (linhVuc == null) return NotFound();
-
-            ViewBag.IntegrationNote = "Hiện Module 2 chưa ghép. Khi có bảng GiangViens/DeTais, hệ thống sẽ tự kiểm tra dữ liệu liên quan trước khi xóa.";
-            return View(linhVuc);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var linhVuc = await _context.LinhVucs.FindAsync(id);
-            if (linhVuc == null) return NotFound();
-
-            if (await CoDuLieuModule2LienQuanAsync(id))
-            {
-                TempData["Error"] = "Không thể xóa lĩnh vực vì đang có giảng viên hoặc đề tài liên quan.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            _context.LinhVucs.Remove(linhVuc);
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = "Xóa lĩnh vực thành công.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        // Demo tích hợp Module 2 không cần tạo Entity giả.
-        // Khi Module 2 được merge đúng tên bảng/cột chuẩn, hàm này tự kiểm tra quan hệ.
-        private async Task<bool> CoDuLieuModule2LienQuanAsync(int maLinhVuc)
-        {
-            var connection = _context.Database.GetDbConnection();
-            var needClose = connection.State != ConnectionState.Open;
-
-            if (needClose) await connection.OpenAsync();
+            if (!ModelState.IsValid)
+                return View(linhVuc);
 
             try
             {
-                foreach (var table in new[] { "GiangViens", "GiangVien", "DeTais", "DeTai" })
-                {
-                    await using var existsCommand = connection.CreateCommand();
-                    existsCommand.CommandText =
-                        "SELECT CASE WHEN OBJECT_ID(@TableName, N'U') IS NULL THEN 0 ELSE 1 END";
+                _db.LinhVucs.Add(linhVuc);
+                await _db.SaveChangesAsync();
 
-                    var tableParameter = existsCommand.CreateParameter();
-                    tableParameter.ParameterName = "@TableName";
-                    tableParameter.Value = $"dbo.{table}";
-                    existsCommand.Parameters.Add(tableParameter);
+                TempData["ThongBaoLinhVuc"] =
+                    "Thêm lĩnh vực thành công!";
 
-                    var tableExists = Convert.ToInt32(await existsCommand.ExecuteScalarAsync()) == 1;
-                    if (!tableExists) continue;
-
-                    await using var relationCommand = connection.CreateCommand();
-                    relationCommand.CommandText =
-                        $"SELECT CASE WHEN EXISTS (SELECT 1 FROM [dbo].[{table}] WHERE [MaLinhVuc] = @MaLinhVuc) THEN 1 ELSE 0 END";
-
-                    var idParameter = relationCommand.CreateParameter();
-                    idParameter.ParameterName = "@MaLinhVuc";
-                    idParameter.Value = maLinhVuc;
-                    relationCommand.Parameters.Add(idParameter);
-
-                    var hasRelatedData = Convert.ToInt32(await relationCommand.ExecuteScalarAsync()) == 1;
-                    if (hasRelatedData) return true;
-                }
-
-                return false;
+                return RedirectToAction(nameof(Index));
             }
-            finally
+            catch (DbUpdateException)
             {
-                if (needClose) await connection.CloseAsync();
+                ModelState.AddModelError(
+                    nameof(LinhVuc.TenLinhVuc),
+                    "Không thể lưu lĩnh vực. Vui lòng kiểm tra lại.");
+
+                return View(linhVuc);
             }
+        }
+
+        // 4. CHI TIẾT
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var linhVuc = await _db.LinhVucs
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.MaLinhVuc == id);
+
+            if (linhVuc == null)
+                return NotFound();
+
+            ViewBag.SoGiangVien = await _db.GiangViens
+                .CountAsync(x => x.MaLinhVuc == id);
+
+            ViewBag.SoDeTai = await _db.DeTais
+                .CountAsync(x => x.MaLinhVuc == id);
+
+            return View(linhVuc);
+        }
+
+        // 5. SỬA - GET
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var linhVuc = await _db.LinhVucs
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.MaLinhVuc == id);
+
+            if (linhVuc == null)
+                return NotFound();
+
+            return View(linhVuc);
+        }
+
+        // 6. SỬA - POST
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(
+            int id,
+            [Bind("MaLinhVuc,TenLinhVuc,MoTa,TrangThai")] LinhVuc form)
+        {
+            if (id != form.MaLinhVuc)
+                return BadRequest();
+
+            var linhVuc = await _db.LinhVucs
+                .FirstOrDefaultAsync(x => x.MaLinhVuc == id);
+
+            if (linhVuc == null)
+                return NotFound();
+
+            form.TenLinhVuc = form.TenLinhVuc?.Trim() ?? "";
+
+            form.MoTa = string.IsNullOrWhiteSpace(form.MoTa)
+                ? null
+                : form.MoTa.Trim();
+
+            ModelState.Remove(nameof(LinhVuc.TenLinhVuc));
+            TryValidateModel(form);
+
+            if (string.IsNullOrWhiteSpace(form.TenLinhVuc))
+            {
+                ModelState.AddModelError(
+                    nameof(LinhVuc.TenLinhVuc),
+                    "Vui lòng nhập tên lĩnh vực.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                bool trungTen = await _db.LinhVucs.AnyAsync(x =>
+                    x.TenLinhVuc == form.TenLinhVuc &&
+                    x.MaLinhVuc != id);
+
+                if (trungTen)
+                {
+                    ModelState.AddModelError(
+                        nameof(LinhVuc.TenLinhVuc),
+                        "Tên lĩnh vực đã tồn tại.");
+                }
+            }
+
+            if (!ModelState.IsValid)
+                return View(form);
+
+            linhVuc.TenLinhVuc = form.TenLinhVuc;
+            linhVuc.MoTa = form.MoTa;
+            linhVuc.TrangThai = form.TrangThai;
+
+            try
+            {
+                await _db.SaveChangesAsync();
+
+                TempData["ThongBaoLinhVuc"] =
+                    "Cập nhật lĩnh vực thành công!";
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Không thể cập nhật lĩnh vực. Vui lòng thử lại.");
+
+                return View(form);
+            }
+        }
+
+        // 7. XÓA - GET
+        // Hiển thị trang xác nhận xóa
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var linhVuc = await _db.LinhVucs
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.MaLinhVuc == id);
+
+            if (linhVuc == null)
+                return NotFound();
+
+            ViewBag.SoGiangVien = await _db.GiangViens
+                .CountAsync(x => x.MaLinhVuc == id);
+
+            ViewBag.SoDeTai = await _db.DeTais
+                .CountAsync(x => x.MaLinhVuc == id);
+
+            return View(linhVuc);
+        }
+
+        // 8. XÓA - POST
+        // Chỉ xóa khi người dùng đã xác nhận
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(
+            int id,
+            bool xacNhan)
+        {
+            if (!xacNhan)
+            {
+                TempData["LoiLinhVuc"] =
+                    "Bạn chưa xác nhận xóa lĩnh vực.";
+
+                return RedirectToAction(nameof(Delete), new { id });
+            }
+
+            var linhVuc = await _db.LinhVucs
+                .FirstOrDefaultAsync(x => x.MaLinhVuc == id);
+
+            if (linhVuc == null)
+                return NotFound();
+
+            bool coGiangVien = await _db.GiangViens
+                .AnyAsync(x => x.MaLinhVuc == id);
+
+            bool coDeTai = await _db.DeTais
+                .AnyAsync(x => x.MaLinhVuc == id);
+
+            if (coGiangVien || coDeTai)
+            {
+                TempData["LoiLinhVuc"] =
+                    "Không thể xóa lĩnh vực vì đang có giảng viên " +
+                    "hoặc đề tài sử dụng.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                _db.LinhVucs.Remove(linhVuc);
+                await _db.SaveChangesAsync();
+
+                TempData["ThongBaoLinhVuc"] =
+                    "Xóa lĩnh vực thành công!";
+            }
+            catch (DbUpdateException)
+            {
+                TempData["LoiLinhVuc"] =
+                    "Không thể xóa lĩnh vực vì có dữ liệu liên quan.";
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

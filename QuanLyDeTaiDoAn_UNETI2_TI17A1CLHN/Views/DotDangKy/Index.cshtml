@@ -1,0 +1,445 @@
+
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers.DotDangKyForm
+
+@{
+    ViewData["Title"] = "Cấu hình đợt đăng ký";
+
+    var danhSachNamHoc =
+        ViewBag.DanhSachNamHoc as List<string>
+        ?? new List<string>();
+}
+
+<style>
+    .dot-config-page {
+        padding: 8px 0 30px;
+        color: #29445f;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .dot-config-page .page-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 22px;
+    }
+
+    .dot-config-page .heading-left {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+    .dot-config-page .heading-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 11px;
+        background: #e8f1fb;
+        color: #245b91;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 21px;
+    }
+
+    .dot-config-page .page-heading h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #244f78;
+        margin: 0 0 5px;
+    }
+
+    .dot-config-page .page-heading p {
+        color: #7b8da0;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .dot-config-page .main-card {
+        background: #fff;
+        border: 1px solid #dfe7f0;
+        border-radius: 11px;
+        box-shadow: 0 2px 9px rgba(30, 65, 100, .045);
+        overflow: hidden;
+    }
+
+    .dot-config-page .card-heading {
+        padding: 18px 23px;
+        border-bottom: 1px solid #e8edf3;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .dot-config-page .card-heading i {
+        color: #28649d;
+        font-size: 17px;
+    }
+
+    .dot-config-page .card-heading h5 {
+        color: #294f73;
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .dot-config-page .card-body {
+        padding: 24px;
+    }
+
+    .dot-config-page .section-label {
+        color: #365875;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 9px;
+        display: block;
+    }
+
+    .dot-config-page .form-control {
+        min-height: 43px;
+        border: 1px solid #d6e0eb;
+        border-radius: 7px;
+        color: #35536e;
+        font-size: 14px;
+        box-shadow: none;
+        background-color: #fff;
+    }
+
+    .dot-config-page .form-control:focus {
+        border-color: #4b8dca;
+        box-shadow: 0 0 0 3px rgba(49, 119, 184, .10);
+    }
+
+    .dot-config-page .form-hint {
+        color: #8999a9;
+        font-size: 12px;
+        margin-top: 7px;
+    }
+
+    .dot-config-page .status-panel {
+        border: 1px solid #dce6f0;
+        border-radius: 9px;
+        padding: 17px 19px;
+        background: #f8fafc;
+        margin-top: 8px;
+    }
+
+    .dot-config-page .status-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .dot-config-page .status-title {
+        font-size: 14px;
+        color: #365875;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .dot-config-page .status-description {
+        color: #8293a4;
+        font-size: 12px;
+        margin: 0;
+    }
+
+    .dot-config-page .status-badge {
+        padding: 7px 13px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .dot-config-page .status-open {
+        color: #168052;
+        background: #e5f5ed;
+    }
+
+    .dot-config-page .status-closed {
+        color: #ad681d;
+        background: #fff1df;
+    }
+
+    .dot-config-page .switch-area {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        margin-top: 17px;
+        padding-top: 16px;
+        border-top: 1px solid #e4eaf0;
+    }
+
+    .dot-config-page .switch-area input {
+        width: 19px;
+        height: 19px;
+        accent-color: #28649d;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .dot-config-page .switch-area label {
+        margin: 0;
+        font-size: 14px;
+        color: #35536e;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .dot-config-page .switch-hint {
+        color: #8797a7;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .dot-config-page .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+        padding-top: 22px;
+        margin-top: 22px;
+        border-top: 1px solid #edf0f4;
+    }
+
+    .dot-config-page .btn-save {
+        background: #245b91;
+        border: 1px solid #245b91;
+        color: white;
+        border-radius: 7px;
+        padding: 10px 21px;
+        font-size: 14px;
+        font-weight: 600;
+        transition: .2s;
+    }
+
+    .dot-config-page .btn-save:hover {
+        background: #194775;
+        border-color: #194775;
+        color: white;
+    }
+
+    .dot-config-page .btn-back {
+        background: white;
+        color: #526c83;
+        border: 1px solid #d6e0eb;
+        border-radius: 7px;
+        padding: 10px 18px;
+        font-size: 14px;
+        text-decoration: none;
+        transition: .2s;
+    }
+
+    .dot-config-page .btn-back:hover {
+        background: #f2f6fa;
+        color: #245b91;
+    }
+
+    .dot-config-page .alert {
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    @@media (max-width: 576px) {
+        .dot-config-page .card-body {
+            padding: 17px;
+        }
+
+        .dot-config-page .form-actions {
+            flex-direction: column-reverse;
+        }
+
+        .dot-config-page .form-actions a,
+        .dot-config-page .form-actions button {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
+<div class="dot-config-page">
+
+    <!-- TIÊU ĐỀ TRANG -->
+    <div class="page-heading">
+        <div class="heading-left">
+            <div class="heading-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+
+            <div>
+                <h2>Cấu hình đợt đăng ký</h2>
+                <p>
+                    Quản lý thời gian và trạng thái đăng ký đề tài của sinh viên
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- THÔNG BÁO -->
+    @if (ViewBag.ThongBao != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            @ViewBag.ThongBao
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
+
+    <div asp-validation-summary="All"
+         class="text-danger mb-3">
+    </div>
+
+    <!-- FORM CẤU HÌNH -->
+    <div class="main-card">
+
+        <div class="card-heading">
+            <i class="fas fa-sliders-h"></i>
+            <h5>Thông tin đợt đăng ký</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-controller="DotDangKy"
+                  asp-action="Index"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <!-- NĂM HỌC VÀ HỌC KỲ -->
+                <div class="row g-4">
+
+                    <div class="col-md-6">
+                        <label asp-for="NamHoc"
+                               class="section-label">
+                            Năm học
+                        </label>
+
+                        <input asp-for="NamHoc"
+                               class="form-control"
+                               list="danhSachNamHoc"
+                               placeholder="Ví dụ: 2026-2027"
+                               maxlength="9"
+                               required />
+
+                        <datalist id="danhSachNamHoc">
+                            @foreach (var nam in danhSachNamHoc)
+                            {
+                                <option value="@nam"></option>
+                            }
+                        </datalist>
+
+                        <span asp-validation-for="NamHoc"
+                              class="text-danger small">
+                        </span>
+
+                        <div class="form-hint">
+                            Chọn năm học đã có đề tài hoặc nhập năm học mới.
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="HocKy"
+                               class="section-label">
+                            Học kỳ
+                        </label>
+
+                        <select asp-for="HocKy"
+                                class="form-control"
+                                required>
+                            <option value="0">
+                                -- Chọn học kỳ --
+                            </option>
+                            <option value="1">Học kỳ 1</option>
+                            <option value="2">Học kỳ 2</option>
+                            <option value="3">Học kỳ 3</option>
+                        </select>
+
+                        <span asp-validation-for="HocKy"
+                              class="text-danger small">
+                        </span>
+
+                        <div class="form-hint">
+                            Lựa chọn học kỳ áp dụng cho đợt đăng ký.
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- TRẠNG THÁI ĐĂNG KÝ -->
+                <div class="status-panel mt-4">
+
+                    <div class="status-content">
+
+                        <div>
+                            <div class="status-title">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Trạng thái đăng ký hiện tại
+                            </div>
+
+                            <p class="status-description">
+                                Thiết lập quyền đăng ký đề tài của sinh viên.
+                            </p>
+                        </div>
+
+                        <span class="status-badge @(Model.DangMo ? "status-open" : "status-closed")">
+                            <i class="fas @(Model.DangMo ? "fa-check-circle" : "fa-lock") me-1"></i>
+
+                            @(Model.DangMo
+                                ? "Đang mở đăng ký"
+                                : "Đã đóng đăng ký")
+                        </span>
+
+                    </div>
+
+                    <div class="switch-area">
+
+                        <input asp-for="DangMo"
+                               type="checkbox" />
+
+                        <div>
+                            <label asp-for="DangMo">
+                                Cho phép sinh viên đăng ký đề tài
+                            </label>
+
+                            <div class="switch-hint">
+                                Bật để cho phép đăng ký, bỏ chọn để tạm đóng đăng ký.
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- NÚT THAO TÁC -->
+                <div class="form-actions">
+
+                    <a asp-controller="Home"
+                       asp-action="Index"
+                       class="btn-back">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Quay lại
+                    </a>
+
+                    <button type="submit"
+                            class="btn-save">
+                        <i class="fas fa-save me-1"></i>
+                        Lưu cấu hình
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+    </div>
+
+</div>

@@ -1,0 +1,341 @@
+﻿@model IEnumerable<QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.PhanCongHuongDan>
+@using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
+
+@{
+    ViewData["Title"] = "Phân công của tôi";
+    ViewData["UnifiedIndex"] = true;
+
+    var danhSach = Model?.ToList() ?? new List<PhanCongHuongDan>();
+
+    var dangThucHien = danhSach
+        .Where(x => x.DangHieuLuc &&
+                    x.TrangThaiThucHien != "Hoàn thành")
+        .OrderByDescending(x => x.NgayPhanCong)
+        .ThenByDescending(x => x.MaPhanCong)
+        .ToList();
+
+    var daHoanThanh = danhSach
+        .Where(x => x.TrangThaiThucHien == "Hoàn thành")
+        .OrderByDescending(x => x.NgayKetThuc)
+        .ThenByDescending(x => x.MaPhanCong)
+        .ToList();
+
+    var lichSuThayDoi = danhSach
+        .Where(x => !x.DangHieuLuc &&
+                    x.TrangThaiThucHien != "Hoàn thành")
+        .OrderByDescending(x => x.NgayPhanCong)
+        .ThenByDescending(x => x.MaPhanCong)
+        .ToList();
+
+    string hoTen = ViewBag.HoTenSinhVien as string ?? "Sinh viên";
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="page-title mb-1">
+                    <i class="fa-solid fa-chalkboard-user me-2"></i>
+                    Phân công của tôi
+                </h2>
+                <p class="page-description mb-0">
+                    Theo dõi giảng viên hướng dẫn và tiến độ đồ án của @hoTen
+                </p>
+            </div>
+
+            <a asp-controller="CongSinhVien"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left me-1"></i>
+                Trang chủ
+            </a>
+        </div>
+
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-4">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-2">
+                            Đang thực hiện
+                        </div>
+                        <div class="fs-3 fw-bold text-primary">
+                            @dangThucHien.Count
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-2">
+                            Đã hoàn thành
+                        </div>
+                        <div class="fs-3 fw-bold text-success">
+                            @daHoanThanh.Count
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-2">
+                            Lịch sử thay đổi
+                        </div>
+                        <div class="fs-3 fw-bold text-info">
+                            @lichSuThayDoi.Count
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <h5 class="fw-bold text-primary mb-3">
+            <i class="fa-solid fa-spinner me-2"></i>
+            Đồ án đang thực hiện
+        </h5>
+
+        @if (dangThucHien.Any())
+        {
+            @foreach (var item in dangThucHien)
+            {
+                string lopTienDo = item.TrangThaiThucHien == "Đang thực hiện"
+                    ? "uneti-status-info"
+                    : "uneti-status-warning";
+
+                <div class="uneti-card mb-3">
+                    <div class="uneti-card-body">
+
+                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                            <h6 class="fw-bold text-primary mb-0">
+                                @(item.DangKyDeTai?.DeTai?.TenDeTai ?? "Đề tài chưa xác định")
+                            </h6>
+
+                            <span class="uneti-status @lopTienDo">
+                                @item.TrangThaiThucHien
+                            </span>
+                        </div>
+
+                        <div class="uneti-details-row">
+                            <div class="uneti-details-label">
+                                Mã phân công
+                            </div>
+                            <div class="uneti-details-value">
+                                @item.MaPhanCong
+                            </div>
+                        </div>
+
+                        <div class="uneti-details-row">
+                            <div class="uneti-details-label">
+                                Giảng viên hướng dẫn
+                            </div>
+                            <div class="uneti-details-value fw-semibold">
+                                @(item.GiangVien?.HoTen ?? "Chưa cập nhật")
+                            </div>
+                        </div>
+
+                        <div class="uneti-details-row">
+                            <div class="uneti-details-label">
+                                Học vị
+                            </div>
+                            <div class="uneti-details-value">
+                                @(item.GiangVien?.HocVi ?? "—")
+                            </div>
+                        </div>
+
+                        <div class="uneti-details-row">
+                            <div class="uneti-details-label">
+                                Email giảng viên
+                            </div>
+                            <div class="uneti-details-value">
+                                @(item.GiangVien?.Email ?? "—")
+                            </div>
+                        </div>
+
+                        <div class="uneti-details-row">
+                            <div class="uneti-details-label">
+                                Lĩnh vực
+                            </div>
+                            <div class="uneti-details-value">
+                                @(item.DangKyDeTai?.DeTai?.LinhVuc?.TenLinhVuc ?? "—")
+                            </div>
+                        </div>
+
+                        <div class="uneti-details-row">
+                            <div class="uneti-details-label">
+                                Năm học / Học kỳ
+                            </div>
+                            <div class="uneti-details-value">
+                                @(item.DangKyDeTai?.DeTai?.NamHoc ?? "—")
+                                / HK @(item.DangKyDeTai?.DeTai?.HocKy.ToString() ?? "—")
+                            </div>
+                        </div>
+
+                        <div class="uneti-details-row">
+                            <div class="uneti-details-label">
+                                Ngày phân công
+                            </div>
+                            <div class="uneti-details-value">
+                                @item.NgayPhanCong.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                        </div>
+
+                        <div class="uneti-details-row">
+                            <div class="uneti-details-label">
+                                Ghi chú
+                            </div>
+                            <div class="uneti-details-value"
+                                 style="white-space:pre-wrap">
+                                @(string.IsNullOrWhiteSpace(item.GhiChu) ? "Không có" : item.GhiChu)
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="fa-solid fa-circle-info me-2"></i>
+                Hiện bạn chưa có đồ án đang thực hiện.
+                Nếu đăng ký đã được duyệt, hãy chờ quản trị viên phân công
+                giảng viên hướng dẫn.
+            </div>
+        }
+
+        <hr class="my-4" />
+
+        <h5 class="fw-bold text-primary mb-3">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            Đồ án đã hoàn thành
+        </h5>
+
+        <div class="table-responsive mb-4">
+            <table class="table uneti-table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên đề tài</th>
+                        <th>Giảng viên</th>
+                        <th>Ngày phân công</th>
+                        <th>Ngày kết thúc</th>
+                        <th class="text-center">Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (daHoanThanh.Any())
+                    {
+                        int stt = 0;
+
+                        foreach (var item in daHoanThanh)
+                        {
+                            stt++;
+
+                            <tr>
+                                <td>@stt</td>
+                                <td class="fw-semibold">
+                                    @(item.DangKyDeTai?.DeTai?.TenDeTai ?? "—")
+                                </td>
+                                <td>
+                                    @(item.GiangVien?.HoTen ?? "—")
+                                </td>
+                                <td>
+                                    @item.NgayPhanCong.ToString("dd/MM/yyyy")
+                                </td>
+                                <td>
+                                    @(item.NgayKetThuc?.ToString("dd/MM/yyyy") ?? "—")
+                                </td>
+                                <td class="text-center">
+                                    <span class="uneti-status uneti-status-success">
+                                        Hoàn thành
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                Chưa có đồ án hoàn thành.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <h5 class="fw-bold text-primary mb-3">
+            <i class="fa-solid fa-clock-rotate-left me-2"></i>
+            Lịch sử thay đổi giảng viên
+        </h5>
+
+        <div class="table-responsive">
+            <table class="table uneti-table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Đề tài</th>
+                        <th>Giảng viên trước đây</th>
+                        <th>Ngày phân công</th>
+                        <th>Ngày kết thúc</th>
+                        <th>Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (lichSuThayDoi.Any())
+                    {
+                        int stt = 0;
+
+                        foreach (var item in lichSuThayDoi)
+                        {
+                            stt++;
+
+                            <tr>
+                                <td>@stt</td>
+                                <td class="fw-semibold">
+                                    @(item.DangKyDeTai?.DeTai?.TenDeTai ?? "—")
+                                </td>
+                                <td>
+                                    @(item.GiangVien?.HoTen ?? "—")
+                                </td>
+                                <td>
+                                    @item.NgayPhanCong.ToString("dd/MM/yyyy")
+                                </td>
+                                <td>
+                                    @(item.NgayKetThuc?.ToString("dd/MM/yyyy") ?? "—")
+                                </td>
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(item.GhiChu)
+                                        ? "Không có"
+                                        : item.GhiChu)
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                Chưa có lịch sử thay đổi giảng viên.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-info mt-4 mb-0">
+            <i class="fa-solid fa-circle-info me-2"></i>
+            Thông tin phân công và tiến độ được cập nhật bởi quản trị viên.
+            Sinh viên chỉ có quyền theo dõi.
+        </div>
+
+    </div>
+</div>

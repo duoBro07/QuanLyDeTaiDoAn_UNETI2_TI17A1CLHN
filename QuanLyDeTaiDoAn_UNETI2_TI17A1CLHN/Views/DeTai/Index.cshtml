@@ -1,0 +1,468 @@
+@model IEnumerable<QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.DeTai>
+@using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
+
+@{
+    ViewData["Title"] = "Quản lý đề tài";
+
+    int trang = ViewBag.TrangHienTai ?? 1;
+    int tongTrang = ViewBag.TongTrang ?? 0;
+    int tong = ViewBag.TongBanGhi ?? 0;
+    int kichThuoc = ViewBag.KichThuocTrang ?? 10;
+
+    string tuKhoa = ViewBag.TuKhoa ?? "";
+    int? maLinhVuc = ViewBag.MaLinhVucLoc;
+    string namHoc = ViewBag.NamHocLoc ?? "";
+    int? hocKy = ViewBag.HocKyLoc;
+    string trangThai = ViewBag.TrangThaiLoc ?? "";
+    string choCon = ViewBag.ChoCon ?? "";
+    string sapXep = ViewBag.SapXep ?? "";
+
+    var linhVucs = ViewBag.LinhVucs as IEnumerable<LinhVuc>
+        ?? Enumerable.Empty<LinhVuc>();
+
+    var namHocs = ViewBag.NamHocs as IEnumerable<string>
+        ?? Enumerable.Empty<string>();
+
+    var soDaDangKy = ViewBag.SoDaDangKy as Dictionary<int, int>
+        ?? new Dictionary<int, int>();
+
+    int batDau = tong == 0 ? 0 : (trang - 1) * kichThuoc + 1;
+    int ketThuc = Math.Min(trang * kichThuoc, tong);
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="page-title mb-1">
+                    <i class="fa-solid fa-book-open me-2"></i>
+                    Quản lý đề tài
+                </h2>
+                <p class="page-description mb-0">
+                    Quản lý, tìm kiếm, lọc và theo dõi số chỗ của đề tài đồ án
+                </p>
+            </div>
+
+            <a asp-controller="DeTai"
+               asp-action="Create"
+               class="btn btn-main">
+                <i class="fa-solid fa-plus"></i>
+                Thêm đề tài
+            </a>
+        </div>
+
+        @if (TempData["ThongBaoDeTai"] != null)
+        {
+            <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check me-2"></i>
+                @TempData["ThongBaoDeTai"]
+            </div>
+        }
+
+        @if (TempData["LoiDeTai"] != null)
+        {
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                @TempData["LoiDeTai"]
+            </div>
+        }
+
+        <!-- TIM KIEM, LOC, SAP XEP -->
+
+        <form asp-controller="DeTai"
+              asp-action="Index"
+              method="get"
+              class="uneti-filter-bar">
+
+            <div class="row g-3">
+
+                <div class="col-lg-4 col-md-6">
+                    <label for="tuKhoa" class="form-label">
+                        Tìm kiếm
+                    </label>
+                    <input id="tuKhoa"
+                           name="tuKhoa"
+                           value="@tuKhoa"
+                           class="form-control"
+                           placeholder="Tên đề tài, mô tả, yêu cầu..." />
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <label for="maLinhVuc" class="form-label">
+                        Lĩnh vực
+                    </label>
+                    <select id="maLinhVuc"
+                            name="maLinhVuc"
+                            class="form-select">
+                        <option value="">Tất cả lĩnh vực</option>
+                        @foreach (var lv in linhVucs)
+                        {
+                            <option value="@lv.MaLinhVuc"
+                                    selected="@(maLinhVuc == lv.MaLinhVuc)">
+                                @lv.TenLinhVuc
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <label for="namHoc" class="form-label">
+                        Năm học
+                    </label>
+                    <select id="namHoc"
+                            name="namHoc"
+                            class="form-select">
+                        <option value="">Tất cả</option>
+                        @foreach (var nam in namHocs)
+                        {
+                            <option value="@nam"
+                                    selected="@(namHoc == nam)">
+                                @nam
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <label for="hocKy" class="form-label">
+                        Học kỳ
+                    </label>
+                    <select id="hocKy"
+                            name="hocKy"
+                            class="form-select">
+                        <option value="">Tất cả</option>
+                        @for (int hk = 1; hk <= 3; hk++)
+                        {
+                            <option value="@hk"
+                                    selected="@(hocKy == hk)">
+                                Học kỳ @hk
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <label for="trangThai" class="form-label">
+                        Trạng thái
+                    </label>
+                    <select id="trangThai"
+                            name="trangThai"
+                            class="form-select">
+                        <option value="">Tất cả trạng thái</option>
+                        @foreach (var tt in new[] {
+                            "Mở đăng ký", "Đủ số lượng",
+                            "Tạm khóa", "Kết thúc"
+                        })
+                        {
+                            <option value="@tt"
+                                    selected="@(trangThai == tt)">
+                                @tt
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <label for="choCon" class="form-label">
+                        Số chỗ
+                    </label>
+                    <select id="choCon"
+                            name="choCon"
+                            class="form-select">
+                        <option value="">Tất cả</option>
+                        <option value="con"
+                                selected="@(choCon == "con")">
+                            Còn chỗ
+                        </option>
+                        <option value="het"
+                                selected="@(choCon == "het")">
+                            Hết chỗ
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <label for="sapXep" class="form-label">
+                        Sắp xếp
+                    </label>
+                    <select id="sapXep"
+                            name="sapXep"
+                            class="form-select">
+                        <option value="" selected="@(sapXep == "")">
+                            Tên A - Z
+                        </option>
+                        <option value="ten_za"
+                                selected="@(sapXep == "ten_za")">
+                            Tên Z - A
+                        </option>
+                        <option value="sv_tang"
+                                selected="@(sapXep == "sv_tang")">
+                            SV tối đa tăng
+                        </option>
+                        <option value="sv_giam"
+                                selected="@(sapXep == "sv_giam")">
+                            SV tối đa giảm
+                        </option>
+                        <option value="cho_tang"
+                                selected="@(sapXep == "cho_tang")">
+                            Chỗ còn tăng
+                        </option>
+                        <option value="cho_giam"
+                                selected="@(sapXep == "cho_giam")">
+                            Chỗ còn giảm
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-lg-3 col-md-6 d-flex align-items-end gap-2">
+                    <button type="submit"
+                            class="btn btn-main flex-fill">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        Tìm kiếm
+                    </button>
+
+                    <a asp-controller="DeTai"
+                       asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Đặt lại
+                    </a>
+                </div>
+
+            </div>
+        </form>
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+            <h5 class="fw-bold mb-0" style="color:#17477e">
+                <i class="fa-solid fa-list me-2"></i>
+                Danh sách đề tài (@tong)
+            </h5>
+            <span class="text-muted small">
+                @kichThuoc bản ghi / trang
+            </span>
+        </div>
+    </div>
+
+    <!-- BANG DE TAI -->
+
+    <div class="table-responsive">
+        <table class="table uneti-table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th class="ps-3">STT</th>
+                    <th>Mã</th>
+                    <th>Tên đề tài</th>
+                    <th>Lĩnh vực</th>
+                    <th>Năm học</th>
+                    <th>Học kỳ</th>
+                    <th class="text-center">SV tối đa</th>
+                    <th class="text-center">Đã đăng ký</th>
+                    <th class="text-center">Chỗ còn</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    int stt = batDau;
+
+                    foreach (var item in Model)
+                    {
+                        int daDangKy = soDaDangKy.TryGetValue(
+                            item.MaDeTai, out int soLuong) ? soLuong : 0;
+
+                        int soChoCon = item.SoSinhVienToiDa - daDangKy;
+
+                        string trangThaiThucTe =
+                            item.TrangThai == "Tạm khóa" ||
+                            item.TrangThai == "Kết thúc"
+                                ? item.TrangThai
+                                : soChoCon <= 0
+                                    ? "Đủ số lượng"
+                                    : "Mở đăng ký";
+
+                        string lopTrangThai = trangThaiThucTe switch
+                        {
+                            "Mở đăng ký" => "uneti-status-success",
+                            "Đủ số lượng" => "uneti-status-warning",
+                            "Tạm khóa" => "uneti-status-danger",
+                            _ => "uneti-status-info"
+                        };
+
+                        <tr>
+                            <td class="ps-3">@stt</td>
+                            <td>@item.MaDeTai</td>
+
+                            <td class="fw-semibold">
+                                @item.TenDeTai
+                            </td>
+
+                            <td>
+                                @(item.LinhVuc?.TenLinhVuc ?? "Chưa có")
+                            </td>
+
+                            <td>@item.NamHoc</td>
+                            <td>@item.HocKy</td>
+
+                            <td class="text-center">
+                                @item.SoSinhVienToiDa
+                            </td>
+
+                            <td class="text-center">
+                                @daDangKy
+                            </td>
+
+                            <td class="text-center">
+                                @if (soChoCon > 0)
+                                {
+                                    <span class="uneti-status uneti-status-success">
+                                        @soChoCon
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="uneti-status uneti-status-danger">
+                                        @soChoCon
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="text-center">
+                                <span class="uneti-status @lopTrangThai">
+                                    @trangThaiThucTe
+                                </span>
+                            </td>
+
+                            <td class="text-center">
+                                <div class="uneti-actions">
+
+                                    <a asp-controller="DeTai"
+                                       asp-action="Details"
+                                       asp-route-id="@item.MaDeTai"
+                                       class="btn btn-outline-primary btn-sm"
+                                       title="Xem chi tiết">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+
+                                    <a asp-controller="DeTai"
+                                       asp-action="Edit"
+                                       asp-route-id="@item.MaDeTai"
+                                       class="btn btn-outline-primary btn-sm"
+                                       title="Chỉnh sửa">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+
+                                    <a asp-controller="DeTai"
+                                       asp-action="Delete"
+                                       asp-route-id="@item.MaDeTai"
+                                       class="btn btn-outline-danger btn-sm"
+                                       title="Xóa đề tài">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+
+                                </div>
+                            </td>
+                        </tr>
+
+                        stt++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="11" class="text-center text-muted py-5">
+                            <i class="fa-solid fa-inbox fa-2x d-block mb-3"></i>
+                            Không tìm thấy đề tài phù hợp.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PHAN TRANG -->
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 p-3 border-top">
+
+        <div class="uneti-pagination-info">
+            Hiển thị <strong>@batDau - @ketThuc</strong>
+            trong tổng số <strong>@tong</strong> đề tài
+        </div>
+
+        @if (tongTrang > 1)
+        {
+            <nav aria-label="Phân trang đề tài">
+                <ul class="pagination pagination-sm mb-0">
+
+                    <li class="page-item @(trang <= 1 ? "disabled" : "")">
+                        @if (trang > 1)
+                        {
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-trang="@(trang - 1)"
+                               asp-route-tuKhoa="@tuKhoa"
+                               asp-route-maLinhVuc="@maLinhVuc"
+                               asp-route-namHoc="@namHoc"
+                               asp-route-hocKy="@hocKy"
+                               asp-route-trangThai="@trangThai"
+                               asp-route-choCon="@choCon"
+                               asp-route-sapXep="@sapXep">
+                                <i class="fa-solid fa-chevron-left"></i>
+                                Trước
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="page-link">Trước</span>
+                        }
+                    </li>
+
+                    @for (int i = 1; i <= tongTrang; i++)
+                    {
+                        <li class="page-item @(i == trang ? "active" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-trang="@i"
+                               asp-route-tuKhoa="@tuKhoa"
+                               asp-route-maLinhVuc="@maLinhVuc"
+                               asp-route-namHoc="@namHoc"
+                               asp-route-hocKy="@hocKy"
+                               asp-route-trangThai="@trangThai"
+                               asp-route-choCon="@choCon"
+                               asp-route-sapXep="@sapXep">
+                                @i
+                            </a>
+                        </li>
+                    }
+
+                    <li class="page-item @(trang >= tongTrang ? "disabled" : "")">
+                        @if (trang < tongTrang)
+                        {
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-trang="@(trang + 1)"
+                               asp-route-tuKhoa="@tuKhoa"
+                               asp-route-maLinhVuc="@maLinhVuc"
+                               asp-route-namHoc="@namHoc"
+                               asp-route-hocKy="@hocKy"
+                               asp-route-trangThai="@trangThai"
+                               asp-route-choCon="@choCon"
+                               asp-route-sapXep="@sapXep">
+                                Sau
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="page-link">Sau</span>
+                        }
+                    </li>
+
+                </ul>
+            </nav>
+        }
+    </div>
+</div>

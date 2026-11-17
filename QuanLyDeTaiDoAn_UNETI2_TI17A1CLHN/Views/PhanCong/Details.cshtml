@@ -1,0 +1,589 @@
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.PhanCongHuongDan
+@using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
+
+@{
+    ViewData["Title"] = "Chi tiết phân công";
+
+    var lichSu = ViewBag.LichSu as IEnumerable<PhanCongHuongDan>
+        ?? Enumerable.Empty<PhanCongHuongDan>();
+
+    var giangViens = ViewBag.GiangViens as IEnumerable<GiangVien>
+        ?? Enumerable.Empty<GiangVien>();
+
+    var giangVienThayThe = giangViens
+        .Where(x => x.MaGiangVien != Model.MaGiangVien)
+        .ToList();
+
+    bool dangHieuLuc = Model.DangHieuLuc;
+    bool daHoanThanh = Model.TrangThaiThucHien == "Hoàn thành";
+
+    bool coTheThayDoi = dangHieuLuc
+        && !daHoanThanh
+        && Model.DangKyDeTai?.TrangThai == "Đã duyệt";
+
+    string lopTienDo = Model.TrangThaiThucHien switch
+    {
+        "Hoàn thành" => "uneti-status-success",
+        "Đang thực hiện" => "uneti-status-info",
+        _ => "uneti-status-warning"
+    };
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="page-title mb-1">
+                    <i class="fa-solid fa-eye me-2"></i>
+                    Chi tiết phân công
+                </h2>
+                <p class="page-description mb-0">
+                    Theo dõi giảng viên hướng dẫn và tiến độ thực hiện đồ án
+                </p>
+            </div>
+
+            <span class="uneti-status @(dangHieuLuc ? "uneti-status-success" : "uneti-status-info")">
+                @(dangHieuLuc ? "Đang hiệu lực" : "Đã kết thúc")
+            </span>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check me-2"></i>
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                @TempData["Error"]
+            </div>
+        }
+
+        <h5 class="fw-bold mb-3" style="color:#17477e">
+            <i class="fa-solid fa-user-graduate me-2"></i>
+            Thông tin sinh viên và đề tài
+        </h5>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Mã đăng ký</div>
+            <div class="uneti-details-value">@Model.MaDangKy</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Mã sinh viên</div>
+            <div class="uneti-details-value">
+                @(Model.DangKyDeTai?.MaSinhVien.ToString() ?? "—")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Họ tên sinh viên</div>
+            <div class="uneti-details-value fw-semibold">
+                @(Model.DangKyDeTai?.SinhVien?.HoTen ?? "—")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Lớp</div>
+            <div class="uneti-details-value">
+                @(Model.DangKyDeTai?.SinhVien?.Lop ?? "—")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Đề tài</div>
+            <div class="uneti-details-value fw-semibold">
+                @(Model.DangKyDeTai?.DeTai?.TenDeTai ?? "—")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Lĩnh vực</div>
+            <div class="uneti-details-value">
+                @(Model.DangKyDeTai?.DeTai?.LinhVuc?.TenLinhVuc ?? "—")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Năm học / Học kỳ</div>
+            <div class="uneti-details-value">
+                @(Model.DangKyDeTai?.DeTai?.NamHoc ?? "—")
+                / Học kỳ @(Model.DangKyDeTai?.DeTai?.HocKy.ToString() ?? "—")
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <h5 class="fw-bold mb-3" style="color:#17477e">
+            <i class="fa-solid fa-chalkboard-user me-2"></i>
+            Thông tin giảng viên hướng dẫn
+        </h5>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Mã phân công</div>
+            <div class="uneti-details-value">@Model.MaPhanCong</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Giảng viên</div>
+            <div class="uneti-details-value fw-semibold">
+                @(Model.GiangVien?.HoTen ?? "—")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Học vị</div>
+            <div class="uneti-details-value">
+                @(Model.GiangVien?.HocVi ?? "—")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Email giảng viên</div>
+            <div class="uneti-details-value">
+                @(Model.GiangVien?.Email ?? "—")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Ngày phân công</div>
+            <div class="uneti-details-value">
+                @Model.NgayPhanCong.ToString("dd/MM/yyyy HH:mm")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Ngày kết thúc</div>
+            <div class="uneti-details-value">
+                @(Model.NgayKetThuc?.ToString("dd/MM/yyyy HH:mm") ?? "Chưa kết thúc")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Ghi chú</div>
+            <div class="uneti-details-value"
+                 style="white-space:pre-wrap">
+                @(string.IsNullOrWhiteSpace(Model.GhiChu) ? "Không có" : Model.GhiChu)
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Tiến độ thực hiện</div>
+            <div class="uneti-details-value">
+                <span class="uneti-status @lopTienDo">
+                    @Model.TrangThaiThucHien
+                </span>
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <h5 class="fw-bold mb-3" style="color:#17477e">
+            <i class="fa-solid fa-list-check me-2"></i>
+            Cập nhật tiến độ
+        </h5>
+
+        @if (dangHieuLuc && !daHoanThanh)
+        {
+            <form asp-controller="PhanCong"
+                  asp-action="CapNhatTienDo"
+                  method="post"
+                  id="formCapNhatTienDo">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="id"
+                       value="@Model.MaPhanCong" />
+
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-8">
+                        <label for="trangThai" class="form-label">
+                            Trạng thái thực hiện
+                        </label>
+
+                        <select id="trangThai"
+                                name="trangThai"
+                                class="form-select"
+                                required>
+                            <option value="Chưa bắt đầu"
+                                    selected="@(Model.TrangThaiThucHien == "Chưa bắt đầu")">
+                                Chưa bắt đầu
+                            </option>
+                            <option value="Đang thực hiện"
+                                    selected="@(Model.TrangThaiThucHien == "Đang thực hiện")">
+                                Đang thực hiện
+                            </option>
+                            <option value="Hoàn thành"
+                                    selected="@(Model.TrangThaiThucHien == "Hoàn thành")">
+                                Hoàn thành
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <button type="button"
+                                class="btn btn-main w-100"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalTienDo">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Cập nhật tiến độ
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-text mt-2">
+                    Khi chuyển sang Hoàn thành, phân công sẽ kết thúc hiệu lực
+                    và giải phóng tải hướng dẫn của giảng viên.
+                </div>
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="fa-solid fa-circle-info me-2"></i>
+                Phân công đã kết thúc hoặc đồ án đã hoàn thành,
+                không thể cập nhật tiến độ.
+            </div>
+        }
+
+        <hr class="my-4" />
+
+        <h5 class="fw-bold mb-3" style="color:#17477e">
+            <i class="fa-solid fa-people-arrows me-2"></i>
+            Thay đổi giảng viên hướng dẫn
+        </h5>
+
+        @if (coTheThayDoi)
+        {
+            @if (giangVienThayThe.Any())
+            {
+                <form asp-controller="PhanCong"
+                      asp-action="DoiGiangVien"
+                      method="post"
+                      id="formDoiGiangVien">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="id"
+                           value="@Model.MaPhanCong" />
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="maGiangVien" class="form-label">
+                                Giảng viên thay thế
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <select id="maGiangVien"
+                                    name="maGiangVien"
+                                    class="form-select"
+                                    required>
+                                <option value="">
+                                    -- Chọn giảng viên mới --
+                                </option>
+
+                                @foreach (var gv in giangVienThayThe)
+                                {
+                                    <option value="@gv.MaGiangVien">
+                                        @gv.HoTen - Tối đa @gv.SoSinhVienHuongDanToiDa sinh viên
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="lyDo" class="form-label">
+                                Lý do thay đổi
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <textarea id="lyDo"
+                                      name="lyDo"
+                                      class="form-control"
+                                      rows="4"
+                                      maxlength="475"
+                                      required
+                                      placeholder="Nhập lý do thay đổi giảng viên..."></textarea>
+
+                            <div class="form-text">
+                                Lý do được lưu vào lịch sử phân công.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-3">
+                        <button type="button"
+                                id="btnMoDoiGiangVien"
+                                class="btn btn-main">
+                            <i class="fa-solid fa-rotate"></i>
+                            Thay đổi giảng viên
+                        </button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    Không có giảng viên thay thế phù hợp lĩnh vực
+                    và còn tải hướng dẫn.
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info">
+                Không thể thay đổi giảng viên đối với phân công
+                đã kết thúc, đã hoàn thành hoặc đăng ký không còn hợp lệ.
+            </div>
+        }
+
+        <hr class="my-4" />
+
+        <h5 class="fw-bold mb-3" style="color:#17477e">
+            <i class="fa-solid fa-clock-rotate-left me-2"></i>
+            Lịch sử phân công
+        </h5>
+
+        <div class="table-responsive">
+            <table class="table uneti-table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Mã PC</th>
+                        <th>Giảng viên</th>
+                        <th>Ngày phân công</th>
+                        <th>Ngày kết thúc</th>
+                        <th>Tiến độ</th>
+                        <th>Hiệu lực</th>
+                        <th>Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (lichSu.Any())
+                    {
+                        foreach (var item in lichSu)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-controller="PhanCong"
+                                       asp-action="Details"
+                                       asp-route-id="@item.MaPhanCong">
+                                        @item.MaPhanCong
+                                    </a>
+                                </td>
+                                <td class="fw-semibold">
+                                    @(item.GiangVien?.HoTen ?? "—")
+                                </td>
+                                <td>
+                                    @item.NgayPhanCong.ToString("dd/MM/yyyy")
+                                </td>
+                                <td>
+                                    @(item.NgayKetThuc?.ToString("dd/MM/yyyy") ?? "—")
+                                </td>
+                                <td>@item.TrangThaiThucHien</td>
+                                <td>
+                                    @if (item.DangHieuLuc)
+                                    {
+                                        <span class="uneti-status uneti-status-success">
+                                            Hiệu lực
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="uneti-status uneti-status-info">
+                                            Kết thúc
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(item.GhiChu)
+                                        ? "—" : item.GhiChu)
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                Chưa có lịch sử phân công.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <hr class="my-4" />
+
+        <div class="d-flex justify-content-end">
+            <a asp-controller="PhanCong"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left"></i>
+                Quay lại danh sách
+            </a>
+        </div>
+
+    </div>
+</div>
+
+@if (dangHieuLuc && !daHoanThanh)
+{
+    <div class="modal fade"
+         id="modalTienDo"
+         tabindex="-1"
+         aria-labelledby="tieuDeTienDo"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tieuDeTienDo">
+                        Xác nhận cập nhật tiến độ
+                    </h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Đóng"></button>
+                </div>
+
+                <div class="modal-body">
+                    Bạn có chắc muốn cập nhật tiến độ thực hiện đồ án?
+
+                    <p class="text-danger small mt-2 mb-0">
+                        Nếu chọn Hoàn thành, phân công sẽ kết thúc hiệu lực
+                        và không thể chuyển ngược tiến độ.
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Hủy
+                    </button>
+
+                    <button type="button"
+                            id="btnXacNhanTienDo"
+                            class="btn btn-main">
+                        <i class="fa-solid fa-check"></i>
+                        Xác nhận
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (coTheThayDoi && giangVienThayThe.Any())
+{
+    <div class="modal fade"
+         id="modalDoiGiangVien"
+         tabindex="-1"
+         aria-labelledby="tieuDeDoiGiangVien"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tieuDeDoiGiangVien">
+                        Xác nhận đổi giảng viên
+                    </h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Đóng"></button>
+                </div>
+
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn thay đổi giảng viên hướng dẫn?
+
+                    <p class="text-muted small mt-2 mb-0">
+                        Phân công cũ sẽ kết thúc hiệu lực và hệ thống
+                        sẽ tạo bản ghi mới để lưu lịch sử.
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Hủy
+                    </button>
+
+                    <button type="button"
+                            id="btnXacNhanDoiGiangVien"
+                            class="btn btn-main">
+                        <i class="fa-solid fa-check"></i>
+                        Xác nhận thay đổi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const formTienDo =
+                document.getElementById("formCapNhatTienDo");
+
+            const btnTienDo =
+                document.getElementById("btnXacNhanTienDo");
+
+            if (formTienDo && btnTienDo) {
+                btnTienDo.addEventListener("click", function () {
+                    if (!formTienDo.reportValidity()) return;
+
+                    btnTienDo.disabled = true;
+                    formTienDo.requestSubmit();
+                });
+            }
+
+            const formDoi =
+                document.getElementById("formDoiGiangVien");
+
+            const btnMoDoi =
+                document.getElementById("btnMoDoiGiangVien");
+
+            const btnXacNhanDoi =
+                document.getElementById("btnXacNhanDoiGiangVien");
+
+            const modalDoi =
+                document.getElementById("modalDoiGiangVien");
+
+            if (formDoi && btnMoDoi && btnXacNhanDoi && modalDoi) {
+
+                btnMoDoi.addEventListener("click", function () {
+                    const lyDo = document.getElementById("lyDo");
+
+                    if (lyDo) {
+                        lyDo.value = lyDo.value.trim();
+                    }
+
+                    if (!formDoi.reportValidity()) return;
+
+                    bootstrap.Modal
+                        .getOrCreateInstance(modalDoi)
+                        .show();
+                });
+
+                btnXacNhanDoi.addEventListener("click", function () {
+                    if (!formDoi.reportValidity()) return;
+
+                    btnXacNhanDoi.disabled = true;
+                    formDoi.requestSubmit();
+                });
+            }
+
+        });
+    </script>
+}

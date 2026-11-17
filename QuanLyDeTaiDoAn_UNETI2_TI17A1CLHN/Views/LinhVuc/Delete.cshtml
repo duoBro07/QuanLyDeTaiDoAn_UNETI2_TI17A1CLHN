@@ -1,8 +1,281 @@
 @model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.LinhVuc
-@{ ViewData["Title"] = "Xóa lĩnh vực"; }
-<div class="center-message"><div class="message-card danger-message">
-    <div class="message-icon warning-icon">!</div><h2>Xác nhận xóa lĩnh vực</h2>
-    <p>Bạn có chắc chắn muốn xóa <strong>"@Model.TenLinhVuc"</strong>?</p>
-    <div class="integration-note">@ViewBag.IntegrationNote</div>
-    <form asp-action="Delete" asp-route-id="@Model.MaLinhVuc" method="post"><div class="d-flex gap-2 justify-content-center mt-4"><a asp-action="Index" class="btn-soft">Hủy</a><button type="submit" class="btn-danger-soft">Xóa lĩnh vực</button></div></form>
-</div></div>
+
+@{
+    ViewData["Title"] = "Xóa lĩnh vực";
+
+    int soGiangVien = ViewBag.SoGiangVien ?? 0;
+    int soDeTai = ViewBag.SoDeTai ?? 0;
+
+    bool coDuLieuLienQuan = soGiangVien > 0 || soDeTai > 0;
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+
+        <div class="mb-4">
+
+            <h2 class="page-title mb-1">
+                <i class="fa-solid fa-trash me-2 text-danger"></i>
+                Xóa lĩnh vực
+            </h2>
+
+            <p class="page-description mb-0">
+                Kiểm tra thông tin trước khi xóa lĩnh vực đề tài
+            </p>
+
+        </div>
+
+        @if (coDuLieuLienQuan)
+        {
+            <div class="uneti-delete-warning">
+
+                <div class="fw-bold mb-2">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i>
+                    Không thể xóa lĩnh vực này!
+                </div>
+
+                <div>
+                    Lĩnh vực đang có
+                    <strong>@soGiangVien giảng viên</strong>
+                    và
+                    <strong>@soDeTai đề tài</strong>
+                    liên quan.
+                </div>
+
+                <div class="mt-2">
+                    Bạn cần xử lý dữ liệu liên quan trước khi xóa.
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+
+                <i class="fa-solid fa-triangle-exclamation me-2"></i>
+
+                Bạn có chắc chắn muốn xóa lĩnh vực này không?
+
+                <div class="mt-1">
+                    Thao tác xóa không thể hoàn tác bằng chức năng này.
+                </div>
+
+            </div>
+        }
+
+        <div class="uneti-details-row">
+
+            <div class="uneti-details-label">
+                Mã lĩnh vực
+            </div>
+
+            <div class="uneti-details-value">
+                @Model.MaLinhVuc
+            </div>
+
+        </div>
+
+        <div class="uneti-details-row">
+
+            <div class="uneti-details-label">
+                Tên lĩnh vực
+            </div>
+
+            <div class="uneti-details-value fw-semibold">
+                @Model.TenLinhVuc
+            </div>
+
+        </div>
+
+        <div class="uneti-details-row">
+
+            <div class="uneti-details-label">
+                Mô tả
+            </div>
+
+            <div class="uneti-details-value"
+                 style="white-space:pre-wrap">
+                @(string.IsNullOrWhiteSpace(Model.MoTa) ? "Chưa có mô tả" : Model.MoTa)
+            </div>
+
+        </div>
+
+        <div class="uneti-details-row">
+
+            <div class="uneti-details-label">
+                Trạng thái
+            </div>
+
+            <div class="uneti-details-value">
+
+                @if (Model.TrangThai)
+                {
+                    <span class="uneti-status uneti-status-success">
+                        Hoạt động
+                    </span>
+                }
+                else
+                {
+                    <span class="uneti-status uneti-status-danger">
+                        Ngừng hoạt động
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+        <div class="uneti-details-row">
+
+            <div class="uneti-details-label">
+                Số giảng viên liên quan
+            </div>
+
+            <div class="uneti-details-value">
+                @soGiangVien
+            </div>
+
+        </div>
+
+        <div class="uneti-details-row">
+
+            <div class="uneti-details-label">
+                Số đề tài liên quan
+            </div>
+
+            <div class="uneti-details-value">
+                @soDeTai
+            </div>
+
+        </div>
+
+        <form asp-controller="LinhVuc"
+              asp-action="Delete"
+              asp-route-id="@Model.MaLinhVuc"
+              method="post"
+              id="formXoaLinhVuc">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden"
+                   name="id"
+                   value="@Model.MaLinhVuc" />
+
+            <input type="hidden"
+                   name="xacNhan"
+                   value="true" />
+
+            <div class="uneti-delete-actions justify-content-end">
+
+                <a asp-controller="LinhVuc"
+                   asp-action="Index"
+                   class="btn btn-outline-secondary">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Quay lại
+                </a>
+
+                @if (!coDuLieuLienQuan)
+                {
+                    <button type="button"
+                            class="btn btn-danger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#xacNhanXoaModal">
+
+                        <i class="fa-solid fa-trash"></i>
+                        Xóa lĩnh vực
+                    </button>
+                }
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- MODAL XAC NHAN XOA -->
+@if (!coDuLieuLienQuan)
+{
+    <div class="modal fade"
+         id="xacNhanXoaModal"
+         tabindex="-1"
+         aria-labelledby="xacNhanXoaLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title"
+                        id="xacNhanXoaLabel">
+
+                        <i class="fa-solid fa-triangle-exclamation
+                        text-danger me-2"></i>
+                        Xác nhận xóa
+
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Đóng"></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    Bạn có chắc chắn muốn xóa lĩnh vực:
+
+                    <strong>@Model.TenLinhVuc</strong>?
+
+                    <div class="text-danger mt-2">
+                        Thao tác này không thể hoàn tác.
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+
+                        Hủy
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-danger"
+                            id="btnXacNhanXoa">
+
+                        <i class="fa-solid fa-trash"></i>
+                        Xác nhận xóa
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const btn = document.getElementById("btnXacNhanXoa");
+            const form = document.getElementById("formXoaLinhVuc");
+
+            if (!btn || !form) {
+                return;
+            }
+
+            btn.addEventListener("click", function () {
+                btn.disabled = true;
+                form.requestSubmit();
+            });
+
+        });
+    </script>
+}

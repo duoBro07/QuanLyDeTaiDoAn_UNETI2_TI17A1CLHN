@@ -1,0 +1,641 @@
+﻿
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.DangKyDeTai
+@using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models
+
+@{
+    ViewData["Title"] = "Chi tiết đăng ký";
+
+    var phanCong = ViewBag.PhanCongHienTai
+        as PhanCongHuongDan;
+
+    int soDaDuyet = ViewBag.SoDaDuyet ?? 0;
+    int soChoCon = ViewBag.SoChoCon ?? 0;
+
+    bool duSoLuong = ViewBag.DuSoLuong ?? true;
+    bool daCoDeTaiKhac = ViewBag.DaCoDeTaiKhac ?? false;
+    bool daCoPhanCong = ViewBag.DaCoPhanCong ?? false;
+
+    bool sinhVienHopLe = ViewBag.SinhVienHopLe ?? false;
+    bool taiKhoanHopLe = ViewBag.TaiKhoanHopLe ?? false;
+    bool linhVucHopLe = ViewBag.LinhVucHopLe ?? false;
+
+    string? loiSinhVien = ViewBag.LoiSinhVien as string;
+
+    bool choDuyet = Model.TrangThai == "Chờ duyệt";
+
+    bool coTheDuyet =
+        choDuyet &&
+        sinhVienHopLe &&
+        taiKhoanHopLe &&
+        linhVucHopLe &&
+        !duSoLuong &&
+        !daCoDeTaiKhac &&
+        !daCoPhanCong &&
+        Model.DeTai != null &&
+        Model.DeTai.TrangThai == "Mở đăng ký";
+
+    string lopTrangThai = Model.TrangThai switch
+    {
+        "Đã duyệt" => "uneti-status-success",
+        "Chờ duyệt" => "uneti-status-warning",
+        "Từ chối" => "uneti-status-danger",
+        _ => "uneti-status-info"
+    };
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+
+        <!-- TIEU DE -->
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="page-title mb-1">
+                    <i class="fa-solid fa-file-circle-check me-2"></i>
+                    Chi tiết hồ sơ đăng ký
+                </h2>
+
+                <p class="page-description mb-0">
+                    Kiểm tra thông tin trước khi duyệt hoặc từ chối
+                </p>
+            </div>
+
+            <span class="uneti-status @lopTrangThai">
+                @Model.TrangThai
+            </span>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check me-2"></i>
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                @TempData["Error"]
+            </div>
+        }
+
+        <!-- THONG TIN SINH VIEN -->
+        <h5 class="fw-bold mb-3" style="color:#17477e">
+            <i class="fa-solid fa-user-graduate me-2"></i>
+            Thông tin sinh viên
+        </h5>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Mã sinh viên</div>
+            <div class="uneti-details-value">
+                @Model.MaSinhVien
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Họ và tên</div>
+            <div class="uneti-details-value fw-semibold">
+                @(Model.SinhVien?.HoTen ?? "Không có thông tin")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Lớp</div>
+            <div class="uneti-details-value">
+                @(Model.SinhVien?.Lop ?? "—")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Khoa</div>
+            <div class="uneti-details-value">
+                @(Model.SinhVien?.Khoa ?? "—")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Chuyên ngành</div>
+            <div class="uneti-details-value">
+                @(Model.SinhVien?.ChuyenNganh ?? "—")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Email</div>
+            <div class="uneti-details-value">
+                @(Model.SinhVien?.Email ?? "—")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Trạng thái sinh viên</div>
+            <div class="uneti-details-value">
+                @if (Model.SinhVien == null)
+                {
+                    <span class="text-danger">
+                        Không tìm thấy hồ sơ
+                    </span>
+                }
+                else if (sinhVienHopLe)
+                {
+                    <span class="uneti-status uneti-status-success">
+                        Hoạt động
+                    </span>
+                }
+                else
+                {
+                    <span class="uneti-status uneti-status-danger">
+                        Ngừng hoạt động
+                    </span>
+                }
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Tài khoản liên kết</div>
+            <div class="uneti-details-value">
+                @if (Model.SinhVien != null)
+                {
+                    <span>
+                        Mã TK: @Model.SinhVien.MaTaiKhoan
+                        —
+                        @(taiKhoanHopLe ? "Hợp lệ" : "Không hợp lệ")
+                    </span>
+                }
+                else
+                {
+                    <span>—</span>
+                }
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- THONG TIN DE TAI -->
+        <h5 class="fw-bold mb-3" style="color:#17477e">
+            <i class="fa-solid fa-book-open me-2"></i>
+            Thông tin đề tài
+        </h5>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Mã đề tài</div>
+            <div class="uneti-details-value">
+                @Model.MaDeTai
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Tên đề tài</div>
+            <div class="uneti-details-value fw-semibold">
+                @(Model.DeTai?.TenDeTai ?? "Không có thông tin")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Lĩnh vực</div>
+            <div class="uneti-details-value">
+                @(Model.DeTai?.LinhVuc?.TenLinhVuc ?? "—")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Năm học / Học kỳ</div>
+            <div class="uneti-details-value">
+                @if (Model.DeTai != null)
+                {
+                    <span>
+                        @Model.DeTai.NamHoc -
+                        Học kỳ @Model.DeTai.HocKy
+                    </span>
+                }
+                else
+                {
+                    <span>—</span>
+                }
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Trạng thái đề tài</div>
+            <div class="uneti-details-value">
+                @(Model.DeTai?.TrangThai ?? "—")
+            </div>
+        </div>
+
+        <!-- THONG KE SO LUONG -->
+        <div class="row g-3 mt-3">
+            <div class="col-md-4">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-1">
+                            Số sinh viên tối đa
+                        </div>
+                        <div class="fs-3 fw-bold">
+                            @(Model.DeTai?.SoSinhVienToiDa ?? 0)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-1">
+                            Đã duyệt
+                        </div>
+                        <div class="fs-3 fw-bold text-primary">
+                            @soDaDuyet
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-1">
+                            Số chỗ còn
+                        </div>
+                        <div class="fs-3 fw-bold @(soChoCon > 0 ? "text-success" : "text-danger")">
+                            @soChoCon
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- THONG TIN DANG KY -->
+        <h5 class="fw-bold mb-3" style="color:#17477e">
+            <i class="fa-solid fa-clipboard-list me-2"></i>
+            Thông tin đăng ký
+        </h5>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Mã đăng ký</div>
+            <div class="uneti-details-value">
+                @Model.MaDangKy
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Ngày đăng ký</div>
+            <div class="uneti-details-value">
+                @Model.NgayDangKy.ToString("dd/MM/yyyy HH:mm")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Lý do đăng ký</div>
+            <div class="uneti-details-value"
+                 style="white-space:pre-wrap">
+                @Model.LyDoDangKy
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Trạng thái hồ sơ</div>
+            <div class="uneti-details-value">
+                <span class="uneti-status @lopTrangThai">
+                    @Model.TrangThai
+                </span>
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Ghi chú xét duyệt</div>
+            <div class="uneti-details-value"
+                 style="white-space:pre-wrap">
+                @(string.IsNullOrWhiteSpace(Model.GhiChuDuyet)
+                    ? "Chưa có ghi chú"
+                    : Model.GhiChuDuyet)
+            </div>
+        </div>
+
+        <!-- GIANG VIEN HUONG DAN -->
+        @if (phanCong != null)
+        {
+            <hr class="my-4" />
+
+            <h5 class="fw-bold mb-3" style="color:#17477e">
+                <i class="fa-solid fa-chalkboard-user me-2"></i>
+                Giảng viên hướng dẫn
+            </h5>
+
+            <div class="uneti-details-row">
+                <div class="uneti-details-label">Giảng viên</div>
+                <div class="uneti-details-value">
+                    @(phanCong.GiangVien?.HoTen ?? "Chưa có thông tin")
+                </div>
+            </div>
+
+            <div class="uneti-details-row">
+                <div class="uneti-details-label">Ngày phân công</div>
+                <div class="uneti-details-value">
+                    @phanCong.NgayPhanCong.ToString("dd/MM/yyyy")
+                </div>
+            </div>
+
+            <div class="uneti-details-row">
+                <div class="uneti-details-label">
+                    Trạng thái thực hiện
+                </div>
+                <div class="uneti-details-value">
+                    @phanCong.TrangThaiThucHien
+                </div>
+            </div>
+        }
+
+        <!-- KIEM TRA DIEU KIEN XET DUYET -->
+        @if (choDuyet)
+        {
+            <hr class="my-4" />
+
+            <h5 class="fw-bold mb-3" style="color:#17477e">
+                <i class="fa-solid fa-shield-halved me-2"></i>
+                Kiểm tra điều kiện xét duyệt
+            </h5>
+
+            @if (!string.IsNullOrWhiteSpace(loiSinhVien))
+            {
+                <div class="alert alert-warning">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    @loiSinhVien
+                </div>
+            }
+
+            @if (duSoLuong)
+            {
+                <div class="alert alert-warning">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    Đề tài đã đủ số lượng sinh viên
+                    hoặc sức chứa không hợp lệ.
+                </div>
+            }
+
+            @if (daCoDeTaiKhac)
+            {
+                <div class="alert alert-warning">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    Sinh viên đã có đề tài khác được duyệt
+                    trong cùng năm học và học kỳ.
+                </div>
+            }
+
+            @if (Model.DeTai == null)
+            {
+                <div class="alert alert-warning">
+                    Không tìm thấy đề tài của đăng ký.
+                </div>
+            }
+            else
+            {
+                @if (Model.DeTai.TrangThai != "Mở đăng ký")
+                {
+                    <div class="alert alert-warning">
+                        Đề tài không ở trạng thái Mở đăng ký.
+                    </div>
+                }
+
+                @if (!linhVucHopLe)
+                {
+                    <div class="alert alert-warning">
+                        Lĩnh vực đề tài không còn hoạt động
+                        hoặc không tồn tại.
+                    </div>
+                }
+            }
+
+            @if (daCoPhanCong)
+            {
+                <div class="alert alert-warning">
+                    Đăng ký đã phát sinh dữ liệu phân công.
+                    Cần kiểm tra lịch sử trước khi duyệt.
+                </div>
+            }
+
+            @if (coTheDuyet)
+            {
+                <div class="alert alert-info">
+                    <i class="fa-solid fa-circle-info me-2"></i>
+                    Hồ sơ đáp ứng các điều kiện sơ bộ.
+                    Bạn có thể tiến hành duyệt đăng ký.
+                    Hệ thống sẽ kiểm tra lại trước khi lưu.
+                </div>
+            }
+        }
+
+        <hr class="my-4" />
+
+        <!-- CAC NUT THAO TAC -->
+        <div class="d-flex justify-content-end gap-2 flex-wrap">
+
+            <a asp-controller="DuyetDangKy"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left me-1"></i>
+                Quay lại
+            </a>
+
+            @if (choDuyet)
+            {
+                <button type="button"
+                        class="btn btn-outline-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalTuChoi">
+                    <i class="fa-solid fa-xmark me-1"></i>
+                    Từ chối
+                </button>
+
+                @if (coTheDuyet)
+                {
+                    <button type="button"
+                            class="btn btn-main"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalDuyet">
+                        <i class="fa-solid fa-check me-1"></i>
+                        Duyệt đăng ký
+                    </button>
+                }
+            }
+
+        </div>
+    </div>
+</div>
+
+@if (choDuyet)
+{
+    <!-- MODAL XAC NHAN DUYET -->
+    <div class="modal fade"
+         id="modalDuyet"
+         tabindex="-1"
+         aria-labelledby="tieuDeDuyet"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tieuDeDuyet">
+                        <i class="fa-solid fa-circle-check text-success me-2"></i>
+                        Xác nhận duyệt đăng ký
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Đóng">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn duyệt đăng ký của sinh viên
+                    <strong>
+                        @(Model.SinhVien?.HoTen ?? "Không xác định")
+                    </strong>
+                    cho đề tài
+                    <strong>
+                        @(Model.DeTai?.TenDeTai ?? "Không xác định")
+                    </strong>?
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Hủy
+                    </button>
+
+                    <form asp-controller="DuyetDangKy"
+                          asp-action="Duyet"
+                          method="post"
+                          class="m-0">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="id"
+                               value="@Model.MaDangKy" />
+
+                        <button type="submit"
+                                class="btn btn-main">
+                            <i class="fa-solid fa-check me-1"></i>
+                            Xác nhận duyệt
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TU CHOI -->
+    <div class="modal fade"
+         id="modalTuChoi"
+         tabindex="-1"
+         aria-labelledby="tieuDeTuChoi"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tieuDeTuChoi">
+                        <i class="fa-solid fa-circle-xmark text-danger me-2"></i>
+                        Từ chối đăng ký
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Đóng">
+                    </button>
+                </div>
+
+                <form asp-controller="DuyetDangKy"
+                      asp-action="TuChoi"
+                      method="post"
+                      id="formTuChoi">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="id"
+                           value="@Model.MaDangKy" />
+
+                    <div class="modal-body">
+                        <p>
+                            Từ chối hồ sơ đăng ký của sinh viên
+                            <strong>
+                                @(Model.SinhVien?.HoTen ?? "Không xác định")
+                            </strong>.
+                        </p>
+
+                        <label for="lyDo" class="form-label">
+                            Lý do từ chối
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <textarea id="lyDo"
+                                  name="lyDo"
+                                  class="form-control"
+                                  rows="4"
+                                  maxlength="1000"
+                                  required
+                                  placeholder="Nhập lý do từ chối đăng ký..."></textarea>
+
+                        <small class="text-muted">
+                            Tối đa 1.000 ký tự.
+                        </small>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">
+                            Hủy
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-danger">
+                            <i class="fa-solid fa-xmark me-1"></i>
+                            Xác nhận từ chối
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const formTuChoi =
+                document.getElementById("formTuChoi");
+
+            const lyDo =
+                document.getElementById("lyDo");
+
+            if (formTuChoi && lyDo) {
+                formTuChoi.addEventListener("submit", function (event) {
+                    lyDo.value = lyDo.value.trim();
+
+                    if (!lyDo.value) {
+                        event.preventDefault();
+
+                        lyDo.setCustomValidity(
+                            "Vui lòng nhập lý do từ chối."
+                        );
+
+                        lyDo.reportValidity();
+                        lyDo.setCustomValidity("");
+                    }
+                });
+            }
+        });
+    </script>
+}

@@ -1,0 +1,154 @@
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.DeTai
+
+@{
+    ViewData["Title"] = "Chi tiết đề tài";
+
+    int daDangKy = ViewBag.SoDaDangKy ?? 0;
+    int soChoCon = ViewBag.SoChoCon ?? (Model.SoSinhVienToiDa - daDangKy);
+
+    string trangThaiThucTe =
+        Model.TrangThai == "Tạm khóa" ||
+        Model.TrangThai == "Kết thúc"
+            ? Model.TrangThai
+            : soChoCon <= 0 ? "Đủ số lượng" : "Mở đăng ký";
+
+    string lopTrangThai = trangThaiThucTe switch
+    {
+        "Mở đăng ký" => "uneti-status-success",
+        "Đủ số lượng" => "uneti-status-warning",
+        "Tạm khóa" => "uneti-status-danger",
+        _ => "uneti-status-info"
+    };
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="page-title mb-1">
+                    <i class="fa-solid fa-eye me-2"></i>
+                    Chi tiết đề tài
+                </h2>
+                <p class="page-description mb-0">
+                    Thông tin và tình trạng tiếp nhận sinh viên
+                </p>
+            </div>
+
+            <span class="uneti-status @lopTrangThai">
+                @trangThaiThucTe
+            </span>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Mã đề tài</div>
+            <div class="uneti-details-value">@Model.MaDeTai</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Tên đề tài</div>
+            <div class="uneti-details-value fw-semibold">
+                @Model.TenDeTai
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Lĩnh vực</div>
+            <div class="uneti-details-value">
+                @(Model.LinhVuc?.TenLinhVuc ?? "Chưa có")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Năm học</div>
+            <div class="uneti-details-value">@Model.NamHoc</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Học kỳ</div>
+            <div class="uneti-details-value">Học kỳ @Model.HocKy</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Mô tả</div>
+            <div class="uneti-details-value"
+                 style="white-space:pre-wrap">
+                @(string.IsNullOrWhiteSpace(Model.MoTa) ? "Chưa có mô tả" : Model.MoTa)
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Yêu cầu</div>
+            <div class="uneti-details-value"
+                 style="white-space:pre-wrap">
+                @(string.IsNullOrWhiteSpace(Model.YeuCau) ? "Chưa có yêu cầu" : Model.YeuCau)
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Trạng thái lưu trong hệ thống</div>
+            <div class="uneti-details-value">@Model.TrangThai</div>
+        </div>
+
+        <div class="row g-3 mt-3">
+            <div class="col-md-4">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-1">
+                            Số sinh viên tối đa
+                        </div>
+                        <div class="fs-4 fw-bold">
+                            @Model.SoSinhVienToiDa
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-1">
+                            Đã đăng ký hợp lệ
+                        </div>
+                        <div class="fs-4 fw-bold">
+                            @daDangKy
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-1">
+                            Số chỗ còn
+                        </div>
+                        <div class="fs-4 fw-bold @(soChoCon <= 0 ? "text-danger" : "text-success")">
+                            @soChoCon
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <div class="d-flex justify-content-end gap-2 flex-wrap">
+            <a asp-controller="DeTai"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left"></i>
+                Quay lại
+            </a>
+
+            <a asp-controller="DeTai"
+               asp-action="Edit"
+               asp-route-id="@Model.MaDeTai"
+               class="btn btn-main">
+                <i class="fa-solid fa-pen"></i>
+                Chỉnh sửa
+            </a>
+        </div>
+
+    </div>
+</div>

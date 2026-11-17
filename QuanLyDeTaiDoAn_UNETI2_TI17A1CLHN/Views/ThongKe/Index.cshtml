@@ -1,0 +1,1385 @@
+
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.ThongKeViewModel
+@using System.Text.Json
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Báo cáo và thống kê";
+    ViewData["UnifiedIndex"] = true;
+
+    var cards = new[]
+    {
+        new { Ten="Sinh viên", So=Model.TongSinhVien, Mau="navy", Icon="fa-user-graduate" },
+        new { Ten="Giảng viên", So=Model.TongGiangVien, Mau="purple", Icon="fa-chalkboard-user" },
+        new { Ten="Đề tài", So=Model.TongDeTai, Mau="navy", Icon="fa-book-open" },
+        new { Ten="Đăng ký", So=Model.TongDangKy, Mau="green", Icon="fa-file-signature" },
+        new { Ten="Chờ duyệt", So=Model.ChoDuyet, Mau="brown", Icon="fa-clock" },
+        new { Ten="Đã duyệt", So=Model.DaDuyet, Mau="green", Icon="fa-circle-check" },
+        new { Ten="Từ chối", So=Model.TuChoi, Mau="red", Icon="fa-circle-xmark" },
+        new { Ten="Đang hướng dẫn", So=Model.DangHuongDan, Mau="purple", Icon="fa-users" },
+        new { Ten="Đề tài còn chỗ", So=Model.DeTaiConCho, Mau="green", Icon="fa-door-open" },
+        new { Ten="Đề tài hết chỗ", So=Model.DeTaiHetCho, Mau="brown", Icon="fa-lock" },
+        new { Ten="Giảng viên đầy tải", So=Model.GiangVienDayTai, Mau="red", Icon="fa-user-check" }
+    };
+
+    var reportData = new
+    {
+        namHoc = Model.NamHoc,
+        hocKy = Model.HocKy,
+
+        tongQuan = cards.Select(x => new
+        {
+            ten = x.Ten,
+            so = x.So
+        }),
+
+        linhVuc = Model.TheoLinhVuc.Select(x => new
+        {
+            ten = x.Ten,
+            soLuong = x.SoLuong
+        }),
+
+        trangThai = Model.TheoTrangThai.Select(x => new
+        {
+            ten = x.Ten,
+            soLuong = x.SoLuong
+        }),
+
+        thang = Model.TheoThang.Select(x => new
+        {
+            ten = x.Ten,
+            soLuong = x.SoLuong
+        }),
+
+        namHocThongKe = Model.TheoNamHoc.Select(x => new
+        {
+            ten = x.Ten,
+            soLuong = x.SoLuong
+        }),
+
+        deTai = Model.TheoDeTai.Select(x => new
+        {
+            ten = x.Ten,
+            linhVuc = x.LinhVuc,
+            namHoc = x.NamHoc,
+            hocKy = x.HocKy,
+            soSinhVien = x.SoSinhVien,
+            toiDa = x.ToiDa,
+            soChoCon = x.SoChoCon
+        }),
+
+        giangVien = Model.TheoGiangVien.Select(x => new
+        {
+            ten = x.Ten,
+            linhVuc = x.LinhVuc,
+            dangHuongDan = x.DangHuongDan,
+            toiDa = x.ToiDa
+        })
+    };
+}
+
+<style>
+    .tk-page { color: #34465a; }
+    .tk-title { color: #29465b; font-size: 24px; font-weight: 750; }
+    .tk-muted { color: #748393; }
+
+    .tk-section {
+        color: #29465b;
+        font-size: 17px;
+        font-weight: 700;
+        border-bottom: 1px solid #e4eaf0;
+        padding-bottom: 10px;
+        margin: 27px 0 16px;
+    }
+
+    .tk-filter, .tk-options {
+        background: #fafbfd;
+        border: 1px solid #e3eaf1;
+        border-radius: 12px;
+        padding: 18px;
+    }
+
+    .tk-card {
+        background: white;
+        border: 1px solid #e4e9ef;
+        border-radius: 12px;
+        padding: 18px;
+        height: 100%;
+        box-shadow: 0 2px 8px rgba(35,55,75,.035);
+    }
+
+    .tk-card-label { color: #65758a; font-size: 13px; }
+    .tk-card-number { font-size: 28px; font-weight: 700; margin-top: 12px; }
+
+    .tk-card-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .tk-card.navy .tk-card-number { color: #29465b; }
+    .tk-card.navy .tk-card-icon { background: #eaf0f3; color: #29465b; }
+
+    .tk-card.green .tk-card-number { color: #38685d; }
+    .tk-card.green .tk-card-icon { background: #e9f1ed; color: #38685d; }
+
+    .tk-card.brown .tk-card-number { color: #896746; }
+    .tk-card.brown .tk-card-icon { background: #f4eee7; color: #896746; }
+
+    .tk-card.purple .tk-card-number { color: #665d78; }
+    .tk-card.purple .tk-card-icon { background: #f0edf4; color: #665d78; }
+
+    .tk-card.red .tk-card-number { color: #925e5b; }
+    .tk-card.red .tk-card-icon { background: #f5eceb; color: #925e5b; }
+
+    .tk-btn {
+        background: #29465b;
+        color: white;
+        border: 1px solid #29465b;
+    }
+
+    .tk-btn:hover { background: #20394b; color: white; }
+
+    .tk-export {
+        background: #38685d;
+        color: white;
+        border: 1px solid #38685d;
+    }
+
+    .tk-export:hover { background: #2d554c; color: white; }
+
+    .tk-chart {
+        border: 1px solid #e4e9ef;
+        border-radius: 12px;
+        padding: 18px;
+        height: 100%;
+        background: white;
+    }
+
+    .tk-chart h6 { color: #405970; font-weight: 700; }
+    .tk-chart-area { height: 280px; position: relative; }
+
+    .tk-table-wrap {
+        border: 1px solid #e4e9ef;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .tk-table { font-size: 13px; margin: 0; }
+    .tk-table th { background: #f2f5f7; color: #405970; white-space: nowrap; }
+    .tk-table td, .tk-table th { padding: 12px; vertical-align: middle; }
+
+    .tk-options { margin-bottom: 16px; }
+    .tk-options-title { color: #29465b; font-weight: 700; margin-bottom: 12px; }
+    .tk-check { margin: 9px 0; }
+
+    .tk-progress {
+        height: 8px;
+        background: #e9edf1;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .tk-progress > div { height: 100%; background: #38685d; }
+
+    #tkPrintArea { display: none; }
+
+    @@media print {
+        @@page {
+            size: A4 portrait;
+            margin: 14mm;
+        }
+
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+            color: black !important;
+            font-family: "Times New Roman", serif !important;
+            overflow: visible !important;
+            height: auto !important;
+        }
+
+        .uneti-header, .uneti-sidebar, .sidebar,
+        .navbar, .tk-screen, .modal, .modal-backdrop {
+            display: none !important;
+        }
+
+        .uneti-main, .uneti-main-inner {
+            position: static !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            max-width: none !important;
+            min-height: 0 !important;
+            height: auto !important;
+            overflow: visible !important;
+            background: white !important;
+        }
+
+        #tkPrintArea {
+            display: block !important;
+            width: 100% !important;
+            color: black !important;
+            background: white !important;
+            font-size: 11pt;
+        }
+
+        .tk-print-head { text-align: center; margin-bottom: 24px; }
+        .tk-print-head h2 { font-size: 17pt; font-weight: bold; margin: 20px 0 12px; }
+        .tk-print-section { margin-top: 20px; }
+        .tk-print-section h3 {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-bottom: 10px;
+            break-after: avoid;
+        }
+
+        .tk-print-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+        }
+
+        .tk-print-table th, .tk-print-table td {
+            border: 1px solid #333;
+            padding: 6px;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+        }
+
+        .tk-print-table th { text-align: center; }
+        .tk-print-table thead { display: table-header-group; }
+        .tk-print-table tr { break-inside: avoid; }
+
+        .tk-print-chart {
+            display: block;
+            max-width: 100%;
+            max-height: 230px;
+            object-fit: contain;
+            margin: 10px auto;
+        }
+
+        .tk-print-signature {
+            text-align: right;
+            margin-top: 30px;
+            break-inside: avoid;
+        }
+
+        .tk-print-signature > div {
+            display: inline-block;
+            width: 45%;
+            text-align: center;
+        }
+    }
+</style>
+
+<script type="application/json" id="tkData">
+@Html.Raw(JsonSerializer.Serialize(reportData))
+</script>
+
+<div class="tk-screen content-card">
+    <div class="p-3 p-lg-4 tk-page">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="tk-title mb-1">
+                    <i class="fa-solid fa-chart-line me-2"></i>
+                    Báo cáo và thống kê
+                </h2>
+                <p class="tk-muted mb-0">
+                    Tổng hợp và xuất báo cáo quản lý đề tài đồ án
+                </p>
+            </div>
+
+            <button type="button" class="btn tk-export"
+                    data-bs-toggle="modal" data-bs-target="#modalXuat">
+                <i class="fa-solid fa-file-export me-2"></i>
+                Xuất báo cáo
+            </button>
+        </div>
+
+        <form asp-controller="ThongKe" asp-action="Index"
+              method="get" class="tk-filter mb-4">
+
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label">Năm học</label>
+                    <select class="form-select" name="namHoc">
+                        <option value="">Tất cả năm học</option>
+                        @foreach (var n in Model.DanhSachNamHoc)
+                        {
+                            <option value="@n" selected="@(Model.NamHoc == n)">
+                                @n
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Học kỳ</label>
+                    <select class="form-select" name="hocKy">
+                        <option value="">Tất cả học kỳ</option>
+                        @for (int k = 1; k <= 3; k++)
+                        {
+                            <option value="@k" selected="@(Model.HocKy == k)">
+                                Học kỳ @k
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn tk-btn flex-fill">
+                        Áp dụng
+                    </button>
+                    <a asp-controller="ThongKe" asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Đặt lại
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        <div class="alert alert-light border small">
+            Phạm vi:
+            <strong>
+                @(string.IsNullOrEmpty(Model.NamHoc) ? "Tất cả năm học" : Model.NamHoc)
+                —
+                @(Model.HocKy.HasValue ? $"Học kỳ {Model.HocKy}" : "Tất cả học kỳ")
+            </strong>.
+            Sinh viên và giảng viên tính trên toàn hệ thống.
+        </div>
+
+        <h5 class="tk-section">1. Thống kê tổng quan</h5>
+
+        <div class="row g-3">
+            @foreach (var c in cards)
+            {
+                <div class="col-6 col-lg-3">
+                    <div class="tk-card @c.Mau">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="tk-card-label">@c.Ten</span>
+                            <span class="tk-card-icon">
+                                <i class="fa-solid @c.Icon"></i>
+                            </span>
+                        </div>
+                        <div class="tk-card-number">@c.So</div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <h5 class="tk-section">2. Biểu đồ thống kê</h5>
+
+        <div class="row g-3">
+            <div class="col-lg-6">
+                <div class="tk-chart">
+                    <h6>Đề tài theo lĩnh vực</h6>
+                    <div class="tk-chart-area">
+                        <canvas id="chartLinhVuc"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="tk-chart">
+                    <h6>Đăng ký theo trạng thái</h6>
+                    <div class="tk-chart-area">
+                        <canvas id="chartTrangThai"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="tk-chart">
+                    <h6>Đăng ký theo tháng</h6>
+                    <div class="tk-chart-area">
+                        <canvas id="chartThang"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="tk-chart">
+                    <h6>Đề tài theo năm học / học kỳ</h6>
+                    <div class="tk-chart-area">
+                        <canvas id="chartNamHoc"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="tk-section">3. Sinh viên theo đề tài</h5>
+
+        <div class="tk-table-wrap mb-4">
+            <div class="table-responsive">
+                <table class="table table-hover tk-table">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên đề tài</th>
+                            <th>Lĩnh vực</th>
+                            <th>Năm học / HK</th>
+                            <th>Đã duyệt</th>
+                            <th>Tối đa</th>
+                            <th>Chỗ còn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.TheoDeTai.Any())
+                        {
+                            int i = 0;
+                            foreach (var x in Model.TheoDeTai)
+                            {
+                                i++;
+                                <tr>
+                                    <td>@i</td>
+                                    <td class="fw-semibold">@x.Ten</td>
+                                    <td>@x.LinhVuc</td>
+                                    <td>@x.NamHoc - HK@x.HocKy</td>
+                                    <td>@x.SoSinhVien</td>
+                                    <td>@x.ToiDa</td>
+                                    <td>@x.SoChoCon</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    Không có dữ liệu đề tài.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <h5 class="tk-section">4. Tải hướng dẫn của giảng viên</h5>
+
+        <div class="tk-table-wrap">
+            <div class="table-responsive">
+                <table class="table table-hover tk-table">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Giảng viên</th>
+                            <th>Lĩnh vực</th>
+                            <th>Đang hướng dẫn</th>
+                            <th>Giới hạn</th>
+                            <th>Tỷ lệ sử dụng</th>
+                            <th>Đánh giá</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.TheoGiangVien.Any())
+                        {
+                            int i = 0;
+                            foreach (var x in Model.TheoGiangVien)
+                            {
+                                i++;
+                                double rate = x.ToiDa > 0
+                                    ? (double)x.DangHuongDan * 100 / x.ToiDa
+                                    : 0;
+
+                                string width = Math.Clamp(rate, 0, 100)
+                                    .ToString("0.##", CultureInfo.InvariantCulture) + "%";
+
+                                <tr>
+                                    <td>@i</td>
+                                    <td class="fw-semibold">@x.Ten</td>
+                                    <td>@x.LinhVuc</td>
+                                    <td>@x.DangHuongDan</td>
+                                    <td>@x.ToiDa</td>
+                                    <td>
+                                        <div class="tk-progress">
+                                            <div style="width:@width"></div>
+                                        </div>
+                                        <small>
+                                            @(x.ToiDa > 0 ? rate.ToString("0.#") + "%" : "—")
+                                        </small>
+                                    </td>
+                                    <td>
+                                        @(x.ToiDa <= 0
+                                            ? "Chưa có giới hạn"
+                                            : x.DangHuongDan >= x.ToiDa
+                                                ? "Đầy tải"
+                                                : "Còn khả năng")
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    Không có dữ liệu giảng viên.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- HỘP THOẠI XUẤT BÁO CÁO -->
+
+<div class="modal fade" id="modalXuat" tabindex="-1"
+     aria-labelledby="modalXuatTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title tk-title" id="modalXuatTitle"
+                    style="font-size:19px">
+                    <i class="fa-solid fa-file-export me-2"></i>
+                    Tùy chọn xuất báo cáo
+                </h5>
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+
+            <div class="modal-body p-4">
+
+                <div class="tk-options-title">1. Chọn nội dung báo cáo</div>
+
+                <div class="tk-options">
+                    <div class="d-flex gap-2 mb-3">
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                id="selectAll">
+                            Chọn tất cả
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                id="clearAll">
+                            Bỏ chọn
+                        </button>
+                    </div>
+
+                    @{
+                        var nhomBaoCao = new[]
+                        {
+                            new { Id="tongquan", Ten="Thống kê tổng quan" },
+                            new { Id="dangky", Ten="Thống kê đăng ký" },
+                            new { Id="detai", Ten="Thống kê đề tài" },
+                            new { Id="giangvien", Ten="Tải hướng dẫn giảng viên" },
+                            new { Id="chitiet", Ten="Danh sách đề tài chi tiết" }
+                        };
+                    }
+
+                    @foreach (var n in nhomBaoCao)
+                    {
+                        <div class="form-check tk-check">
+                            <input class="form-check-input tk-group"
+                                   type="checkbox" id="group_@n.Id"
+                                   value="@n.Id" checked />
+                            <label class="form-check-label" for="group_@n.Id">
+                                @n.Ten
+                            </label>
+                        </div>
+                    }
+                </div>
+
+                <div class="tk-options-title">2. Phạm vi dữ liệu</div>
+
+                <div class="tk-options">
+                    <div class="form-check tk-check">
+                        <input class="form-check-input" type="radio"
+                               name="scope" id="scopeCurrent"
+                               value="current" checked />
+                        <label class="form-check-label" for="scopeCurrent">
+                            Theo bộ lọc hiện tại
+                        </label>
+                    </div>
+
+                    <div class="form-check tk-check">
+                        <input class="form-check-input" type="radio"
+                               name="scope" id="scopeCustom"
+                               value="custom" />
+                        <label class="form-check-label" for="scopeCustom">
+                            Tùy chọn năm học và học kỳ
+                        </label>
+                    </div>
+
+                    <div id="customScope" class="border rounded p-3 mt-2"
+                         style="display:none;background:#fff">
+
+                        <label class="form-label fw-semibold">Năm học</label>
+                        <select id="exportYear" class="form-select mb-3">
+                            <option value="">Tất cả năm học</option>
+                            @foreach (var n in Model.DanhSachNamHoc)
+                            {
+                                <option value="@n" selected="@(Model.NamHoc == n)">
+                                    @n
+                                </option>
+                            }
+                        </select>
+
+                        <label class="form-label fw-semibold">
+                            Chọn một hoặc nhiều học kỳ
+                        </label>
+
+                        <div class="d-flex gap-4 flex-wrap">
+                            @for (int k = 1; k <= 3; k++)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input tk-sem"
+                                           type="checkbox" value="@k"
+                                           id="sem_@k"
+                                           checked="@(Model.HocKy == k || (!Model.HocKy.HasValue && k == 1))" />
+                                    <label class="form-check-label" for="sem_@k">
+                                        Học kỳ @k
+                                    </label>
+                                </div>
+                            }
+                        </div>
+
+                        <small class="text-muted">
+                            Ví dụ: chọn năm học 2025-2026,
+                            tích học kỳ 1 và 2 để xuất chung hai kỳ.
+                        </small>
+                    </div>
+
+                    <div class="form-check tk-check mt-3">
+                        <input class="form-check-input" type="radio"
+                               name="scope" id="scopeAll" value="all" />
+                        <label class="form-check-label" for="scopeAll">
+                            Toàn bộ dữ liệu hệ thống
+                        </label>
+                    </div>
+                </div>
+
+                <div class="tk-options-title">3. Định dạng xuất</div>
+
+                <div class="tk-options">
+                    <div class="form-check tk-check">
+                        <input class="form-check-input" type="radio"
+                               name="format" value="pdf" id="formatPdf" checked />
+                        <label class="form-check-label" for="formatPdf">
+                            PDF — lưu báo cáo
+                        </label>
+                    </div>
+
+                    <div class="form-check tk-check">
+                        <input class="form-check-input" type="radio"
+                               name="format" value="print" id="formatPrint" />
+                        <label class="form-check-label" for="formatPrint">
+                            In trực tiếp
+                        </label>
+                    </div>
+
+                    <div class="form-check tk-check">
+                        <input class="form-check-input" type="radio"
+                               name="format" value="excel" id="formatExcel" />
+                        <label class="form-check-label" for="formatExcel">
+                            Excel (.xlsx)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="tk-options-title">4. Bố cục trang</div>
+
+                <div class="tk-options" id="pageOptions">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio"
+                               name="orientation" value="portrait" checked />
+                        <label class="form-check-label">A4 dọc</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio"
+                               name="orientation" value="landscape" />
+                        <label class="form-check-label">A4 ngang</label>
+                    </div>
+                </div>
+
+                <div class="tk-options-title">5. Tùy chọn bổ sung</div>
+
+                <div class="tk-options">
+                    <div class="form-check tk-check">
+                        <input class="form-check-input" type="checkbox"
+                               id="withCharts" />
+                        <label class="form-check-label" for="withCharts">
+                            Kèm biểu đồ trong bản in / PDF
+                        </label>
+                    </div>
+
+                    <div class="form-check tk-check">
+                        <input class="form-check-input" type="checkbox"
+                               id="withSignature" checked />
+                        <label class="form-check-label" for="withSignature">
+                            Kèm phần ký xác nhận
+                        </label>
+                    </div>
+                </div>
+
+                <div class="alert alert-light border" id="exportSummary"></div>
+                <div class="text-danger small" id="exportError"></div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary" type="button"
+                        data-bs-dismiss="modal">
+                    Hủy
+                </button>
+                <button class="btn tk-export" type="button" id="doExport">
+                    <i class="fa-solid fa-file-export me-1"></i>
+                    Thực hiện xuất
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="tkPrintArea"></div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const initial = JSON.parse(
+        document.getElementById("tkData").textContent
+    );
+
+    const colors = [
+        "#29465b", "#38685d", "#896746",
+        "#665d78", "#718493", "#925e5b", "#7a8065"
+    ];
+
+    const $ = id => document.getElementById(id);
+
+    const checked = name =>
+        document.querySelector('input[name="' + name + '"]:checked')?.value;
+
+    const groups = () =>
+        [...document.querySelectorAll(".tk-group:checked")]
+            .map(x => x.value);
+
+    const escapeHtml = s => String(s ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+    // ==============================
+    // BIỂU ĐỒ TRÊN WEBSITE
+    // ==============================
+
+    function drawChart(id, type, rows) {
+        if (typeof Chart === "undefined" || !rows.length) return;
+
+        const pie = type === "doughnut";
+        const line = type === "line";
+
+        new Chart($(id), {
+            type: type,
+            data: {
+                labels: rows.map(x => x.ten),
+                datasets: [{
+                    label: "Số lượng",
+                    data: rows.map(x => x.soLuong),
+                    backgroundColor: pie
+                        ? rows.map((_, i) => colors[i % colors.length])
+                        : line ? "rgba(56,104,93,.12)" : "#38685d",
+                    borderColor: line ? "#38685d" : "#fff",
+                    borderWidth: line ? 2 : 1,
+                    fill: line,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: pie,
+                        position: "bottom"
+                    }
+                },
+                scales: pie ? {} : {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0 }
+                    }
+                }
+            }
+        });
+    }
+
+    drawChart("chartLinhVuc", "doughnut", initial.linhVuc);
+    drawChart("chartTrangThai", "bar", initial.trangThai);
+    drawChart("chartThang", "line", initial.thang);
+    drawChart("chartNamHoc", "bar", initial.namHocThongKe);
+
+    // ==============================
+    // ĐIỀU KHIỂN HỘP THOẠI
+    // ==============================
+
+    function updateOptions() {
+        const custom = checked("scope") === "custom";
+        $("customScope").style.display = custom ? "block" : "none";
+
+        const excel = checked("format") === "excel";
+        $("pageOptions").style.opacity = excel ? ".5" : "1";
+
+        $("pageOptions").querySelectorAll("input")
+            .forEach(x => x.disabled = excel);
+
+        const selectedGroups = groups();
+
+        $("exportSummary").textContent =
+            selectedGroups.length + " nhóm báo cáo — " +
+            (custom ? "Tùy chọn học kỳ"
+                : checked("scope") === "all"
+                    ? "Toàn hệ thống"
+                    : "Bộ lọc hiện tại") +
+            " — " + checked("format").toUpperCase();
+
+        $("doExport").disabled = selectedGroups.length === 0;
+    }
+
+    document.querySelectorAll(
+        '.tk-group, input[name="scope"], input[name="format"], .tk-sem, #exportYear'
+    ).forEach(x => x.addEventListener("change", updateOptions));
+
+    $("selectAll").onclick = function () {
+        document.querySelectorAll(".tk-group")
+            .forEach(x => x.checked = true);
+        updateOptions();
+    };
+
+    $("clearAll").onclick = function () {
+        document.querySelectorAll(".tk-group")
+            .forEach(x => x.checked = false);
+        updateOptions();
+    };
+
+    updateOptions();
+
+    // ==============================
+    // TẢI DỮ LIỆU THẬT TỪ CONTROLLER
+    // ==============================
+
+    function getReportUrl() {
+        const scope = checked("scope");
+
+        if (scope === "current") {
+            return null;
+        }
+
+        const url = new URL(
+            '@Url.Action("Index", "ThongKe")',
+            window.location.origin
+        );
+
+        if (scope === "custom") {
+            const year = $("exportYear").value;
+
+            if (year) {
+                url.searchParams.set("namHoc", year);
+            }
+
+            const semesters = [
+                ...document.querySelectorAll(".tk-sem:checked")
+            ].map(x => x.value);
+
+            if (semesters.length === 0) {
+                throw new Error("Vui lòng chọn ít nhất một học kỳ.");
+            }
+
+            semesters.forEach(k =>
+                url.searchParams.append("hocKys", k)
+            );
+        }
+
+        return url;
+    }
+
+    async function loadReport() {
+        const url = getReportUrl();
+
+        if (!url) {
+            return initial;
+        }
+
+        const response = await fetch(url.toString(), {
+            credentials: "same-origin"
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                "Không tải được dữ liệu từ Controller: " +
+                response.status
+            );
+        }
+
+        const html = await response.text();
+
+        const doc = new DOMParser().parseFromString(
+            html, "text/html"
+        );
+
+        const json = doc.getElementById("tkData");
+
+        if (!json) {
+            throw new Error(
+                "Không tìm thấy dữ liệu thống kê. Kiểm tra đăng nhập và Controller."
+            );
+        }
+
+        return JSON.parse(json.textContent);
+    }
+
+    function scopeLabel(d) {
+        if (checked("scope") === "custom") {
+            const semesters = [
+                ...document.querySelectorAll(".tk-sem:checked")
+            ].map(x => "Học kỳ " + x.value);
+
+            return ($("exportYear").value || "Tất cả năm học") +
+                " — " + semesters.join(", ");
+        }
+
+        return (d.namHoc || "Tất cả năm học") +
+            " — " +
+            (d.hocKy ? "Học kỳ " + d.hocKy : "Tất cả học kỳ");
+    }
+
+    // ==============================
+    // CHUẨN BỊ CÁC BẢNG SỐ LIỆU
+    // ==============================
+
+    function simpleRows(arr) {
+        return arr.map((x, i) => [
+            i + 1, x.ten, x.soLuong
+        ]);
+    }
+
+    function topicRows(d) {
+        return d.deTai.map((x, i) => [
+            i + 1,
+            x.ten,
+            x.linhVuc,
+            x.namHoc + " / HK" + x.hocKy,
+            x.soSinhVien,
+            x.toiDa,
+            x.soChoCon
+        ]);
+    }
+
+    function lecturerRows(d) {
+        return d.giangVien.map((x, i) => {
+            const rate = x.toiDa > 0
+                ? x.dangHuongDan * 100 / x.toiDa
+                : null;
+
+            return [
+                i + 1,
+                x.ten,
+                x.linhVuc,
+                x.dangHuongDan,
+                x.toiDa,
+                rate === null ? "—" : rate.toFixed(1) + "%",
+                x.toiDa <= 0
+                    ? "Chưa có giới hạn"
+                    : x.dangHuongDan >= x.toiDa
+                        ? "Đầy tải"
+                        : "Còn khả năng"
+            ];
+        });
+    }
+
+    function tableHtml(headers, rows) {
+        let html = '<table class="tk-print-table"><thead><tr>';
+
+        headers.forEach(x => {
+            html += "<th>" + escapeHtml(x) + "</th>";
+        });
+
+        html += "</tr></thead><tbody>";
+
+        if (rows.length === 0) {
+            html += '<tr><td colspan="' + headers.length +
+                '" style="text-align:center">Không có dữ liệu</td></tr>';
+        } else {
+            rows.forEach(row => {
+                html += "<tr>";
+
+                row.forEach(cell => {
+                    html += "<td>" + escapeHtml(cell) + "</td>";
+                });
+
+                html += "</tr>";
+            });
+        }
+
+        return html + "</tbody></table>";
+    }
+
+    function sectionHtml(title, content) {
+        return '<section class="tk-print-section">' +
+            "<h3>" + escapeHtml(title) + "</h3>" +
+            content + "</section>";
+    }
+
+    // ==============================
+    // TẠO BIỂU ĐỒ CHO DỮ LIỆU XUẤT
+    // ==============================
+
+    function exportChart(rows, type) {
+        if (!rows.length || typeof Chart === "undefined") {
+            return "";
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = 950;
+        canvas.height = 390;
+
+        const pie = type === "doughnut";
+
+        const chart = new Chart(canvas, {
+            type: type,
+            data: {
+                labels: rows.map(x => x.ten),
+                datasets: [{
+                    label: "Số lượng",
+                    data: rows.map(x => x.soLuong),
+                    backgroundColor: pie
+                        ? rows.map((_, i) => colors[i % colors.length])
+                        : "#38685d",
+                    borderColor: "#fff"
+                }]
+            },
+            options: {
+                responsive: false,
+                animation: false,
+                plugins: {
+                    legend: {
+                        display: pie,
+                        position: "bottom"
+                    }
+                },
+                scales: pie ? {} : {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        chart.update("none");
+        const src = chart.toBase64Image();
+        chart.destroy();
+
+        return '<img class="tk-print-chart" src="' +
+            src + '" alt="Biểu đồ thống kê" />';
+    }
+
+    // ==============================
+    // TẠO BÁO CÁO IN / PDF
+    // ==============================
+
+    function buildPrint(d, selected, withCharts, signature) {
+        let n = 0;
+
+        let html =
+            '<div class="tk-print-head">' +
+            '<strong>TRƯỜNG ĐẠI HỌC KINH TẾ - KỸ THUẬT CÔNG NGHIỆP</strong>' +
+            '<div>HỆ THỐNG QUẢN LÝ ĐỀ TÀI ĐỒ ÁN</div>' +
+            '<h2>BÁO CÁO THỐNG KÊ ĐỀ TÀI ĐỒ ÁN</h2>' +
+            '<div>Phạm vi: ' + escapeHtml(scopeLabel(d)) + '</div>' +
+            '<div>Lập lúc: ' +
+            escapeHtml(new Date().toLocaleString("vi-VN")) +
+            '</div></div>';
+
+        if (selected.includes("tongquan")) {
+            html += sectionHtml(
+                (++n) + ". THỐNG KÊ TỔNG QUAN",
+                tableHtml(
+                    ["STT", "Chỉ tiêu", "Số lượng"],
+                    d.tongQuan.map((x, i) => [i + 1, x.ten, x.so])
+                ) +
+                "<p><em>Sinh viên, giảng viên và giảng viên đầy tải " +
+                "là chỉ tiêu toàn hệ thống.</em></p>"
+            );
+        }
+
+        if (selected.includes("dangky")) {
+            let content = "<p><b>Đăng ký theo trạng thái</b></p>";
+
+            content += tableHtml(
+                ["STT", "Trạng thái", "Số lượng"],
+                simpleRows(d.trangThai)
+            );
+
+            if (withCharts) {
+                content += exportChart(d.trangThai, "bar");
+            }
+
+            content += "<p><b>Đăng ký theo tháng</b></p>";
+
+            content += tableHtml(
+                ["STT", "Tháng", "Số lượng"],
+                simpleRows(d.thang)
+            );
+
+            if (withCharts) {
+                content += exportChart(d.thang, "line");
+            }
+
+            html += sectionHtml((++n) + ". THỐNG KÊ ĐĂNG KÝ", content);
+        }
+
+        if (selected.includes("detai")) {
+            let content = "<p><b>Đề tài theo lĩnh vực</b></p>";
+
+            content += tableHtml(
+                ["STT", "Lĩnh vực", "Số đề tài"],
+                simpleRows(d.linhVuc)
+            );
+
+            if (withCharts) {
+                content += exportChart(d.linhVuc, "doughnut");
+            }
+
+            content += "<p><b>Đề tài theo năm học / học kỳ</b></p>";
+
+            content += tableHtml(
+                ["STT", "Năm học / Học kỳ", "Số đề tài"],
+                simpleRows(d.namHocThongKe)
+            );
+
+            if (withCharts) {
+                content += exportChart(d.namHocThongKe, "bar");
+            }
+
+            html += sectionHtml((++n) + ". THỐNG KÊ ĐỀ TÀI", content);
+        }
+
+        if (selected.includes("giangvien")) {
+            html += sectionHtml(
+                (++n) + ". TẢI HƯỚNG DẪN GIẢNG VIÊN",
+                tableHtml(
+                    [
+                        "STT", "Giảng viên", "Lĩnh vực",
+                        "Đang HD", "Giới hạn", "Tỷ lệ", "Đánh giá"
+                    ],
+                    lecturerRows(d)
+                )
+            );
+        }
+
+        if (selected.includes("chitiet")) {
+            html += sectionHtml(
+                (++n) + ". DANH SÁCH ĐỀ TÀI CHI TIẾT",
+                tableHtml(
+                    [
+                        "STT", "Tên đề tài", "Lĩnh vực",
+                        "Năm học / HK", "Đã duyệt", "Tối đa", "Chỗ còn"
+                    ],
+                    topicRows(d)
+                )
+            );
+        }
+
+        if (signature) {
+            const date = new Date();
+
+            html +=
+                '<div class="tk-print-signature"><div>' +
+                'Ngày ' + date.getDate() +
+                ' tháng ' + (date.getMonth() + 1) +
+                ' năm ' + date.getFullYear() +
+                '<p><b>NGƯỜI LẬP BÁO CÁO</b></p>' +
+                '<em>(Ký và ghi rõ họ tên)</em>' +
+                '<div style="height:65px"></div>' +
+                '</div></div>';
+        }
+
+        $("tkPrintArea").innerHTML = html;
+    }
+
+    // ==============================
+    // XUẤT EXCEL NHIỀU SHEET
+    // ==============================
+
+    function exportExcel(d, selected) {
+        if (typeof XLSX === "undefined") {
+            throw new Error(
+                "Không tải được thư viện Excel. Kiểm tra Internet."
+            );
+        }
+
+        const workbook = XLSX.utils.book_new();
+
+        function addSheet(name, headers, rows) {
+            const sheet = XLSX.utils.aoa_to_sheet([
+                headers, ...rows
+            ]);
+
+            sheet["!cols"] = headers.map((h, i) => ({
+                wch: Math.min(
+                    65,
+                    Math.max(
+                        16,
+                        String(h).length + 3,
+                        ...rows.map(r => String(r[i] ?? "").length + 2)
+                    )
+                )
+            }));
+
+            XLSX.utils.book_append_sheet(
+                workbook, sheet, name
+            );
+        }
+
+        if (selected.includes("tongquan")) {
+            addSheet(
+                "Tong quan",
+                ["STT", "Chỉ tiêu", "Số lượng"],
+                d.tongQuan.map((x, i) => [
+                    i + 1, x.ten, x.so
+                ])
+            );
+        }
+
+        if (selected.includes("dangky")) {
+            addSheet(
+                "Trang thai dang ky",
+                ["STT", "Trạng thái", "Số lượng"],
+                simpleRows(d.trangThai)
+            );
+
+            addSheet(
+                "Dang ky theo thang",
+                ["STT", "Tháng", "Số lượng"],
+                simpleRows(d.thang)
+            );
+        }
+
+        if (selected.includes("detai")) {
+            addSheet(
+                "De tai theo linh vuc",
+                ["STT", "Lĩnh vực", "Số đề tài"],
+                simpleRows(d.linhVuc)
+            );
+
+            addSheet(
+                "De tai theo nam hoc",
+                ["STT", "Năm học / HK", "Số đề tài"],
+                simpleRows(d.namHocThongKe)
+            );
+        }
+
+        if (selected.includes("giangvien")) {
+            addSheet(
+                "Tai giang vien",
+                [
+                    "STT", "Giảng viên", "Lĩnh vực",
+                    "Đang HD", "Giới hạn", "Tỷ lệ", "Đánh giá"
+                ],
+                lecturerRows(d)
+            );
+        }
+
+        if (selected.includes("chitiet")) {
+            addSheet(
+                "Chi tiet de tai",
+                [
+                    "STT", "Tên đề tài", "Lĩnh vực",
+                    "Năm học / HK", "Đã duyệt", "Tối đa", "Chỗ còn"
+                ],
+                topicRows(d)
+            );
+        }
+
+        const date = new Date();
+
+        const stamp =
+            date.getFullYear() +
+            String(date.getMonth() + 1).padStart(2, "0") +
+            String(date.getDate()).padStart(2, "0");
+
+        XLSX.writeFile(
+            workbook,
+            "BaoCao_UNETI_" + stamp + ".xlsx"
+        );
+    }
+
+    // ==============================
+    // THỰC HIỆN XUẤT
+    // ==============================
+
+    $("doExport").addEventListener("click", async function () {
+        const selected = groups();
+
+        if (!selected.length) return;
+
+        const button = this;
+        const oldText = button.innerHTML;
+
+        button.disabled = true;
+        button.textContent = "Đang tải dữ liệu...";
+        $("exportError").textContent = "";
+
+        try {
+            // Dữ liệu mới từ SQL Server qua Controller
+            const d = await loadReport();
+
+            if (checked("format") === "excel") {
+                exportExcel(d, selected);
+                return;
+            }
+
+            buildPrint(
+                d,
+                selected,
+                $("withCharts").checked,
+                $("withSignature").checked
+            );
+
+            // Cài đặt A4 dọc / ngang
+            let style = $("tkPageStyle");
+
+            if (!style) {
+                style = document.createElement("style");
+                style.id = "tkPageStyle";
+                document.head.appendChild(style);
+            }
+
+            style.textContent =
+                "@@media print { @@page { size: A4 " +
+                checked("orientation") +
+                "; margin: 14mm; } }";
+
+            // Đóng modal trước khi in
+            const modal = bootstrap.Modal.getInstance(
+                $("modalXuat")
+            );
+
+            if (modal) modal.hide();
+
+            await new Promise(resolve =>
+                setTimeout(resolve, 450)
+            );
+
+            window.print();
+
+        } catch (err) {
+            console.error(err);
+            $("exportError").textContent = err.message;
+        } finally {
+            button.disabled = false;
+            button.innerHTML = oldText;
+        }
+    });
+});
+</script>
+}

@@ -1,15 +1,157 @@
 @model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.LinhVuc
-@{ ViewData["Title"] = "Chi tiết lĩnh vực"; }
-<div class="page-card">
-    <div class="page-card-header"><div><h4>Thông tin lĩnh vực</h4><small class="text-secondary">Thông tin này sẽ được dùng chung bởi Module 2</small></div><a asp-action="Edit" asp-route-id="@Model.MaLinhVuc" class="btn-main">Chỉnh sửa</a></div>
-    <div class="page-card-body">
-        <div class="detail-grid">
-            <div class="detail-label">Mã lĩnh vực</div><div class="detail-value">#@Model.MaLinhVuc</div>
-            <div class="detail-label">Tên lĩnh vực</div><div class="detail-value">@Model.TenLinhVuc</div>
-            <div class="detail-label">Mô tả</div><div class="detail-value">@(string.IsNullOrWhiteSpace(Model.MoTa) ? "Chưa có mô tả" : Model.MoTa)</div>
-            <div class="detail-label">Trạng thái</div><div class="detail-value">@if(Model.TrangThai){<span class="status-active">Hoạt động</span>}else{<span class="status-off">Ngừng hoạt động</span>}</div>
-            <div class="detail-label">Liên kết dự kiến</div><div class="detail-value"><span class="integration-badge">GiangVien.MaLinhVuc</span> <span class="integration-badge">DeTai.MaLinhVuc</span></div>
+
+@{
+    ViewData["Title"] = "Chi tiết lĩnh vực";
+
+    int soGiangVien = ViewBag.SoGiangVien ?? 0;
+    int soDeTai = ViewBag.SoDeTai ?? 0;
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+
+        <div class="d-flex justify-content-between
+            align-items-start flex-wrap gap-3 mb-4">
+
+            <div>
+                <h2 class="page-title mb-1">
+                    <i class="fa-solid fa-eye me-2"></i>
+                    Chi tiết lĩnh vực
+                </h2>
+
+                <p class="page-description mb-0">
+                    Thông tin lĩnh vực nghiên cứu
+                </p>
+            </div>
+
+            @if (Model.TrangThai)
+            {
+                <span class="uneti-status uneti-status-success">
+                    <i class="fa-solid fa-circle-check me-1"></i>
+                    Hoạt động
+                </span>
+            }
+            else
+            {
+                <span class="uneti-status uneti-status-danger">
+                    <i class="fa-solid fa-circle-pause me-1"></i>
+                    Ngừng hoạt động
+                </span>
+            }
+
         </div>
-        <div class="mt-4"><a asp-action="Index" class="btn-soft">Quay lại</a></div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">
+                Mã lĩnh vực
+            </div>
+
+            <div class="uneti-details-value">
+                @Model.MaLinhVuc
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">
+                Tên lĩnh vực
+            </div>
+
+            <div class="uneti-details-value fw-semibold">
+                @Model.TenLinhVuc
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">
+                Mô tả
+            </div>
+
+            <div class="uneti-details-value"
+                 style="white-space:pre-wrap">
+                @(string.IsNullOrWhiteSpace(Model.MoTa) ? "Chưa có mô tả" : Model.MoTa)
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">
+                Trạng thái
+            </div>
+
+            <div class="uneti-details-value">
+                @(Model.TrangThai ? "Hoạt động" : "Ngừng hoạt động")
+            </div>
+        </div>
+
+        <div class="row g-3 mt-3">
+
+            <div class="col-md-6">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body d-flex
+                        align-items-center gap-3">
+
+                        <i class="fa-solid fa-chalkboard-user
+                        fa-2x text-primary"></i>
+
+                        <div>
+                            <div class="text-muted small">
+                                Giảng viên thuộc lĩnh vực
+                            </div>
+
+                            <div class="fs-4 fw-bold">
+                                @soGiangVien
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body d-flex
+                        align-items-center gap-3">
+
+                        <i class="fa-solid fa-book-open
+                        fa-2x text-primary"></i>
+
+                        <div>
+                            <div class="text-muted small">
+                                Đề tài thuộc lĩnh vực
+                            </div>
+
+                            <div class="fs-4 fw-bold">
+                                @soDeTai
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <hr class="my-4" />
+
+        <div class="d-flex justify-content-end gap-2 flex-wrap">
+
+            <a asp-controller="LinhVuc"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+
+                <i class="fa-solid fa-arrow-left"></i>
+                Quay lại
+            </a>
+
+            <a asp-controller="LinhVuc"
+               asp-action="Edit"
+               asp-route-id="@Model.MaLinhVuc"
+               class="btn btn-main">
+
+                <i class="fa-solid fa-pen"></i>
+                Chỉnh sửa
+            </a>
+
+        </div>
+
     </div>
 </div>

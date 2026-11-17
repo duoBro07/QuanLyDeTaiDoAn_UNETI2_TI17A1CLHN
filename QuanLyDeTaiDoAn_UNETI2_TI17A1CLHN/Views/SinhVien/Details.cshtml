@@ -1,0 +1,114 @@
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.SinhVien
+
+@{
+    ViewData["Title"] = "Chi tiết sinh viên";
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="page-title mb-1">
+                    <i class="fa-solid fa-eye me-2"></i>
+                    Chi tiết sinh viên
+                </h2>
+                <p class="page-description mb-0">
+                    Thông tin hồ sơ sinh viên
+                </p>
+            </div>
+
+            @if (Model.TrangThai)
+            {
+                <span class="uneti-status uneti-status-success">
+                    Hoạt động
+                </span>
+            }
+            else
+            {
+                <span class="uneti-status uneti-status-danger">
+                    Tạm ngừng
+                </span>
+            }
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Mã sinh viên</div>
+            <div class="uneti-details-value">@Model.MaSinhVien</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Họ và tên</div>
+            <div class="uneti-details-value fw-semibold">@Model.HoTen</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Ngày sinh</div>
+            <div class="uneti-details-value">
+                @Model.NgaySinh.ToString("dd/MM/yyyy")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Lớp</div>
+            <div class="uneti-details-value">@Model.Lop</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Khoa</div>
+            <div class="uneti-details-value">@Model.Khoa</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Chuyên ngành</div>
+            <div class="uneti-details-value">@Model.ChuyenNganh</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Email</div>
+            <div class="uneti-details-value">@Model.Email</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Số điện thoại</div>
+            <div class="uneti-details-value">
+                @(string.IsNullOrWhiteSpace(Model.SoDienThoai)
+                    ? "Chưa cập nhật" : Model.SoDienThoai)
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Tài khoản liên kết</div>
+            <div class="uneti-details-value">
+                @(Model.TaiKhoan?.TenDangNhap ?? "Chưa có thông tin")
+            </div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Trạng thái</div>
+            <div class="uneti-details-value">
+                @(Model.TrangThai ? "Hoạt động" : "Tạm ngừng")
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <div class="d-flex justify-content-end gap-2 flex-wrap">
+            <a asp-controller="SinhVien"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left"></i>
+                Quay lại
+            </a>
+
+            <a asp-controller="SinhVien"
+               asp-action="Edit"
+               asp-route-id="@Model.MaSinhVien"
+               class="btn btn-main">
+                <i class="fa-solid fa-pen"></i>
+                Chỉnh sửa
+            </a>
+        </div>
+
+    </div>
+</div>
