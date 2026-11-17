@@ -21,7 +21,7 @@
               asp-action="Edit"
               asp-route-id="@Model.MaDeTai"
               method="post"
-              id="formSuaDeTai">
+              id="formSuaDeTai" data-no-confirm="true">
 
             @Html.AntiForgeryToken()
             <input asp-for="MaDeTai" type="hidden" />

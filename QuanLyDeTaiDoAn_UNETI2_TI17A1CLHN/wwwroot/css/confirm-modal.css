@@ -1,0 +1,113 @@
+﻿/* =========================================
+   MODAL XÁC NHẬN DÙNG CHUNG
+========================================= */
+
+.confirm-modal-content {
+    border: none;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+}
+
+/* Header */
+
+.confirm-modal-header {
+    padding: 18px 22px;
+    background: #f4f7fb;
+    border-bottom: 1px solid #e5eaf0;
+}
+
+    .confirm-modal-header .modal-title {
+        margin: 0;
+        color: #1d4e80;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+/* Icon */
+
+.confirm-modal-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #e4effb;
+    color: #20558d;
+    font-size: 17px;
+}
+
+/* Body */
+
+.confirm-modal-body {
+    padding: 24px 22px;
+    color: #46576a;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+/* Footer */
+
+.confirm-modal-footer {
+    padding: 14px 22px;
+    border-top: 1px solid #e5eaf0;
+    gap: 8px;
+}
+
+/* Nút hủy */
+
+.btn-confirm-cancel {
+    padding: 8px 17px;
+    border: 1px solid #d5dce5;
+    border-radius: 7px;
+    background: #fff;
+    color: #536273;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+    .btn-confirm-cancel:hover {
+        background: #f1f3f5;
+        border-color: #c5ced8;
+        color: #344054;
+    }
+
+/* Nút đồng ý */
+
+.btn-confirm-accept {
+    padding: 8px 18px;
+    border: 1px solid #20558d;
+    border-radius: 7px;
+    background: #20558d;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+    .btn-confirm-accept:hover {
+        background: #17436f;
+        border-color: #17436f;
+        color: #fff;
+    }
+
+    .btn-confirm-accept:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+
+/* Responsive */
+
+@media (max-width: 576px) {
+    .confirm-modal-header {
+        padding: 15px 16px;
+    }
+
+    .confirm-modal-body {
+        padding: 20px 16px;
+    }
+
+    .confirm-modal-footer {
+        padding: 12px 16px;
+    }
+}

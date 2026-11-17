@@ -22,10 +22,13 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
         // DANH SÁCH - TÌM KIẾM - LỌC - PHÂN TRANG
         [HttpGet]
         public async Task<IActionResult> Index(
-            string? tuKhoa, string? vaiTro,
-            string? trangThai, int trang = 1)
+            string? tuKhoa,
+            string? vaiTro,
+            string? trangThai,
+            int trang = 1)
         {
             const int kichThuocTrang = 8;
+
             trang = Math.Max(1, trang);
 
             var query = _db.TaiKhoans.AsNoTracking();
@@ -33,6 +36,7 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             if (!string.IsNullOrWhiteSpace(tuKhoa))
             {
                 tuKhoa = tuKhoa.Trim();
+
                 query = query.Where(x =>
                     x.TenDangNhap.Contains(tuKhoa) ||
                     x.HoTen.Contains(tuKhoa) ||
@@ -40,15 +44,23 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             }
 
             if (vaiTro == "Admin" || vaiTro == "SinhVien")
+            {
                 query = query.Where(x => x.VaiTro == vaiTro);
+            }
 
             if (trangThai == "HoatDong")
+            {
                 query = query.Where(x => x.TrangThai);
+            }
             else if (trangThai == "DaKhoa")
+            {
                 query = query.Where(x => !x.TrangThai);
+            }
 
             int tong = await query.CountAsync();
-            int tongTrang = Math.Max(1,
+
+            int tongTrang = Math.Max(
+                1,
                 (int)Math.Ceiling(tong / (double)kichThuocTrang));
 
             trang = Math.Min(trang, tongTrang);
@@ -84,8 +96,11 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             KiemTraVaiTro(form);
 
             if (string.IsNullOrWhiteSpace(form.MatKhau))
+            {
                 ModelState.AddModelError(
-                    nameof(form.MatKhau), "Vui lòng nhập mật khẩu.");
+                    nameof(form.MatKhau),
+                    "Vui lòng nhập mật khẩu.");
+            }
 
             if (ModelState.IsValid)
             {
@@ -101,22 +116,27 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             }
 
             if (!ModelState.IsValid)
+            {
                 return View(form);
+            }
 
             var taiKhoan = new TaiKhoan
             {
                 TenDangNhap = form.TenDangNhap.Trim(),
                 HoTen = form.HoTen.Trim(),
                 Email = string.IsNullOrWhiteSpace(form.Email)
-                    ? null : form.Email.Trim(),
+                    ? null
+                    : form.Email.Trim(),
                 VaiTro = form.VaiTro,
                 TrangThai = form.TrangThai
             };
 
             taiKhoan.MatKhau = _hasher.HashPassword(
-                taiKhoan, form.MatKhau!);
+                taiKhoan,
+                form.MatKhau!);
 
             _db.TaiKhoans.Add(taiKhoan);
+
             await _db.SaveChangesAsync();
 
             TempData["ThongBaoTaiKhoan"] =
@@ -134,7 +154,9 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
                 .FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
             if (taiKhoan == null)
+            {
                 return NotFound();
+            }
 
             return View(taiKhoan);
         }
@@ -148,9 +170,11 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
                 .FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
             if (taiKhoan == null)
+            {
                 return NotFound();
+            }
 
-            return View(new TaiKhoanForm
+            var form = new TaiKhoanForm
             {
                 MaTaiKhoan = taiKhoan.MaTaiKhoan,
                 TenDangNhap = taiKhoan.TenDangNhap,
@@ -159,31 +183,50 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
                 VaiTro = taiKhoan.VaiTro,
                 TrangThai = taiKhoan.TrangThai,
                 MatKhau = null
-            });
+            };
+
+            return View(form);
         }
 
         // SỬA - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, TaiKhoanForm form)
+        public async Task<IActionResult> Edit(
+            int id,
+            TaiKhoanForm form)
         {
             if (id != form.MaTaiKhoan)
+            {
                 return BadRequest();
+            }
 
             var taiKhoan = await _db.TaiKhoans
                 .FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
             if (taiKhoan == null)
+            {
                 return NotFound();
+            }
 
             KiemTraVaiTro(form);
 
+            // Để trống mật khẩu thì giữ nguyên mật khẩu cũ.
+            if (string.IsNullOrWhiteSpace(form.MatKhau))
+            {
+                form.MatKhau = null;
+                ModelState.Remove(nameof(form.MatKhau));
+            }
+
+            // Kiểm tra tên đăng nhập trùng.
             if (ModelState.IsValid)
             {
                 string ten = form.TenDangNhap.Trim();
 
-                if (await _db.TaiKhoans.AnyAsync(x =>
-                    x.TenDangNhap == ten && x.MaTaiKhoan != id))
+                bool trungTen = await _db.TaiKhoans.AnyAsync(x =>
+                    x.TenDangNhap == ten &&
+                    x.MaTaiKhoan != id);
+
+                if (trungTen)
                 {
                     ModelState.AddModelError(
                         nameof(form.TenDangNhap),
@@ -194,24 +237,32 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             int? maDangNhap =
                 HttpContext.Session.GetInt32("MaTaiKhoan");
 
+            // Không cho tự khóa hoặc tự hạ quyền Admin.
             if (maDangNhap == id)
             {
                 if (!form.TrangThai)
+                {
                     ModelState.AddModelError(
                         nameof(form.TrangThai),
                         "Không thể tự khóa tài khoản.");
+                }
 
                 if (form.VaiTro != "Admin")
+                {
                     ModelState.AddModelError(
                         nameof(form.VaiTro),
                         "Không thể tự hạ quyền Admin.");
+                }
             }
 
-            bool dangLaAdmin = taiKhoan.VaiTro == "Admin"
-                              && taiKhoan.TrangThai;
+            // Không cho khóa hoặc hạ quyền Admin cuối cùng.
+            bool dangLaAdmin =
+                taiKhoan.VaiTro == "Admin" &&
+                taiKhoan.TrangThai;
 
-            bool vanLaAdmin = form.VaiTro == "Admin"
-                              && form.TrangThai;
+            bool vanLaAdmin =
+                form.VaiTro == "Admin" &&
+                form.TrangThai;
 
             if (dangLaAdmin && !vanLaAdmin)
             {
@@ -219,34 +270,51 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
                     x => x.VaiTro == "Admin" && x.TrangThai);
 
                 if (soAdmin <= 1)
-                    ModelState.AddModelError("",
+                {
+                    ModelState.AddModelError(
+                        "",
                         "Không thể khóa hoặc đổi quyền Admin cuối cùng.");
+                }
             }
 
             if (!ModelState.IsValid)
+            {
                 return View(form);
+            }
 
+            // Cập nhật thông tin tài khoản.
             taiKhoan.TenDangNhap = form.TenDangNhap.Trim();
             taiKhoan.HoTen = form.HoTen.Trim();
-            taiKhoan.Email = string.IsNullOrWhiteSpace(form.Email)
-                ? null : form.Email.Trim();
+
+            taiKhoan.Email =
+                string.IsNullOrWhiteSpace(form.Email)
+                    ? null
+                    : form.Email.Trim();
+
             taiKhoan.VaiTro = form.VaiTro;
             taiKhoan.TrangThai = form.TrangThai;
 
+            // Chỉ đổi mật khẩu khi người dùng nhập mật khẩu mới.
             if (!string.IsNullOrWhiteSpace(form.MatKhau))
             {
                 taiKhoan.MatKhau = _hasher.HashPassword(
-                    taiKhoan, form.MatKhau);
+                    taiKhoan,
+                    form.MatKhau);
             }
 
             await _db.SaveChangesAsync();
 
+            // Nếu đang sửa chính tài khoản đăng nhập,
+            // cập nhật lại thông tin trong Session.
             if (maDangNhap == id)
             {
                 HttpContext.Session.SetString(
-                    "HoTen", taiKhoan.HoTen);
+                    "HoTen",
+                    taiKhoan.HoTen);
+
                 HttpContext.Session.SetString(
-                    "VaiTro", taiKhoan.VaiTro);
+                    "VaiTro",
+                    taiKhoan.VaiTro);
             }
 
             TempData["ThongBaoTaiKhoan"] =
@@ -264,7 +332,9 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
                 .FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
             if (taiKhoan == null)
+            {
                 return NotFound();
+            }
 
             int? maDangNhap =
                 HttpContext.Session.GetInt32("MaTaiKhoan");
@@ -273,6 +343,7 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
             {
                 TempData["LoiTaiKhoan"] =
                     "Bạn không thể tự khóa tài khoản đang đăng nhập.";
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -285,20 +356,24 @@ namespace QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers
                 {
                     TempData["LoiTaiKhoan"] =
                         "Không thể khóa Admin cuối cùng.";
+
                     return RedirectToAction(nameof(Index));
                 }
             }
 
             taiKhoan.TrangThai = !taiKhoan.TrangThai;
+
             await _db.SaveChangesAsync();
 
-            TempData["ThongBaoTaiKhoan"] = taiKhoan.TrangThai
-                ? "Mở khóa tài khoản thành công!"
-                : "Khóa tài khoản thành công!";
+            TempData["ThongBaoTaiKhoan"] =
+                taiKhoan.TrangThai
+                    ? "Mở khóa tài khoản thành công!"
+                    : "Khóa tài khoản thành công!";
 
             return RedirectToAction(nameof(Index));
         }
 
+        // KIỂM TRA VAI TRÒ
         private void KiemTraVaiTro(TaiKhoanForm form)
         {
             if (form.VaiTro != "Admin" &&

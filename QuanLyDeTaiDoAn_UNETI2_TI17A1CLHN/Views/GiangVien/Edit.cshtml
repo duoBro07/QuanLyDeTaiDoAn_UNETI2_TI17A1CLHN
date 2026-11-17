@@ -21,7 +21,7 @@
               asp-controller="GiangVien"
               asp-action="Edit"
               asp-route-id="@Model.MaGiangVien"
-              method="post">
+              method="post" data-no-confirm="true">
 
             @Html.AntiForgeryToken()
             <input asp-for="MaGiangVien" type="hidden" />
