@@ -1,0 +1,928 @@
+﻿
+/* =========================================================
+   UNETI - COMMON CSS
+   CLASSIC BLUE THEME
+   ========================================================= */
+
+:root {
+    --u-primary: #20558D;
+    --u-primary-hover: #174776;
+    --u-primary-light: #EAF1F8;
+    --u-header: #20558D;
+    --u-sidebar: #152F50;
+    --u-sidebar-hover: #24476B;
+    --u-sidebar-active: #2A527A;
+    --u-background: #F4F7FB;
+    --u-surface: #FFFFFF;
+    --u-surface-soft: #F3F6FA;
+    --u-border: #DFE7EF;
+    --u-border-strong: #CCD9E5;
+    --u-text: #40566E;
+    --u-heading: #244B70;
+    --u-muted: #75869A;
+    --u-success: #2E8069;
+    --u-warning: #B17C39;
+    --u-danger: #B85761;
+    --u-purple: #7362A1;
+    --u-radius: 10px;
+    --u-shadow: 0 3px 12px rgba(25, 58, 90, .055);
+}
+
+/* =========================================================
+   1. HEADER
+   ========================================================= */
+
+.uneti-header {
+    background: var(--u-header) !important;
+    color: #FFFFFF !important;
+    border-bottom: 1px solid #194A7C !important;
+    box-shadow: 0 2px 9px rgba(17, 45, 75, .13) !important;
+}
+
+    .uneti-header,
+    .uneti-header a,
+    .uneti-header span,
+    .uneti-header strong,
+    .uneti-header .navbar-brand {
+        color: #FFFFFF !important;
+    }
+
+        .uneti-header a {
+            text-decoration: none;
+        }
+
+            .uneti-header a:hover {
+                color: #E2EDF8 !important;
+            }
+
+        .uneti-header i,
+        .uneti-header svg {
+            color: #FFFFFF !important;
+        }
+
+        .uneti-header .btn,
+        .uneti-header .logout-btn {
+            color: #FFFFFF !important;
+            background: rgba(255, 255, 255, .10) !important;
+            border: 1px solid rgba(255, 255, 255, .55) !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+            transition: background-color .2s ease;
+        }
+
+            .uneti-header .btn:hover,
+            .uneti-header .logout-btn:hover {
+                color: #FFFFFF !important;
+                background: rgba(255, 255, 255, .20) !important;
+                border-color: #FFFFFF !important;
+            }
+
+/* =========================================================
+   2. SIDEBAR
+   ========================================================= */
+
+.uneti-sidebar {
+    background: var(--u-sidebar) !important;
+    color: #E4EDF6 !important;
+    border-right: 1px solid #1D3C5D !important;
+}
+
+    .uneti-sidebar .sidebar-brand,
+    .uneti-sidebar .sidebar-header {
+        background: #152F50 !important;
+        border-bottom: 1px solid #31516F !important;
+    }
+
+        .uneti-sidebar .sidebar-brand *,
+        .uneti-sidebar .sidebar-header * {
+            color: #FFFFFF !important;
+        }
+
+    .uneti-sidebar .sidebar-section-title,
+    .uneti-sidebar .sidebar-group-title,
+    .uneti-sidebar .menu-title {
+        color: #A9BFD5 !important;
+        font-size: 11px;
+        font-weight: 600 !important;
+        letter-spacing: .7px;
+        text-transform: uppercase;
+    }
+
+    .uneti-sidebar a {
+        color: #E0EAF4 !important;
+        font-weight: 500 !important;
+        text-decoration: none;
+        transition: background-color .2s ease, color .2s ease;
+    }
+
+        .uneti-sidebar a:hover {
+            background: var(--u-sidebar-hover) !important;
+            color: #FFFFFF !important;
+        }
+
+        .uneti-sidebar a.active,
+        .uneti-sidebar .nav-link.active,
+        .uneti-sidebar .sidebar-link.active {
+            background: var(--u-sidebar-active) !important;
+            color: #FFFFFF !important;
+            border-left: 3px solid #8CB8DF !important;
+            font-weight: 600 !important;
+        }
+
+        .uneti-sidebar a i,
+        .uneti-sidebar a svg {
+            color: #B9CDE0 !important;
+        }
+
+        .uneti-sidebar a:hover i,
+        .uneti-sidebar a.active i,
+        .uneti-sidebar a:hover svg,
+        .uneti-sidebar a.active svg {
+            color: #FFFFFF !important;
+        }
+
+    .uneti-sidebar .sidebar-footer {
+        background: #122B49 !important;
+        border-top: 1px solid #31516F !important;
+        color: #B9CDE0 !important;
+    }
+
+/* =========================================================
+   3. MAIN CONTENT
+   ========================================================= */
+
+.uneti-main {
+    background: var(--u-background) !important;
+    color: var(--u-text);
+    font-size: 13px;
+}
+
+.uneti-main-inner {
+    color: var(--u-text);
+}
+
+/* =========================================================
+   4. PAGE TITLES
+   ========================================================= */
+
+.uneti-main .page-title,
+.uneti-main .uneti-page-title {
+    color: var(--u-heading);
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.uneti-main .page-description {
+    color: var(--u-muted);
+    font-size: 12.5px;
+    line-height: 1.6;
+}
+
+/* =========================================================
+   5. CONTENT CARDS
+   ========================================================= */
+
+.uneti-main .content-card,
+.uneti-main .uneti-card {
+    background: var(--u-surface);
+    border: 1px solid var(--u-border);
+    border-radius: var(--u-radius);
+    box-shadow: var(--u-shadow);
+}
+
+.uneti-main .uneti-card-header {
+    padding: 15px 18px;
+    background: var(--u-surface-soft);
+    border-bottom: 1px solid var(--u-border);
+    color: var(--u-heading);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.uneti-main .uneti-card-body {
+    padding: 20px;
+}
+
+/* =========================================================
+   6. FORMS
+   ========================================================= */
+
+.uneti-main .form-label {
+    color: #46617C;
+    font-size: 12.5px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.uneti-main .form-control,
+.uneti-main .form-select {
+    min-height: 36px;
+    padding: 7px 11px;
+    border: 1px solid #D8E2EC;
+    border-radius: 8px;
+    background-color: #FFFFFF;
+    color: var(--u-text);
+    font-size: 12.5px;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+    .uneti-main .form-control:focus,
+    .uneti-main .form-select:focus {
+        border-color: #7CA7CC;
+        box-shadow: 0 0 0 .16rem rgba(32, 85, 141, .11);
+        outline: none;
+    }
+
+    .uneti-main .form-control::placeholder {
+        color: #96A5B5;
+    }
+
+.uneti-main textarea.form-control {
+    min-height: 100px;
+    height: auto;
+}
+
+.uneti-main .form-check-input {
+    border-color: #B6C9D9;
+}
+
+    .uneti-main .form-check-input:checked {
+        background-color: var(--u-primary);
+        border-color: var(--u-primary);
+    }
+
+    .uneti-main .form-check-input:focus {
+        box-shadow: 0 0 0 .15rem rgba(32, 85, 141, .15);
+    }
+
+.uneti-main .field-validation-error,
+.uneti-main .text-danger {
+    color: var(--u-danger) !important;
+    font-size: 12px;
+}
+
+/* =========================================================
+   7. BUTTONS
+   ========================================================= */
+
+.uneti-main .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 13px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color .2s ease, border-color .2s ease, color .2s ease;
+}
+
+.uneti-main .btn-main,
+.uneti-main .btn-primary {
+    background: var(--u-primary);
+    color: #FFFFFF;
+    border: 1px solid var(--u-primary);
+}
+
+    .uneti-main .btn-main:hover,
+    .uneti-main .btn-primary:hover {
+        background: var(--u-primary-hover);
+        border-color: var(--u-primary-hover);
+        color: #FFFFFF;
+    }
+
+.uneti-main .btn-outline-secondary {
+    background: #FFFFFF;
+    color: #60758A;
+    border: 1px solid #C9D6E2;
+}
+
+    .uneti-main .btn-outline-secondary:hover {
+        background: #EDF3F8;
+        border-color: #AFC4D7;
+        color: var(--u-heading);
+    }
+
+.uneti-main .btn-danger {
+    background: var(--u-danger);
+    border-color: var(--u-danger);
+    color: #FFFFFF;
+}
+
+    .uneti-main .btn-danger:hover {
+        background: #A74751;
+        border-color: #A74751;
+        color: #FFFFFF;
+    }
+
+.uneti-main .btn-success {
+    background: var(--u-success);
+    border-color: var(--u-success);
+    color: #FFFFFF;
+}
+
+    .uneti-main .btn-success:hover {
+        background: #236B57;
+        border-color: #236B57;
+        color: #FFFFFF;
+    }
+
+/* =========================================================
+   8. FILTER BAR
+   ========================================================= */
+
+.uneti-main .uneti-filter-bar {
+    background: #FFFFFF;
+    border: 1px solid var(--u-border);
+    border-radius: var(--u-radius);
+    padding: 16px;
+    margin-bottom: 18px;
+}
+
+.uneti-main .uneti-filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* =========================================================
+   9. TABLES
+   ========================================================= */
+
+.uneti-main .table,
+.uneti-main .uneti-table {
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 12.5px;
+    color: var(--u-text);
+}
+
+    .uneti-main .table thead th,
+    .uneti-main .uneti-table thead th {
+        background: #EAF1F8;
+        color: #315779;
+        font-weight: 700;
+        padding: 11px 10px;
+        border-bottom: 1px solid #D7E3EE;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    .uneti-main .table tbody td,
+    .uneti-main .uneti-table tbody td {
+        padding: 10px;
+        border-bottom: 1px solid #E9EEF4;
+        color: #40566E;
+        vertical-align: middle;
+    }
+
+    .uneti-main .table tbody tr:hover,
+    .uneti-main .uneti-table tbody tr:hover {
+        background: #F4F8FC;
+    }
+
+/* =========================================================
+   10. ACTION BUTTONS
+   ========================================================= */
+
+.uneti-main .uneti-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+}
+
+    .uneti-main .uneti-actions .btn {
+        display: inline-flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 36px !important;
+        height: 34px !important;
+        min-width: 36px !important;
+        min-height: 34px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #FFFFFF !important;
+        border-radius: 8px !important;
+        box-shadow: none !important;
+    }
+
+    .uneti-main .uneti-actions .btn-outline-primary {
+        color: #20558D !important;
+        border: 1px solid #8EACC8 !important;
+    }
+
+        .uneti-main .uneti-actions .btn-outline-primary:hover {
+            background: #EAF1F8 !important;
+        }
+
+    .uneti-main .uneti-actions .btn-outline-danger {
+        color: #B85761 !important;
+        border: 1px solid #D3A0A5 !important;
+    }
+
+        .uneti-main .uneti-actions .btn-outline-danger:hover {
+            background: #F8EBED !important;
+        }
+
+    .uneti-main .uneti-actions .btn i {
+        font-size: 14px !important;
+        line-height: 1 !important;
+        margin: 0 !important;
+    }
+
+/* =========================================================
+   11. STATUS BADGES
+   ========================================================= */
+
+.uneti-main .uneti-status {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.uneti-main .uneti-status-success {
+    color: #28715C;
+    background: #E7F3EE;
+}
+
+.uneti-main .uneti-status-warning {
+    color: #996A2F;
+    background: #FFF2DE;
+}
+
+.uneti-main .uneti-status-danger {
+    color: #A84953;
+    background: #F9E9EC;
+}
+
+.uneti-main .uneti-status-info {
+    color: #20558D;
+    background: #E7F0F9;
+}
+
+/* =========================================================
+   12. PAGINATION
+   ========================================================= */
+
+.uneti-main .pagination {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+    .uneti-main .pagination .page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 34px;
+        height: 34px;
+        padding: 5px 10px;
+        border: 1px solid #D5E0EA;
+        border-radius: 7px;
+        background: #FFFFFF;
+        color: #20558D;
+        font-size: 12px;
+    }
+
+        .uneti-main .pagination .page-link:hover {
+            background: #EAF1F8;
+            border-color: #B8CDE0;
+            color: #174776;
+        }
+
+    .uneti-main .pagination .page-item.active .page-link {
+        background: #20558D;
+        border-color: #20558D;
+        color: #FFFFFF;
+    }
+
+    .uneti-main .pagination .page-item.disabled .page-link {
+        color: #99A9B9;
+        background: #F5F7FA;
+    }
+
+/* =========================================================
+   13. DETAILS PAGE
+   ========================================================= */
+
+.uneti-main .uneti-details-row {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--u-border);
+}
+
+.uneti-main .uneti-details-label {
+    color: #667C92;
+    font-weight: 600;
+}
+
+.uneti-main .uneti-details-value {
+    color: var(--u-text);
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   14. DELETE CONFIRMATION
+   ========================================================= */
+
+.uneti-main .uneti-delete-warning {
+    background: #FBEFF0;
+    color: #A74751;
+    border: 1px solid #E7BFC3;
+    border-radius: 9px;
+    padding: 15px;
+    margin-bottom: 18px;
+}
+
+.uneti-main .uneti-delete-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+/* =========================================================
+   15. MODALS
+   ========================================================= */
+
+.modal-content {
+    border: 1px solid var(--u-border);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(25, 58, 90, .12);
+}
+
+.modal-header {
+    background: #F2F6FA;
+    border-bottom: 1px solid var(--u-border);
+}
+
+.modal-title {
+    color: var(--u-heading);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--u-border);
+}
+
+/* =========================================================
+   16. STATISTICS PAGE
+   ========================================================= */
+
+.uneti-main .tk-page {
+    color: var(--u-text);
+}
+
+.uneti-main .tk-title {
+    color: #244B70 !important;
+    font-weight: 700 !important;
+}
+
+.uneti-main .tk-section {
+    color: #244B70 !important;
+    font-weight: 700 !important;
+    border-bottom-color: #DFE7EF !important;
+}
+
+.uneti-main .tk-muted {
+    color: #75869A !important;
+}
+
+.uneti-main .tk-filter,
+.uneti-main .tk-options {
+    background: #FAFCFE !important;
+    border-color: #DFE7EF !important;
+}
+
+.uneti-main .tk-card {
+    background: #FFFFFF !important;
+    border-color: #DFE7EF !important;
+    box-shadow: 0 2px 8px rgba(25, 58, 90, .04) !important;
+}
+
+.uneti-main .tk-card-label {
+    color: #687C91 !important;
+    font-weight: 500 !important;
+}
+
+.uneti-main .tk-card-number {
+    font-weight: 700 !important;
+}
+
+/* KPI colors */
+
+.uneti-main .tk-card.navy .tk-card-number {
+    color: #20558D !important;
+}
+
+.uneti-main .tk-card.green .tk-card-number,
+.uneti-main .tk-card.teal .tk-card-number {
+    color: #2E8069 !important;
+}
+
+.uneti-main .tk-card.brown .tk-card-number,
+.uneti-main .tk-card.orange .tk-card-number {
+    color: #B17C39 !important;
+}
+
+.uneti-main .tk-card.purple .tk-card-number {
+    color: #7362A1 !important;
+}
+
+.uneti-main .tk-card.red .tk-card-number {
+    color: #B85761 !important;
+}
+
+/* KPI icons */
+
+.uneti-main .tk-card.navy .tk-card-icon {
+    color: #20558D !important;
+    background: #E7F0F9 !important;
+}
+
+.uneti-main .tk-card.green .tk-card-icon,
+.uneti-main .tk-card.teal .tk-card-icon {
+    color: #2E8069 !important;
+    background: #E7F3EE !important;
+}
+
+.uneti-main .tk-card.brown .tk-card-icon,
+.uneti-main .tk-card.orange .tk-card-icon {
+    color: #B17C39 !important;
+    background: #FFF2DE !important;
+}
+
+.uneti-main .tk-card.purple .tk-card-icon {
+    color: #7362A1 !important;
+    background: #F0ECF8 !important;
+}
+
+.uneti-main .tk-card.red .tk-card-icon {
+    color: #B85761 !important;
+    background: #F9E9EC !important;
+}
+
+/* Statistics charts */
+
+.uneti-main .tk-chart,
+.uneti-main .tk-chart-box {
+    background: #FFFFFF !important;
+    border-color: #DFE7EF !important;
+    box-shadow: 0 2px 8px rgba(25, 58, 90, .035) !important;
+}
+
+    .uneti-main .tk-chart h6,
+    .uneti-main .tk-chart-title {
+        color: #315779 !important;
+        font-weight: 700 !important;
+    }
+
+/* Statistics tables */
+
+.uneti-main .tk-table th {
+    background: #EAF1F8 !important;
+    color: #315779 !important;
+    font-weight: 700 !important;
+}
+
+.uneti-main .tk-table td {
+    color: #40566E !important;
+}
+
+/* Statistics buttons */
+
+.uneti-main .tk-btn {
+    background: #20558D !important;
+    border-color: #20558D !important;
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+}
+
+    .uneti-main .tk-btn:hover {
+        background: #174776 !important;
+        border-color: #174776 !important;
+    }
+
+.uneti-main .tk-export,
+.uneti-main .tk-btn-export {
+    background: #20558D !important;
+    border-color: #20558D !important;
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+}
+
+    .uneti-main .tk-export:hover,
+    .uneti-main .tk-btn-export:hover {
+        background: #174776 !important;
+        border-color: #174776 !important;
+    }
+
+/* Progress */
+
+.uneti-main .tk-progress {
+    background: #E7EEF5 !important;
+}
+
+    .uneti-main .tk-progress > div,
+    .uneti-main .tk-progress-fill {
+        background: #2E8069 !important;
+    }
+
+/* =========================================================
+   17. RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .uneti-main .page-title,
+    .uneti-main .uneti-page-title {
+        font-size: 18px;
+    }
+
+    .uneti-main .uneti-card-body {
+        padding: 14px;
+    }
+
+    .uneti-main .uneti-details-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    .uneti-main .uneti-filter-bar {
+        padding: 12px;
+    }
+
+    .uneti-main .tk-card-number {
+        font-size: 24px;
+    }
+}
+
+/* =========================================================
+   18. PRINT REPORT - A4
+   ========================================================= */
+
+@media print {
+
+    @page {
+        size: A4 portrait;
+        margin: 14mm;
+    }
+
+    html,
+    body {
+        background: #FFFFFF !important;
+        color: #111111 !important;
+        font-family: "Times New Roman", serif !important;
+        overflow: visible !important;
+        height: auto !important;
+    }
+
+    .uneti-header,
+    .uneti-sidebar,
+    .sidebar-navigation,
+    .sidebar-footer,
+    .uneti-mobile-toggle,
+    .modal,
+    .modal-backdrop {
+        display: none !important;
+    }
+
+    .uneti-main,
+    .uneti-main-inner {
+        position: static !important;
+        width: 100% !important;
+        max-width: none !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        background: #FFFFFF !important;
+        color: #111111 !important;
+    }
+
+        .uneti-main .content-card,
+        .uneti-main .uneti-card {
+            background: #FFFFFF !important;
+            box-shadow: none !important;
+        }
+
+    /* Hide web statistics when printing */
+
+    body:has(#tkPrintArea) .tk-screen {
+        display: none !important;
+    }
+
+    body:has(#tkPrintArea) #tkPrintArea {
+        display: block !important;
+        width: 100% !important;
+        color: #111111 !important;
+        background: #FFFFFF !important;
+        font-family: "Times New Roman", serif !important;
+    }
+
+    #tkPrintArea .tk-print-head {
+        text-align: center;
+        margin-bottom: 24px;
+    }
+
+        #tkPrintArea .tk-print-head h2 {
+            font-size: 17pt;
+            font-weight: bold;
+            color: #111111 !important;
+            margin: 20px 0 12px;
+        }
+
+    #tkPrintArea .tk-print-section {
+        margin-top: 20px;
+    }
+
+        #tkPrintArea .tk-print-section h3 {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #111111 !important;
+            margin-bottom: 10px;
+            break-after: avoid;
+        }
+
+    #tkPrintArea .tk-print-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10pt;
+    }
+
+        #tkPrintArea .tk-print-table th,
+        #tkPrintArea .tk-print-table td {
+            border: 1px solid #333333 !important;
+            padding: 6px;
+            color: #111111 !important;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+        }
+
+        #tkPrintArea .tk-print-table thead {
+            display: table-header-group;
+        }
+
+        #tkPrintArea .tk-print-table tr {
+            break-inside: avoid;
+        }
+
+    #tkPrintArea .tk-print-chart {
+        display: block;
+        max-width: 100%;
+        max-height: 230px;
+        object-fit: contain;
+        margin: 10px auto;
+    }
+
+    #tkPrintArea .tk-print-signature {
+        text-align: right;
+        margin-top: 30px;
+        break-inside: avoid;
+    }
+
+        #tkPrintArea .tk-print-signature > div {
+            display: inline-block;
+            width: 45%;
+            text-align: center;
+        }
+
+    /* Other printable reports */
+
+    .report-print-area .no-print,
+    .report-print-area form,
+    .report-print-area .uneti-filter-bar {
+        display: none !important;
+    }
+
+    .report-print-area table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 10pt !important;
+    }
+
+    .report-print-area th,
+    .report-print-area td {
+        border: 1px solid #555555 !important;
+        padding: 6px !important;
+        color: #111111 !important;
+    }
+
+    .report-print-area thead {
+        display: table-header-group;
+    }
+
+    .report-print-area tr {
+        break-inside: avoid;
+    }
+}

@@ -1,24 +1,293 @@
-@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.ViewModels.TaiKhoan.TaiKhoanEditViewModel
-@{ ViewData["Title"] = "Sửa tài khoản"; }
-<div class="form-page-wrap">
-<div class="page-card form-card">
-    <div class="page-card-header"><div><h4>Sửa thông tin tài khoản</h4><small class="text-secondary">Để trống mật khẩu mới nếu không muốn đổi mật khẩu</small></div></div>
-    <div class="page-card-body">
-        <form asp-action="Edit" asp-route-id="@Model.MaTaiKhoan" method="post">
-            <input type="hidden" asp-for="MaTaiKhoan" />
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-            <div class="form-grid">
-                <div><label asp-for="TenDangNhap" class="form-label"></label><input asp-for="TenDangNhap" class="form-control" /><span asp-validation-for="TenDangNhap" class="text-danger"></span></div>
-                <div><label asp-for="HoTen" class="form-label"></label><input asp-for="HoTen" class="form-control" /><span asp-validation-for="HoTen" class="text-danger"></span></div>
-                <div><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" /><span asp-validation-for="Email" class="text-danger"></span></div>
-                <div><label asp-for="VaiTro" class="form-label"></label><select asp-for="VaiTro" class="form-select"><option value="SinhVien">Sinh viên</option><option value="Admin">Admin</option></select><span asp-validation-for="VaiTro" class="text-danger"></span></div>
-                <div><label asp-for="MatKhauMoi" class="form-label"></label><input asp-for="MatKhauMoi" class="form-control" placeholder="Không đổi thì để trống" /><span asp-validation-for="MatKhauMoi" class="text-danger"></span></div>
-                <div><label asp-for="XacNhanMatKhauMoi" class="form-label"></label><input asp-for="XacNhanMatKhauMoi" class="form-control" /><span asp-validation-for="XacNhanMatKhauMoi" class="text-danger"></span></div>
+﻿@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers.TaiKhoanForm
+
+@{
+    ViewData["Title"] = "Chỉnh sửa tài khoản";
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+
+        <div class="mb-4">
+            <h2 class="page-title mb-1">
+                <i class="fa-solid fa-pen me-2"></i>
+                Chỉnh sửa tài khoản
+            </h2>
+
+            <p class="page-description mb-0">
+                Cập nhật thông tin và quyền truy cập hệ thống
+            </p>
+        </div>
+
+        <form asp-controller="TaiKhoan"
+              asp-action="Edit"
+              asp-route-id="@Model.MaTaiKhoan"
+              method="post"
+              id="formSuaTaiKhoan">
+
+            @Html.AntiForgeryToken()
+
+            <input asp-for="MaTaiKhoan" type="hidden" />
+
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger mb-3"></div>
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">Mã tài khoản</label>
+                    <input class="form-control"
+                           value="@Model.MaTaiKhoan"
+                           readonly />
+                </div>
+
+                <div class="col-md-8">
+                    <label asp-for="TenDangNhap" class="form-label">
+                        Tên đăng nhập
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="TenDangNhap"
+                           class="form-control"
+                           autocomplete="username" />
+
+                    <span asp-validation-for="TenDangNhap"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="HoTen" class="form-label">
+                        Họ và tên
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="HoTen"
+                           class="form-control" />
+
+                    <span asp-validation-for="HoTen"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Email" class="form-label">
+                        Email
+                    </label>
+
+                    <input asp-for="Email"
+                           type="email"
+                           class="form-control" />
+
+                    <span asp-validation-for="Email"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="VaiTro" class="form-label">
+                        Vai trò
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <select asp-for="VaiTro" class="form-select">
+                        <option value="SinhVien">Sinh viên</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+
+                    <span asp-validation-for="VaiTro"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="MatKhau" class="form-label">
+                        Mật khẩu mới
+                    </label>
+
+                    <div class="input-group">
+                        <input asp-for="MatKhau"
+                               type="password"
+                               id="MatKhau"
+                               class="form-control"
+                               minlength="6"
+                               maxlength="100"
+                               autocomplete="new-password"
+                               placeholder="Để trống nếu không đổi mật khẩu" />
+
+                        <button type="button"
+                                id="btnHienMatKhau"
+                                class="btn btn-outline-secondary"
+                                title="Hiện hoặc ẩn mật khẩu">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+
+                    <span asp-validation-for="MatKhau"
+                          class="text-danger"></span>
+
+                    <small class="text-muted">
+                        Chỉ nhập nếu muốn đặt mật khẩu mới.
+                    </small>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label d-block">
+                        Trạng thái
+                    </label>
+
+                    <div class="form-check form-check-inline">
+                        <input asp-for="TrangThai"
+                               type="radio"
+                               value="true"
+                               id="editHoatDong"
+                               class="form-check-input" />
+
+                        <label for="editHoatDong"
+                               class="form-check-label">
+                            Hoạt động
+                        </label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                        <input asp-for="TrangThai"
+                               type="radio"
+                               value="false"
+                               id="editDaKhoa"
+                               class="form-check-input" />
+
+                        <label for="editDaKhoa"
+                               class="form-check-label">
+                            Đã khóa
+                        </label>
+                    </div>
+
+                    <span asp-validation-for="TrangThai"
+                          class="text-danger d-block"></span>
+                </div>
+
             </div>
-            <div class="form-check my-4"><input asp-for="TrangThai" class="form-check-input" /><label asp-for="TrangThai" class="form-check-label">Tài khoản hoạt động</label><span asp-validation-for="TrangThai" class="text-danger d-block"></span></div>
-            <div class="d-flex gap-2"><a asp-action="Index" class="btn-soft">Hủy</a><button type="submit" class="btn-main">Lưu thay đổi</button></div>
+
+            <hr class="my-4" />
+
+            <div class="d-flex justify-content-end gap-2 flex-wrap">
+
+                <a asp-controller="TaiKhoan"
+                   asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Quay lại
+                </a>
+
+                <button type="button"
+                        id="btnMoSuaTaiKhoan"
+                        class="btn btn-main">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Cập nhật tài khoản
+                </button>
+
+            </div>
+
         </form>
+
     </div>
 </div>
+
+<!-- MODAL XAC NHAN -->
+
+<div class="modal fade"
+     id="modalSuaTaiKhoan"
+     tabindex="-1"
+     aria-labelledby="tieuDeSuaTaiKhoan"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="tieuDeSuaTaiKhoan">
+                    <i class="fa-solid fa-circle-question me-2"></i>
+                    Xác nhận cập nhật
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Đóng"></button>
+            </div>
+
+            <div class="modal-body">
+                Bạn có chắc chắn muốn cập nhật tài khoản
+                <strong>@Model.TenDangNhap</strong>?
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                    Hủy
+                </button>
+
+                <button type="button"
+                        id="btnXacNhanSuaTaiKhoan"
+                        class="btn btn-main">
+                    <i class="fa-solid fa-check"></i>
+                    Xác nhận
+                </button>
+
+            </div>
+
+        </div>
+    </div>
 </div>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form = document.getElementById("formSuaTaiKhoan");
+            const btnMo = document.getElementById("btnMoSuaTaiKhoan");
+            const btnXacNhan = document.getElementById("btnXacNhanSuaTaiKhoan");
+            const modalElement = document.getElementById("modalSuaTaiKhoan");
+
+            const inputMatKhau = document.getElementById("MatKhau");
+            const btnHienMatKhau = document.getElementById("btnHienMatKhau");
+
+            if (inputMatKhau && btnHienMatKhau) {
+                btnHienMatKhau.addEventListener("click", function () {
+
+                    const hien = inputMatKhau.type === "password";
+                    inputMatKhau.type = hien ? "text" : "password";
+
+                    btnHienMatKhau.querySelector("i").className =
+                        hien ? "fa-solid fa-eye-slash" : "fa-solid fa-eye";
+
+                });
+            }
+
+            if (!form || !btnMo || !btnXacNhan || !modalElement) {
+                return;
+            }
+
+            btnMo.addEventListener("click", function () {
+
+                if (window.jQuery &&
+                    typeof window.jQuery.fn.valid === "function") {
+
+                    if (!window.jQuery(form).valid()) return;
+
+                } else if (!form.reportValidity()) {
+                    return;
+                }
+
+                bootstrap.Modal.getOrCreateInstance(modalElement).show();
+
+            });
+
+            btnXacNhan.addEventListener("click", function () {
+                btnXacNhan.disabled = true;
+                form.requestSubmit();
+            });
+
+        });
+    </script>
+}

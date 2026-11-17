@@ -1,0 +1,108 @@
+﻿
+/* UNETI COMPACT - hien thi 100% */
+:root {
+    --uneti-compact-font: 13px;
+}
+
+.content-card,
+.gv-create-card,
+.uneti-index .card,
+body:has(.uneti-index-marker) .card {
+    border-radius: 12px !important;
+}
+
+.page-title,
+.sv-title,
+.uneti-index .page-title,
+body:has(.uneti-index-marker) .page-title {
+    font-size: 20px !important;
+}
+
+.content-card .table,
+.uneti-index .table,
+body:has(.uneti-index-marker) .table,
+.sv-table {
+    font-size: 12.5px !important;
+}
+
+    .content-card .table th,
+    .content-card .table td,
+    .uneti-index .table th,
+    .uneti-index .table td,
+    body:has(.uneti-index-marker) .table th,
+    body:has(.uneti-index-marker) .table td,
+    .sv-table th,
+    .sv-table td {
+        padding: 9px 10px !important;
+    }
+
+.content-card .form-control,
+.content-card .form-select,
+.uneti-index .form-control,
+.uneti-index .form-select,
+body:has(.uneti-index-marker) .form-control,
+body:has(.uneti-index-marker) .form-select,
+.sv-filter .form-control,
+.sv-filter .form-select {
+    min-height: 35px !important;
+    height: 35px;
+    padding: 5px 10px;
+    font-size: 12.5px !important;
+    border-radius: 8px !important;
+}
+
+.content-card .btn,
+.uneti-index .btn,
+body:has(.uneti-index-marker) .btn,
+.sv-btn-primary {
+    font-size: 12px !important;
+    padding: 7px 11px !important;
+    border-radius: 8px !important;
+}
+
+.content-card .btn-sm,
+.uneti-index .btn-sm,
+body:has(.uneti-index-marker) .btn-sm {
+    padding: 5px 8px !important;
+}
+
+.sv-stat,
+.tk-stat {
+    padding: 14px !important;
+    border-radius: 12px !important;
+}
+
+.sv-stat-value {
+    font-size: 22px !important;
+}
+
+.sv-stat-icon {
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 18px !important;
+}
+
+.sv-action {
+    width: 29px !important;
+    height: 29px !important;
+    padding: 0 !important;
+}
+
+.sv-status-active,
+.sv-status-locked,
+.status-active,
+.status-stop,
+.uneti-index .badge {
+    font-size: 11px !important;
+    padding: 5px 9px !important;
+}
+
+.uneti-index .card-header {
+    padding: 11px 15px !important;
+}
+
+.uneti-index .pagination .page-link,
+body:has(.uneti-index-marker) .pagination .page-link {
+    font-size: 12px !important;
+    padding: 5px 9px !important;
+}

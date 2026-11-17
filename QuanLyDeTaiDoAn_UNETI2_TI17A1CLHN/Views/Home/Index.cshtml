@@ -1,26 +1,703 @@
-@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.ViewModels.HomeDashboardViewModel
+
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.DashboardViewModel
+@using System.Text.Json
+
 @{
-    ViewData["Title"] = "Trang chủ";
-    var hoTen = Context.Session.GetString("HoTen") ?? "Người dùng";
-    var vaiTro = Context.Session.GetString("VaiTro");
-    bool laAdmin = vaiTro == "Admin";
+    ViewData["Title"] = "Trang chủ quản trị";
+
+    var linhVucLabels = Model.DeTaiTheoLinhVuc
+        .Select(x => x.TenLinhVuc).ToList();
+
+    var linhVucValues = Model.DeTaiTheoLinhVuc
+        .Select(x => x.SoLuong).ToList();
+
+    var namHocLabels = Model.DangKyTheoNamHoc
+        .Select(x => x.NamHoc).ToList();
+
+    var namHocValues = Model.DangKyTheoNamHoc
+        .Select(x => x.SoLuong).ToList();
+
+    var danhMuc = new[]
+    {
+        new { Ten = "Tài khoản", So = Model.TongTaiKhoan,
+              Icon = "fa-users-gear", Mau = "navy",
+              Controller = "TaiKhoan" },
+
+        new { Ten = "Lĩnh vực", So = Model.TongLinhVuc,
+              Icon = "fa-layer-group", Mau = "teal",
+              Controller = "LinhVuc" },
+
+        new { Ten = "Giảng viên", So = Model.TongGiangVien,
+              Icon = "fa-chalkboard-user", Mau = "purple",
+              Controller = "GiangVien" },
+
+        new { Ten = "Sinh viên", So = Model.TongSinhVien,
+              Icon = "fa-user-graduate", Mau = "orange",
+              Controller = "SinhVien" },
+
+        new { Ten = "Đề tài", So = Model.TongDeTai,
+              Icon = "fa-book-open", Mau = "navy",
+              Controller = "DeTai" }
+    };
+
+    var dangKy = new[]
+    {
+        new { Ten = "Chờ duyệt", So = Model.DangKyChoDuyet,
+              Icon = "fa-clock", Mau = "orange" },
+
+        new { Ten = "Đã duyệt", So = Model.DangKyDaDuyet,
+              Icon = "fa-circle-check", Mau = "teal" }
+    };
+
+    var phanCong = new[]
+    {
+        new { Ten = "Sinh viên có GVHD", So = Model.SinhVienCoGVHD,
+              Icon = "fa-user-check", Mau = "teal" },
+
+        new { Ten = "GV đạt giới hạn", So = Model.GiangVienDatGioiHan,
+              Icon = "fa-users", Mau = "purple" }
+    };
+
+    var sucChua = new[]
+    {
+        new { Ten = "Đề tài còn chỗ", So = Model.DeTaiConCho,
+              Icon = "fa-door-open", Mau = "teal" },
+
+        new { Ten = "Đề tài đủ số lượng", So = Model.DeTaiDuSoLuong,
+              Icon = "fa-lock", Mau = "orange" }
+    };
 }
-@if (laAdmin)
-{
-    <div class="dashboard-welcome"><div><span class="eyebrow">ADMIN DASHBOARD</span><h2>Xin chào, @hoTen!</h2><p>Đây là tổng quan riêng của Module 1.</p></div></div>
-    <div class="stats-grid">
-        <div class="stat-card stat-blue"><div class="stat-title">Tổng tài khoản</div><div class="stat-number">@Model.TongTaiKhoan</div><div class="stat-description">Tất cả tài khoản hệ thống</div></div>
-        <div class="stat-card stat-green"><div class="stat-title">Đang hoạt động</div><div class="stat-number">@Model.TaiKhoanHoatDong</div><div class="stat-description">Có thể đăng nhập</div></div>
-        <div class="stat-card stat-red"><div class="stat-title">Tài khoản khóa</div><div class="stat-number">@Model.TaiKhoanBiKhoa</div><div class="stat-description">Không được đăng nhập</div></div>
-        <div class="stat-card stat-purple"><div class="stat-title">Lĩnh vực</div><div class="stat-number">@Model.TongLinhVuc</div><div class="stat-description">@Model.LinhVucHoatDong đang hoạt động</div></div>
+
+<style>
+    .home-dashboard {
+        color: #334155;
+    }
+
+    .home-dashboard .home-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 26px;
+    }
+
+    .home-dashboard .home-title {
+        font-size: 25px;
+        font-weight: 750;
+        color: #183e68;
+        margin-bottom: 6px;
+    }
+
+    .home-dashboard .home-subtitle {
+        color: #718096;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .home-dashboard .group-section {
+        margin-bottom: 26px;
+    }
+
+    .home-dashboard .group-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 14px;
+        padding-bottom: 11px;
+        border-bottom: 1px solid #e4eaf1;
+    }
+
+    .home-dashboard .group-heading h3 {
+        font-size: 17px;
+        font-weight: 700;
+        color: #244765;
+        margin: 0;
+    }
+
+    .home-dashboard .group-heading h3 i {
+        color: #52748e;
+        margin-right: 8px;
+    }
+
+    .home-dashboard .group-heading a {
+        font-size: 13px;
+        text-decoration: none;
+        color: #456b87;
+        font-weight: 600;
+    }
+
+    .home-dashboard .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .home-dashboard .metric-card {
+        background: #ffffff;
+        border: 1px solid #e4eaf1;
+        border-radius: 12px;
+        padding: 19px;
+        min-height: 124px;
+        box-shadow: 0 3px 12px rgba(30,55,80,.035);
+        transition: transform .15s, box-shadow .15s;
+    }
+
+    .home-dashboard a.metric-card {
+        text-decoration: none;
+        display: block;
+        color: inherit;
+    }
+
+    .home-dashboard a.metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 20px rgba(30,55,80,.09);
+    }
+
+    .home-dashboard .metric-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .home-dashboard .metric-label {
+        color: #65758a;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .home-dashboard .metric-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 16px;
+    }
+
+    .home-dashboard .metric-number {
+        margin-top: 13px;
+        font-size: 29px;
+        line-height: 1.2;
+        font-weight: 750;
+        letter-spacing: -.5px;
+    }
+
+    .home-dashboard .metric-card.navy .metric-number {
+        color: #244765;
+    }
+
+    .home-dashboard .metric-card.navy .metric-icon {
+        color: #315e82;
+        background: #eaf0f6;
+    }
+
+    .home-dashboard .metric-card.teal .metric-number {
+        color: #267568;
+    }
+
+    .home-dashboard .metric-card.teal .metric-icon {
+        color: #267568;
+        background: #e6f3ef;
+    }
+
+    .home-dashboard .metric-card.purple .metric-number {
+        color: #735b87;
+    }
+
+    .home-dashboard .metric-card.purple .metric-icon {
+        color: #735b87;
+        background: #f0ebf5;
+    }
+
+    .home-dashboard .metric-card.orange .metric-number {
+        color: #a36b38;
+    }
+
+    .home-dashboard .metric-card.orange .metric-icon {
+        color: #a36b38;
+        background: #f8efe5;
+    }
+
+    .home-dashboard .chart-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .home-dashboard .home-panel {
+        border: 1px solid #e4eaf1;
+        border-radius: 12px;
+        background: white;
+        overflow: hidden;
+    }
+
+    .home-dashboard .panel-heading {
+        padding: 17px 20px;
+        border-bottom: 1px solid #edf1f5;
+        font-size: 15px;
+        font-weight: 700;
+        color: #244765;
+    }
+
+    .home-dashboard .chart-area {
+        height: 300px;
+        position: relative;
+        padding: 18px;
+    }
+
+    .home-dashboard .empty-message {
+        text-align: center;
+        padding: 45px 12px;
+        color: #8492a2;
+    }
+
+    .home-dashboard .table thead th {
+        background: #f4f7fa;
+        color: #52677d;
+        font-size: 13px;
+        font-weight: 650;
+        white-space: nowrap;
+        padding: 13px;
+    }
+
+    .home-dashboard .table tbody td {
+        padding: 13px;
+        color: #45576b;
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .home-dashboard .table a {
+        color: #315f7c;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .home-dashboard .status {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #52677d;
+        background: #eef2f6;
+    }
+
+    .home-dashboard .status.open {
+        color: #267568;
+        background: #e6f3ef;
+    }
+
+    .home-dashboard .status.closed {
+        color: #a36b38;
+        background: #f8efe5;
+    }
+
+    @@media (max-width: 1100px) {
+        .home-dashboard .metric-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 760px) {
+        .home-dashboard .chart-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 520px) {
+        .home-dashboard .metric-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .home-dashboard .home-title {
+            font-size: 21px;
+        }
+    }
+</style>
+
+<div class="content-card">
+    <div class="p-3 p-lg-4 home-dashboard">
+
+        <!-- TIÊU ĐỀ -->
+        <div class="home-header">
+            <div>
+                <h2 class="home-title">
+                    <i class="fa-solid fa-house me-2"></i>
+                    Tổng quan hệ thống
+                </h2>
+                <p class="home-subtitle">
+                    Quản lý đề tài đồ án và phân công giảng viên hướng dẫn UNETI
+                </p>
+            </div>
+
+            <a asp-controller="ThongKe"
+               asp-action="Index"
+               class="btn btn-outline-primary">
+                <i class="fa-solid fa-chart-column me-1"></i>
+                Xem báo cáo
+            </a>
+        </div>
+
+        <!-- NHÓM 1: DANH MỤC -->
+        <section class="group-section">
+            <div class="group-heading">
+                <h3>
+                    <i class="fa-solid fa-folder-open"></i>
+                    1. Quản lý danh mục
+                </h3>
+            </div>
+
+            <div class="metric-grid">
+                @foreach (var item in danhMuc)
+                {
+                    <a asp-controller="@item.Controller"
+                       asp-action="Index"
+                       class="metric-card @item.Mau">
+
+                        <div class="metric-top">
+                            <span class="metric-label">
+                                @item.Ten
+                            </span>
+                            <span class="metric-icon">
+                                <i class="fa-solid @item.Icon"></i>
+                            </span>
+                        </div>
+
+                        <div class="metric-number">
+                            @item.So
+                        </div>
+                    </a>
+                }
+            </div>
+        </section>
+
+        <!-- NHÓM 2: ĐĂNG KÝ -->
+        <section class="group-section">
+            <div class="group-heading">
+                <h3>
+                    <i class="fa-solid fa-clipboard-list"></i>
+                    2. Quản lý đăng ký đề tài
+                </h3>
+
+                <a asp-controller="DuyetDangKy"
+                   asp-action="Index">
+                    Xem đăng ký
+                    <i class="fa-solid fa-angle-right ms-1"></i>
+                </a>
+            </div>
+
+            <div class="metric-grid">
+                @foreach (var item in dangKy)
+                {
+                    <div class="metric-card @item.Mau">
+                        <div class="metric-top">
+                            <span class="metric-label">@item.Ten</span>
+                            <span class="metric-icon">
+                                <i class="fa-solid @item.Icon"></i>
+                            </span>
+                        </div>
+                        <div class="metric-number">@item.So</div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <!-- NHÓM 3: PHÂN CÔNG -->
+        <section class="group-section">
+            <div class="group-heading">
+                <h3>
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    3. Phân công giảng viên hướng dẫn
+                </h3>
+
+                <a asp-controller="PhanCong"
+                   asp-action="Index">
+                    Xem phân công
+                    <i class="fa-solid fa-angle-right ms-1"></i>
+                </a>
+            </div>
+
+            <div class="metric-grid">
+                @foreach (var item in phanCong)
+                {
+                    <div class="metric-card @item.Mau">
+                        <div class="metric-top">
+                            <span class="metric-label">@item.Ten</span>
+                            <span class="metric-icon">
+                                <i class="fa-solid @item.Icon"></i>
+                            </span>
+                        </div>
+                        <div class="metric-number">@item.So</div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <!-- NHÓM 4: SỨC CHỨA -->
+        <section class="group-section">
+            <div class="group-heading">
+                <h3>
+                    <i class="fa-solid fa-book-open"></i>
+                    4. Tình trạng đề tài
+                </h3>
+
+                <a asp-controller="DeTai"
+                   asp-action="Index">
+                    Xem đề tài
+                    <i class="fa-solid fa-angle-right ms-1"></i>
+                </a>
+            </div>
+
+            <div class="metric-grid">
+                @foreach (var item in sucChua)
+                {
+                    <div class="metric-card @item.Mau">
+                        <div class="metric-top">
+                            <span class="metric-label">@item.Ten</span>
+                            <span class="metric-icon">
+                                <i class="fa-solid @item.Icon"></i>
+                            </span>
+                        </div>
+                        <div class="metric-number">@item.So</div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <!-- NHÓM 5: BIỂU ĐỒ -->
+        <section class="group-section">
+            <div class="group-heading">
+                <h3>
+                    <i class="fa-solid fa-chart-pie"></i>
+                    5. Biểu đồ thống kê
+                </h3>
+            </div>
+
+            <div class="chart-grid">
+
+                <div class="home-panel">
+                    <div class="panel-heading">
+                        Đề tài theo lĩnh vực
+                    </div>
+                    <div class="chart-area">
+                        @if (Model.DeTaiTheoLinhVuc.Any())
+                        {
+                            <canvas id="homeLinhVucChart"></canvas>
+                        }
+                        else
+                        {
+                            <div class="empty-message">
+                                Chưa có dữ liệu đề tài.
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="home-panel">
+                    <div class="panel-heading">
+                        Đăng ký theo năm học
+                    </div>
+                    <div class="chart-area">
+                        @if (Model.DangKyTheoNamHoc.Any())
+                        {
+                            <canvas id="homeNamHocChart"></canvas>
+                        }
+                        else
+                        {
+                            <div class="empty-message">
+                                Chưa có dữ liệu đăng ký.
+                            </div>
+                        }
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- NHÓM 6: ĐỀ TÀI MỚI -->
+        <section class="group-section mb-0">
+            <div class="group-heading">
+                <h3>
+                    <i class="fa-solid fa-list"></i>
+                    6. Đề tài mới nhất
+                </h3>
+
+                <a asp-controller="DeTai"
+                   asp-action="Index">
+                    Xem tất cả
+                    <i class="fa-solid fa-angle-right ms-1"></i>
+                </a>
+            </div>
+
+            <div class="home-panel">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Mã</th>
+                                <th>Tên đề tài</th>
+                                <th>Lĩnh vực</th>
+                                <th>Năm học</th>
+                                <th>Học kỳ</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.DeTaiMoiNhat.Any())
+                            {
+                                @foreach (var item in Model.DeTaiMoiNhat)
+                                {
+                                    <tr>
+                                        <td>@item.MaDeTai</td>
+
+                                        <td>
+                                            <a asp-controller="DeTai"
+                                               asp-action="Details"
+                                               asp-route-id="@item.MaDeTai">
+                                                @item.TenDeTai
+                                            </a>
+                                        </td>
+
+                                        <td>@item.TenLinhVuc</td>
+                                        <td>@item.NamHoc</td>
+                                        <td>HK @item.HocKy</td>
+
+                                        <td>
+                                            <span class="status @(item.TrangThai == "Mở đăng ký" ? "open" : item.TrangThai == "Tạm khóa" ? "closed" : "")">
+                                                @item.TrangThai
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6"
+                                        class="text-center text-muted py-4">
+                                        Chưa có đề tài trong hệ thống.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
     </div>
-    <div class="dashboard-grid mt-4">
-        <div class="page-card"><div class="page-card-header"><h4>Chức năng Module 1</h4></div><div class="page-card-body"><div class="quick-actions"><a asp-controller="TaiKhoan" asp-action="Index" class="quick-action"><strong>Quản lý tài khoản</strong><span>Thêm, sửa, chi tiết, khóa/mở khóa</span></a><a asp-controller="LinhVuc" asp-action="Index" class="quick-action"><strong>Quản lý lĩnh vực</strong><span>CRUD, validation, trạng thái</span></a></div></div></div>
-        <div class="page-card"><div class="page-card-header"><h4>Trạng thái tích hợp</h4></div><div class="page-card-body"><div class="integration-item"><span class="integration-dot pending"></span><div><strong>Module 2</strong><p>Chờ GiangVien/DeTai để hoàn thiện ràng buộc xóa lĩnh vực.</p></div></div><div class="integration-item"><span class="integration-dot pending"></span><div><strong>Module 3/4</strong><p>Chờ SinhVien/DangKy/PhanCong để áp dụng kiểm soát dữ liệu cá nhân.</p></div></div></div></div>
-    </div>
-}
-else
-{
-    <div class="student-hero"><div><span class="eyebrow">SINH VIÊN</span><h2>Xin chào, @hoTen!</h2><p>Đăng nhập và phân quyền của Module 1 đang hoạt động. Chức năng tra cứu/đăng ký sẽ được nối từ Module 2 và 3.</p></div><div class="student-hero-icon">🎓</div></div>
-    <div class="page-card mt-4"><div class="page-card-header"><h4>Quyền hiện tại</h4></div><div class="page-card-body"><p>✓ Có thể đăng nhập/đăng xuất bằng Session.</p><p>✓ Không thể truy cập URL quản trị của Admin.</p><p class="mb-0">⏳ Dữ liệu đăng ký/phân công cá nhân sẽ được xác định từ tài khoản sau khi ghép Module 3/4.</p></div></div>
-}
+</div>
+
+<!-- DỮ LIỆU BIỂU ĐỒ -->
+<script type="application/json" id="homeLinhVucLabels">
+@Html.Raw(JsonSerializer.Serialize(linhVucLabels))
+</script>
+
+<script type="application/json" id="homeLinhVucValues">
+@Html.Raw(JsonSerializer.Serialize(linhVucValues))
+</script>
+
+<script type="application/json" id="homeNamHocLabels">
+@Html.Raw(JsonSerializer.Serialize(namHocLabels))
+</script>
+
+<script type="application/json" id="homeNamHocValues">
+@Html.Raw(JsonSerializer.Serialize(namHocValues))
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        if (typeof Chart === "undefined") {
+            return;
+        }
+
+        function getJson(id) {
+            const element = document.getElementById(id);
+            return element ? JSON.parse(element.textContent) : [];
+        }
+
+        const linhVucCanvas =
+            document.getElementById("homeLinhVucChart");
+
+        if (linhVucCanvas) {
+            new Chart(linhVucCanvas, {
+                type: "doughnut",
+                data: {
+                    labels: getJson("homeLinhVucLabels"),
+                    datasets: [{
+                        data: getJson("homeLinhVucValues"),
+                        backgroundColor: [
+                            "#315e82",
+                            "#267568",
+                            "#a36b38",
+                            "#735b87",
+                            "#7194a3",
+                            "#9c7770",
+                            "#7c8c65"
+                        ],
+                        borderWidth: 2,
+                        borderColor: "#ffffff"
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+                            labels: {
+                                color: "#52677d",
+                                boxWidth: 12
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        const namHocCanvas =
+            document.getElementById("homeNamHocChart");
+
+        if (namHocCanvas) {
+            new Chart(namHocCanvas, {
+                type: "bar",
+                data: {
+                    labels: getJson("homeNamHocLabels"),
+                    datasets: [{
+                        label: "Số đăng ký",
+                        data: getJson("homeNamHocValues"),
+                        backgroundColor: "#527b79",
+                        borderRadius: 6,
+                        maxBarThickness: 55
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>

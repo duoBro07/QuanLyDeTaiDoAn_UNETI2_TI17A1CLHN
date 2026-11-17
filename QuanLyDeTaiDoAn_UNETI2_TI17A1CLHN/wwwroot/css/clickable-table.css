@@ -1,0 +1,31 @@
+﻿
+.clickable-row {
+    cursor: pointer;
+    transition: background-color .15s ease;
+}
+
+    .clickable-row:hover > td {
+        background-color: #eef5ff !important;
+    }
+
+    .clickable-row:focus-visible {
+        outline: 2px solid #2563eb;
+        outline-offset: -2px;
+    }
+
+.row-actions {
+    cursor: default;
+}
+
+    .row-actions .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 3px;
+        vertical-align: middle;
+    }
+
+        .row-actions .action-btn:focus-visible {
+            outline: 2px solid #2563eb;
+            outline-offset: 2px;
+        }

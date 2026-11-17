@@ -1,0 +1,158 @@
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.SinhVien
+
+@{
+    ViewData["Title"] = "Thay đổi trạng thái sinh viên";
+
+    string hanhDong = Model.TrangThai
+        ? "Tạm ngừng"
+        : "Kích hoạt";
+}
+
+<div class="content-card">
+    <div class="p-3 p-lg-4">
+
+        <div class="mb-4">
+            <h2 class="page-title mb-1">
+                <i class="fa-solid fa-user-lock me-2"></i>
+                Thay đổi trạng thái sinh viên
+            </h2>
+
+            <p class="page-description mb-0">
+                Xác nhận khóa hoặc mở khóa hồ sơ sinh viên
+            </p>
+        </div>
+
+        <div class="uneti-delete-warning">
+            <div class="fw-bold mb-2">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                Xác nhận thay đổi trạng thái
+            </div>
+
+            Bạn có chắc muốn <strong>@hanhDong.ToLower()</strong>
+            hồ sơ sinh viên <strong>@Model.HoTen</strong>?
+        </div>
+
+        <div class="alert alert-info">
+            <i class="fa-solid fa-circle-info me-2"></i>
+            Hệ thống chỉ thay đổi trạng thái hồ sơ,
+            không xóa dữ liệu sinh viên.
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Mã sinh viên</div>
+            <div class="uneti-details-value">@Model.MaSinhVien</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Họ và tên</div>
+            <div class="uneti-details-value fw-semibold">@Model.HoTen</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Lớp</div>
+            <div class="uneti-details-value">@Model.Lop</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Khoa</div>
+            <div class="uneti-details-value">@Model.Khoa</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Email</div>
+            <div class="uneti-details-value">@Model.Email</div>
+        </div>
+
+        <div class="uneti-details-row">
+            <div class="uneti-details-label">Trạng thái hiện tại</div>
+            <div class="uneti-details-value">
+                @(Model.TrangThai ? "Hoạt động" : "Tạm ngừng")
+            </div>
+        </div>
+
+        <form asp-controller="SinhVien"
+              asp-action="DoiTrangThai"
+              method="post"
+              id="formDoiTrangThai">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden"
+                   name="id"
+                   value="@Model.MaSinhVien" />
+
+            <div class="uneti-delete-actions justify-content-end">
+                <a asp-controller="SinhVien"
+                   asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Quay lại
+                </a>
+
+                <button type="button"
+                        class="btn @(Model.TrangThai ? "btn-danger" : "btn-main")"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalXacNhan">
+                    <i class="fa-solid @(Model.TrangThai ? "fa-lock" : "fa-lock-open")"></i>
+                    @hanhDong hồ sơ
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade"
+     id="modalXacNhan"
+     tabindex="-1"
+     aria-labelledby="tieuDeXacNhan"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tieuDeXacNhan">
+                    Xác nhận @hanhDong.ToLower()
+                </h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Đóng"></button>
+            </div>
+
+            <div class="modal-body">
+                Bạn có chắc muốn @hanhDong.ToLower()
+                hồ sơ <strong>@Model.HoTen</strong>?
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                    Hủy
+                </button>
+
+                <button type="button"
+                        id="btnXacNhan"
+                        class="btn @(Model.TrangThai ? "btn-danger" : "btn-main")">
+                    <i class="fa-solid fa-check"></i>
+                    Xác nhận
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const btn = document.getElementById("btnXacNhan");
+            const form = document.getElementById("formDoiTrangThai");
+
+            if (!btn || !form) return;
+
+            btn.addEventListener("click", function () {
+                btn.disabled = true;
+                form.requestSubmit();
+            });
+        });
+    </script>
+}

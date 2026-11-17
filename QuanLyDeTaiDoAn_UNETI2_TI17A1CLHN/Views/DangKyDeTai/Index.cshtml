@@ -1,0 +1,363 @@
+
+@model IEnumerable<QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.DangKyDeTai>
+
+@{
+    ViewData["Title"] = "Đăng ký của tôi";
+    ViewData["UnifiedIndex"] = true;
+
+    var danhSach = Model?.ToList()
+        ?? new List<QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Models.DangKyDeTai>();
+
+    int tong = danhSach.Count;
+    int choDuyet = danhSach.Count(x => x.TrangThai == "Chờ duyệt");
+    int daDuyet = danhSach.Count(x => x.TrangThai == "Đã duyệt");
+    int tuChoi = danhSach.Count(x => x.TrangThai == "Từ chối");
+}
+
+<div class="content-card">
+
+    <div class="p-3 p-lg-4">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="page-title mb-1">
+                    <i class="fa-solid fa-clipboard-list me-2"></i>
+                    Đăng ký của tôi
+                </h2>
+
+                <p class="page-description mb-0">
+                    Theo dõi tình trạng xét duyệt và quản lý các đề tài đã đăng ký
+                </p>
+            </div>
+
+            <a asp-controller="CongSinhVien"
+               asp-action="DeTai"
+               asp-route-dangKy="true"
+               class="btn btn-main">
+                <i class="fa-solid fa-plus me-1"></i>
+                Đăng ký đề tài
+            </a>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check me-2"></i>
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                @TempData["Error"]
+            </div>
+        }
+
+        <!-- THONG KE -->
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-3 col-6">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-2">
+                            Tổng đăng ký
+                        </div>
+                        <div class="fs-3 fw-bold text-primary">
+                            @tong
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-2">
+                            Chờ duyệt
+                        </div>
+                        <div class="fs-3 fw-bold text-warning">
+                            @choDuyet
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-2">
+                            Đã duyệt
+                        </div>
+                        <div class="fs-3 fw-bold text-success">
+                            @daDuyet
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="uneti-card h-100">
+                    <div class="uneti-card-body">
+                        <div class="text-muted small mb-2">
+                            Từ chối
+                        </div>
+                        <div class="fs-3 fw-bold text-danger">
+                            @tuChoi
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <h5 class="fw-bold mb-0" style="color:#17477e">
+            <i class="fa-solid fa-list me-2"></i>
+            Danh sách đăng ký (@tong)
+        </h5>
+    </div>
+
+    <!-- BANG DANG KY -->
+    <div class="table-responsive">
+
+        <table class="table uneti-table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th class="ps-3">STT</th>
+                    <th>Mã ĐK</th>
+                    <th>Tên đề tài</th>
+                    <th>Lĩnh vực</th>
+                    <th>Năm học / Học kỳ</th>
+                    <th>Ngày đăng ký</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th>Ghi chú duyệt</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (danhSach.Any())
+                {
+                    int stt = 0;
+
+                    foreach (var item in danhSach)
+                    {
+                        stt++;
+
+                        string lopTrangThai = item.TrangThai switch
+                        {
+                            "Đã duyệt" => "uneti-status-success",
+                            "Chờ duyệt" => "uneti-status-warning",
+                            "Từ chối" => "uneti-status-danger",
+                            _ => "uneti-status-info"
+                        };
+
+                        <tr>
+                            <td class="ps-3">@stt</td>
+
+                            <td>@item.MaDangKy</td>
+
+                            <td class="fw-semibold">
+                                @(item.DeTai?.TenDeTai ?? "Không có thông tin")
+                            </td>
+
+                            <td>
+                                @(item.DeTai?.LinhVuc?.TenLinhVuc ?? "—")
+                            </td>
+
+                            <td>
+                                @if (item.DeTai != null)
+                                {
+                                    <span>
+                                        @item.DeTai.NamHoc / HK @item.DeTai.HocKy
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>—</span>
+                                }
+                            </td>
+
+                            <td>
+                                @item.NgayDangKy.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+
+                            <td class="text-center">
+                                <span class="uneti-status @lopTrangThai">
+                                    @item.TrangThai
+                                </span>
+                            </td>
+
+                            <td>
+                                @(string.IsNullOrWhiteSpace(item.GhiChuDuyet)
+                                    ? "—"
+                                    : item.GhiChuDuyet)
+                            </td>
+
+                            <td class="text-center">
+                                <div class="uneti-actions">
+
+                                    <!-- XEM CHI TIET DE TAI -->
+                                    @if (item.DeTai != null)
+                                    {
+                                        <a asp-controller="CongSinhVien"
+                                           asp-action="Details"
+                                           asp-route-id="@item.MaDeTai"
+                                           class="btn btn-outline-primary btn-sm"
+                                           title="Xem chi tiết đề tài">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                    }
+
+                                    <!-- HUY DANG KY -->
+                                    @if (item.TrangThai == "Chờ duyệt")
+                                    {
+                                        <button type="button"
+                                                class="btn btn-outline-danger btn-sm"
+                                                title="Hủy đăng ký"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalHuyDangKy"
+                                                data-id="@item.MaDangKy"
+                                                data-name="@(item.DeTai?.TenDeTai ?? "Đề tài")">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    }
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9"
+                            class="text-center py-5 text-muted">
+
+                            <i class="fa-solid fa-inbox fa-2x d-block mb-3"></i>
+
+                            Bạn chưa đăng ký đề tài nào.
+
+                            <div class="mt-3">
+                                <a asp-controller="CongSinhVien"
+                                   asp-action="DeTai"
+                                   asp-route-dangKy="true"
+                                   class="btn btn-main">
+                                    <i class="fa-solid fa-plus me-1"></i>
+                                    Xem đề tài đang mở
+                                </a>
+                            </div>
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="p-3 border-top text-muted small">
+        Hiển thị <strong>@tong</strong> đăng ký của bạn.
+        Chỉ các đăng ký đang chờ duyệt mới có thể hủy.
+    </div>
+</div>
+
+<!-- MODAL XAC NHAN HUY DANG KY -->
+<div class="modal fade"
+     id="modalHuyDangKy"
+     tabindex="-1"
+     aria-labelledby="tieuDeHuyDangKy"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="tieuDeHuyDangKy">
+                    <i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>
+                    Xác nhận hủy đăng ký
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Đóng">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                Bạn có chắc chắn muốn hủy đăng ký đề tài:
+
+                <strong id="tenDeTaiHuy"></strong>?
+
+                <p class="text-muted small mt-2 mb-0">
+                    Đăng ký sẽ chuyển sang trạng thái Đã hủy,
+                    không bị xóa khỏi lịch sử.
+                </p>
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                    Quay lại
+                </button>
+
+                <!-- DUNG LAI ACTION HUY CO SAN -->
+                <form asp-controller="DangKyDeTai"
+                      asp-action="Huy"
+                      method="post"
+                      id="formHuyDangKy"
+                      class="m-0">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="id"
+                           id="maDangKyHuy" />
+
+                    <button type="submit"
+                            id="btnXacNhanHuy"
+                            class="btn btn-danger">
+                        <i class="fa-solid fa-trash me-1"></i>
+                        Xác nhận hủy
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const modal = document.getElementById("modalHuyDangKy");
+            const form = document.getElementById("formHuyDangKy");
+            const btn = document.getElementById("btnXacNhanHuy");
+
+            if (!modal || !form || !btn) return;
+
+            modal.addEventListener("show.bs.modal", function (event) {
+
+                const trigger = event.relatedTarget;
+                if (!trigger) return;
+
+                document.getElementById("maDangKyHuy").value =
+                    trigger.getAttribute("data-id");
+
+                document.getElementById("tenDeTaiHuy").textContent =
+                    trigger.getAttribute("data-name");
+
+                btn.disabled = false;
+            });
+
+            form.addEventListener("submit", function () {
+                btn.disabled = true;
+            });
+
+        });
+    </script>
+}
