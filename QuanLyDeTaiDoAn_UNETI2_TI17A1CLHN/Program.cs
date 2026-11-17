@@ -1,23 +1,24 @@
+
 using Microsoft.EntityFrameworkCore;
 using QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// MVC
+// Đăng ký MVC
 builder.Services.AddControllersWithViews();
 
-// Kết nối SQL Server bằng ApplicationDbContext
+// Kết nối SQL Server
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
 
-// Session dùng cho đăng nhập / phân quyền
+// Session dùng cho đăng nhập và phân quyền
 builder.Services.AddSession();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Cấu hình pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -25,22 +26,17 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// Phục vụ CSS/JS trong wwwroot
 app.UseStaticFiles();
 
 app.UseRouting();
 
-// Bật Session
 app.UseSession();
-
 app.UseAuthorization();
 
-app.MapStaticAssets();
-
+// Route mặc định: mở trang đăng nhập Module 2
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=DangNhap}/{action=Index}/{id?}"
+);
 
 app.Run();
