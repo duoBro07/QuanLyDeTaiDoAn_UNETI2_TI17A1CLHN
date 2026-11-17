@@ -1,0 +1,132 @@
+﻿@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.ViewModels.LoginViewModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>Đăng nhập - Quản lý đề tài đồ án</title>
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+</head>
+
+<body class="login-page">
+
+<div class="login-container">
+
+    <section class="login-left">
+
+        <div class="login-brand-box">
+
+            <div class="login-school-icon">
+                🎓
+            </div>
+
+            <h1>
+                Hệ thống quản lý
+                <br />
+                đề tài đồ án
+            </h1>
+
+            <p>
+                Trường Đại học Kinh tế - Kỹ thuật Công nghiệp
+                <br />
+                UNETI
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <section class="login-right">
+
+        <div class="login-card">
+
+            <h2>Đăng nhập hệ thống</h2>
+
+            <p class="login-subtitle">
+                Vui lòng nhập thông tin tài khoản
+            </p>
+
+            <form asp-controller="TaiKhoan"
+                  asp-action="Login"
+                  method="post">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label asp-for="TenDangNhap"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="TenDangNhap"
+                           class="form-control"
+                           placeholder="Nhập tên đăng nhập" />
+
+                    <span asp-validation-for="TenDangNhap"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label asp-for="MatKhau"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="MatKhau"
+                           class="form-control"
+                           placeholder="Nhập mật khẩu" />
+
+                    <span asp-validation-for="MatKhau"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <button type="submit"
+                        class="login-submit">
+
+                    Đăng nhập
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+</body>
+</html>
