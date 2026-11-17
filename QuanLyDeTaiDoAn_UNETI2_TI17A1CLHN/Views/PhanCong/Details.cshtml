@@ -193,7 +193,7 @@
             <form asp-controller="PhanCong"
                   asp-action="CapNhatTienDo"
                   method="post"
-                  id="formCapNhatTienDo">
+                  id="formCapNhatTienDo" data-no-confirm="true">
 
                 @Html.AntiForgeryToken()
 
@@ -266,7 +266,7 @@
                 <form asp-controller="PhanCong"
                       asp-action="DoiGiangVien"
                       method="post"
-                      id="formDoiGiangVien">
+                      id="formDoiGiangVien" data-no-confirm="true">
 
                     @Html.AntiForgeryToken()
 

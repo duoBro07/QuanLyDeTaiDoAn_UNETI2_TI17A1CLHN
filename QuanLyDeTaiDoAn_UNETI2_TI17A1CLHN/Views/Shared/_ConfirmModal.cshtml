@@ -1,0 +1,59 @@
+﻿<div class="modal fade"
+     id="modalXacNhanChung"
+     tabindex="-1"
+     aria-labelledby="modalXacNhanChungLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content confirm-modal-content">
+
+            <div class="modal-header confirm-modal-header">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="confirm-modal-icon">
+                        <i class="fa-solid fa-circle-question"></i>
+                    </div>
+
+                    <h5 class="modal-title"
+                        id="modalXacNhanChungLabel">
+                        Xác nhận thao tác
+                    </h5>
+                </div>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Đóng">
+                </button>
+            </div>
+
+            <div class="modal-body confirm-modal-body">
+
+                <p id="noiDungXacNhanChung" class="mb-0">
+                    Bạn có chắc chắn muốn thực hiện thao tác này không?
+                </p>
+
+            </div>
+
+            <div class="modal-footer confirm-modal-footer">
+
+                <button type="button"
+                        class="btn btn-confirm-cancel"
+                        data-bs-dismiss="modal">
+                    <i class="fa-solid fa-xmark me-1"></i>
+                    Hủy
+                </button>
+
+                <button type="button"
+                        class="btn btn-confirm-accept"
+                        id="btnDongYXacNhanChung">
+
+                    <i class="fa-solid fa-check me-1"></i>
+                    Đồng ý
+
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>

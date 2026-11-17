@@ -70,6 +70,10 @@
           href="~/css/uneti-common.css"
           asp-append-version="true" />
 
+    <link rel="stylesheet"
+          href="~/css/confirm-modal.css"
+          asp-append-version="true" />
+
     <style>
             :root {
                 --uneti-navy: #142f50;
@@ -301,52 +305,6 @@
                 width: 100%;
             }
 
-            /* HOP THOAI DANG XUAT */
-
-            #xacNhanDangXuat .modal-content {
-                border: none;
-                border-radius: 14px;
-                overflow: hidden;
-                box-shadow: 0 14px 45px rgba(0,0,0,.16);
-            }
-
-            #xacNhanDangXuat .modal-header {
-                background: #f1f5fa;
-                border-bottom: 1px solid #e2e8f0;
-                padding: 17px 20px;
-            }
-
-            #xacNhanDangXuat .modal-title {
-                color: #1b4b7a;
-                font-size: 17px;
-                font-weight: 700;
-            }
-
-            #xacNhanDangXuat .modal-body {
-                padding: 22px 20px;
-                font-size: 14px;
-                color: #46576a;
-                line-height: 1.7;
-            }
-
-            #xacNhanDangXuat .modal-footer {
-                border-top: 1px solid #e2e8f0;
-                padding: 14px 20px;
-                gap: 8px;
-            }
-
-            #xacNhanDangXuat .btn {
-                font-size: 13px;
-                font-weight: 600;
-                border-radius: 8px;
-                padding: 9px 15px;
-            }
-
-            #xacNhanDangXuat .btn-primary {
-                background: #20558d;
-                border-color: #20558d;
-            }
-
             /* MOBILE */
 
             @@media (max-width: 991px) {
@@ -452,14 +410,18 @@
                     @hoTen
                 </div>
 
-                <button type="button"
-                        class="uneti-logout"
-                        data-bs-toggle="modal"
-                        data-bs-target="#xacNhanDangXuat">
+                <form asp-controller="DangNhap"
+                      asp-action="DangXuat"
+                      method="post"
+                      class="m-0">
 
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    Đăng xuất
-                </button>
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit" class="uneti-logout">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        Đăng xuất
+                    </button>
+                </form>
             }
             else
             {
@@ -660,69 +622,12 @@
         </div>
     </main>
 
-    <!-- HOP THOAI XAC NHAN DANG XUAT -->
-    @if (daDangNhap)
-    {
-        <div class="modal fade"
-             id="xacNhanDangXuat"
-             tabindex="-1"
-             aria-labelledby="tieuDeDangXuat"
-             aria-hidden="true">
-
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="tieuDeDangXuat">
-                            <i class="fa-solid fa-right-from-bracket me-2"></i>
-                            Xác nhận đăng xuất
-                        </h5>
-
-                        <button type="button"
-                                class="btn-close"
-                                data-bs-dismiss="modal"
-                                aria-label="Đóng">
-                        </button>
-                    </div>
-
-                    <div class="modal-body">
-                        Bạn có chắc chắn muốn đăng xuất khỏi
-                        hệ thống quản lý đề tài đồ án UNETI không?
-                    </div>
-
-                    <div class="modal-footer">
-
-                        <button type="button"
-                                class="btn btn-outline-secondary"
-                                data-bs-dismiss="modal">
-                            Hủy
-                        </button>
-
-                        <!-- DUNG LAI ACTION DANG XUAT -->
-                        <form asp-controller="DangNhap"
-                              asp-action="DangXuat"
-                              method="post"
-                              class="m-0">
-
-                            @Html.AntiForgeryToken()
-
-                            <button type="submit"
-                                    class="btn btn-primary">
-                                <i class="fa-solid fa-check me-1"></i>
-                                Đồng ý đăng xuất
-                            </button>
-
-                        </form>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
+    @await Html.PartialAsync("_ConfirmModal")
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/confirm-modal.js" asp-append-version="true"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {

@@ -1,4 +1,5 @@
-﻿@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers.TaiKhoanForm
+﻿
+@model QuanLyDeTaiDoAn_UNETI2_TI17A1CLHN.Controllers.TaiKhoanForm
 
 @{
     ViewData["Title"] = "Chỉnh sửa tài khoản";
@@ -22,17 +23,19 @@
               asp-action="Edit"
               asp-route-id="@Model.MaTaiKhoan"
               method="post"
-              id="formSuaTaiKhoan">
+              id="formSuaTaiKhoan"
+              data-no-confirm="true">
 
             @Html.AntiForgeryToken()
 
             <input asp-for="MaTaiKhoan" type="hidden" />
 
-            <div asp-validation-summary="ModelOnly"
+            <div asp-validation-summary="All"
                  class="text-danger mb-3"></div>
 
             <div class="row g-3">
 
+                <!-- Mã tài khoản -->
                 <div class="col-md-4">
                     <label class="form-label">Mã tài khoản</label>
                     <input class="form-control"
@@ -40,6 +43,7 @@
                            readonly />
                 </div>
 
+                <!-- Tên đăng nhập -->
                 <div class="col-md-8">
                     <label asp-for="TenDangNhap" class="form-label">
                         Tên đăng nhập
@@ -54,6 +58,7 @@
                           class="text-danger"></span>
                 </div>
 
+                <!-- Họ tên -->
                 <div class="col-md-6">
                     <label asp-for="HoTen" class="form-label">
                         Họ và tên
@@ -67,6 +72,7 @@
                           class="text-danger"></span>
                 </div>
 
+                <!-- Email -->
                 <div class="col-md-6">
                     <label asp-for="Email" class="form-label">
                         Email
@@ -80,6 +86,7 @@
                           class="text-danger"></span>
                 </div>
 
+                <!-- Vai trò -->
                 <div class="col-md-6">
                     <label asp-for="VaiTro" class="form-label">
                         Vai trò
@@ -95,6 +102,7 @@
                           class="text-danger"></span>
                 </div>
 
+                <!-- Mật khẩu -->
                 <div class="col-md-6">
                     <label asp-for="MatKhau" class="form-label">
                         Mật khẩu mới
@@ -122,10 +130,11 @@
                           class="text-danger"></span>
 
                     <small class="text-muted">
-                        Chỉ nhập nếu muốn đặt mật khẩu mới.
+                        Chỉ nhập nếu muốn thay đổi mật khẩu.
                     </small>
                 </div>
 
+                <!-- Trạng thái -->
                 <div class="col-12">
                     <label class="form-label d-block">
                         Trạng thái
@@ -165,19 +174,20 @@
 
             <hr class="my-4" />
 
+            <!-- Nút chức năng -->
             <div class="d-flex justify-content-end gap-2 flex-wrap">
 
                 <a asp-controller="TaiKhoan"
                    asp-action="Index"
                    class="btn btn-outline-secondary">
-                    <i class="fa-solid fa-arrow-left"></i>
+                    <i class="fa-solid fa-arrow-left me-1"></i>
                     Quay lại
                 </a>
 
                 <button type="button"
                         id="btnMoSuaTaiKhoan"
                         class="btn btn-main">
-                    <i class="fa-solid fa-floppy-disk"></i>
+                    <i class="fa-solid fa-floppy-disk me-1"></i>
                     Cập nhật tài khoản
                 </button>
 
@@ -188,7 +198,7 @@
     </div>
 </div>
 
-<!-- MODAL XAC NHAN -->
+<!-- BẢNG THÔNG BÁO XÁC NHẬN CẬP NHẬT -->
 
 <div class="modal fade"
      id="modalSuaTaiKhoan"
@@ -197,7 +207,6 @@
      aria-hidden="true">
 
     <div class="modal-dialog modal-dialog-centered">
-
         <div class="modal-content">
 
             <div class="modal-header">
@@ -209,12 +218,13 @@
                 <button type="button"
                         class="btn-close"
                         data-bs-dismiss="modal"
-                        aria-label="Đóng"></button>
+                        aria-label="Đóng">
+                </button>
             </div>
 
             <div class="modal-body">
-                Bạn có chắc chắn muốn cập nhật tài khoản
-                <strong>@Model.TenDangNhap</strong>?
+                Bạn có chắc chắn muốn cập nhật thông tin tài khoản
+                <strong>@Model.TenDangNhap</strong> không?
             </div>
 
             <div class="modal-footer">
@@ -228,7 +238,7 @@
                 <button type="button"
                         id="btnXacNhanSuaTaiKhoan"
                         class="btn btn-main">
-                    <i class="fa-solid fa-check"></i>
+                    <i class="fa-solid fa-check me-1"></i>
                     Xác nhận
                 </button>
 
@@ -239,53 +249,119 @@
 </div>
 
 @section Scripts {
+
     <partial name="_ValidationScriptsPartial" />
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
             const form = document.getElementById("formSuaTaiKhoan");
+
             const btnMo = document.getElementById("btnMoSuaTaiKhoan");
-            const btnXacNhan = document.getElementById("btnXacNhanSuaTaiKhoan");
-            const modalElement = document.getElementById("modalSuaTaiKhoan");
+
+            const btnXacNhan = document.getElementById(
+                "btnXacNhanSuaTaiKhoan"
+            );
+
+            const modalElement = document.getElementById(
+                "modalSuaTaiKhoan"
+            );
 
             const inputMatKhau = document.getElementById("MatKhau");
-            const btnHienMatKhau = document.getElementById("btnHienMatKhau");
 
-            if (inputMatKhau && btnHienMatKhau) {
-                btnHienMatKhau.addEventListener("click", function () {
-
-                    const hien = inputMatKhau.type === "password";
-                    inputMatKhau.type = hien ? "text" : "password";
-
-                    btnHienMatKhau.querySelector("i").className =
-                        hien ? "fa-solid fa-eye-slash" : "fa-solid fa-eye";
-
-                });
-            }
+            const btnHienMatKhau = document.getElementById(
+                "btnHienMatKhau"
+            );
 
             if (!form || !btnMo || !btnXacNhan || !modalElement) {
                 return;
             }
 
+            const modal = bootstrap.Modal.getOrCreateInstance(
+                modalElement
+            );
+
+            let dangGui = false;
+
+            // HIỆN / ẨN MẬT KHẨU
+            if (inputMatKhau && btnHienMatKhau) {
+
+                btnHienMatKhau.addEventListener("click", function () {
+
+                    const hien = inputMatKhau.type === "password";
+
+                    inputMatKhau.type = hien ? "text" : "password";
+
+                    btnHienMatKhau.querySelector("i").className =
+                        hien
+                            ? "fa-solid fa-eye-slash"
+                            : "fa-solid fa-eye";
+
+                });
+            }
+
+            // MỞ BẢNG XÁC NHẬN
             btnMo.addEventListener("click", function () {
 
                 if (window.jQuery &&
                     typeof window.jQuery.fn.valid === "function") {
 
-                    if (!window.jQuery(form).valid()) return;
+                    if (!window.jQuery(form).valid()) {
+                        return;
+                    }
 
                 } else if (!form.reportValidity()) {
+
                     return;
                 }
 
-                bootstrap.Modal.getOrCreateInstance(modalElement).show();
-
+                modal.show();
             });
 
+            // XÁC NHẬN CẬP NHẬT
             btnXacNhan.addEventListener("click", function () {
+
+                if (dangGui) {
+                    return;
+                }
+
+                // Kiểm tra dữ liệu lần cuối.
+                if (window.jQuery &&
+                    typeof window.jQuery.fn.valid === "function") {
+
+                    if (!window.jQuery(form).valid()) {
+                        modal.hide();
+                        return;
+                    }
+
+                } else if (!form.reportValidity()) {
+
+                    modal.hide();
+                    return;
+                }
+
+                dangGui = true;
+
                 btnXacNhan.disabled = true;
+
+                btnXacNhan.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin me-1"></i> Đang cập nhật...';
+
+                // Đóng bảng xác nhận và gửi form.
+                modal.hide();
+
                 form.requestSubmit();
+            });
+
+            // Khôi phục nút nếu người dùng đóng modal mà chưa xác nhận.
+            modalElement.addEventListener("hidden.bs.modal", function () {
+
+                if (!dangGui) {
+                    btnXacNhan.disabled = false;
+
+                    btnXacNhan.innerHTML =
+                        '<i class="fa-solid fa-check me-1"></i> Xác nhận';
+                }
             });
 
         });
